@@ -5,6 +5,7 @@ SECRET_KEY='SECRET'
 SALT='123456789passwordsalt'
 
 app = Flask(__name__)
+app.debug=True
 
 @app.route('/')
 def main_page():
