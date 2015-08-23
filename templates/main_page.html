@@ -1,6 +1,54 @@
 {% extends "base.html" %}
 {% block content %}
 
+<style>
+
+.twitter-typeahead { width: 100%; } 
+.tt-hint { width: 100%; } 
+.tt-input{ width: 100%; } 
+.tt-dropdown-menu { width: 100%; } 
+
+.tt-query {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+  color: #999
+}
+
+.tt-menu {    // used to be tt-dropdown-menu in older versions
+  width: 422px;
+  margin-top: 4px;
+  padding: 4px 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+  padding: 3px 20px;
+  line-height: 24px;
+}
+
+.tt-suggestion.tt-cursor {
+  color: #fff;
+  background-color: #0097cf;
+
+}
+
+.tt-suggestion p {
+  margin: 0;
+}
+</style>
+
       <!-- Jumbotron -->
      <center>
       <div class="jumbotron" style="background-color:white">
@@ -13,9 +61,10 @@
       
       <div class="input-group input-group-md">
   
-  <input type="text" class="form-control" placeholder="Search for a teacher eg. Physics" aria-describedby="sizing-addon1">
+  <input id="search" type="text" class="form-control col-lg-12 col-md-12" placeholder="Search for a teacher eg. Physics" aria-describedby="sizing-addon1"
+  onkeydown="if (event.keyCode==13) { search();}">
    <span class="input-group-btn">
-        <button class="btn btn-primary" type="button">Search</button>
+        <button class="btn btn-primary" type="button" onclick="search()" style="position:relative;top:-2px;">Search</button>
       </span>
 </div>
           
@@ -29,8 +78,61 @@
   
       </center>
 
-      
+<script>     
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
 
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  }
+});
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+        window.location='search?subject='+name.value.trim();
+    }
+
+</script>
       <!-- Example row of columns -->
      
 {% endblock %}
