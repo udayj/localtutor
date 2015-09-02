@@ -2,40 +2,69 @@
 {% block content %}
 
       <!-- Jumbotron -->
+        <div class="row">
+      <div class="col-lg-8 col-md-8 ">
+      
+      <div class="input-group input-group-md">
+  
+  <input id="search" type="text" class="form-control col-lg-12 col-md-12" placeholder="{{query}}" aria-describedby="sizing-addon1"
+  onkeydown="if (event.keyCode==13) { search();}">
+   <span class="input-group-btn">
+        <button class="btn btn-primary" type="button" onclick="search()" style="position:relative;top:-2px;">Search</button>
+      </span>
+</div>
+          
+        </div>
+      </div>
+
       <div class="row">
       <div class="col-lg-12 col-md-12">
-        <h2>Search results for teachers teaching {{query.title()}}</h2>
+        <h2>Search results for {{query.title()}} teachers</h2>
       </div>
     </div>
     <hr>
    <div class="row">
       <div class="col-lg-12 col-md-12">
         
-        <table class="table table-striped table-hover ">
-  <thead>
-    <tr>
-      
-      <th><center>Name</center></th>
-      <th><center>Location</center></th>
-      <th><center>Contact No.</center></th>
-      <th><center>Email</center></th>
-      <th><center>Classroom Type</center></th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for result in results %}
+   
+{% for result in results|batch(2) %}
+<div class="row clearfix">
 
-            <tr>
-              <td><center>{{result['name'].title()}}</center></td>
-              <td><center>{{result['geographical_location'].title()}}</center></td>
-              <td><center>{{result['contact_number'].title()}}</center></td>
-              <td><center>{{result['email'].title()}}</center></td>
-              <td><center>{{result['classroom_type'].title()}}</center></td>
-            
-              {% endfor %}
+  {% for item in result %}
+              <div class="col-lg-6 col-md-6 col-sm-12">
     
-  </tbody>
-</table> 
+
+            
+                <div class="row clearfix result">
+                  <div class="col-lg-5 col-md-5 col-sm-5">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                      <b>{{item['name'].title()}}</b>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 text-muted">
+                      Teaches {{item['classroom_type'].title()}}
+                    </div>
+                  </div>
+                  <div class="col-lg-7 col-md-7 col-sm-7">
+
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                      <span class="glyphicon glyphicon-phone" aria-hidden="true"></span> {{item['contact_number']|join(',')}}
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                      <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> {{item['email'].title()}}
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                      <span class="glyphicon glyphicon-map-marker" style="color:#2780e3" aria-hidden="true"></span> {{item['geographical_location'].title()}}
+                    </div>
+                  </div>
+                </div>
+            
+ 
+         </div>
+         {% endfor %}
+
+</div> 
+<br>
+              {% endfor %}
               </div>  
             </div>
 
@@ -43,7 +72,69 @@
       
 
       <!-- Example row of columns -->
-     
+<script>
+$('.result').hover(function(){
+  $(this).css('background-color','#eee');
+},function(){
+  $(this).css('background-color','white');
+});
+</script>   
+
+<script>     
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  }
+});
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+        window.location='search?subject='+name.value.trim();
+    }
+
+</script>  
 {% endblock %}
 
 
