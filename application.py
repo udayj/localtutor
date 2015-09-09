@@ -2,6 +2,9 @@ from flask import Flask, request, render_template, Response, redirect, url_for,f
 from pymongo import MongoClient
 import re
 import json
+from datetime import datetime
+import codecs
+import os
 
 SECRET_KEY='SECRET'
 
@@ -11,6 +14,42 @@ SALT='123456789passwordsalt'
 app = Flask(__name__)
 app.debug=True
 
+def content_entry(file_name,db_name):
+	f=codecs.open(file_name,'r','utf-8')
+	client=MongoClient()
+	db=client[db_name]
+	count=0
+	try:
+		while True:
+			teacher=f.readline()
+			if not teacher:
+				break
+			teacher_parts=teacher.split('\t')
+			if len(teacher_parts)<11:
+				continue
+			teacher_structured={}
+			fields=['subject','name','contact_number','email','age_group','venue',
+			'classroom_type','geographical_location','usp','teacher_type','price']
+			counter=0
+			count=count+1
+			for field in fields:
+				if counter==0:
+					parts=teacher_parts[counter].lower().strip().split(',')
+
+					teacher_structured[field]=[part.lower().strip() for part in parts]
+				elif counter==2:
+					parts=teacher_parts[counter].lower().strip().split(',')
+					teacher_structured[field]=[part.lower().strip() for part in parts]
+				else:	
+					teacher_structured[field]=teacher_parts[counter].lower().strip()
+				counter=counter+1
+			
+			db.teachers.save(teacher_structured)
+	except Exception:
+		return -100
+	
+	return count
+
 
 @app.route('/')
 def main_page():
@@ -19,6 +58,53 @@ def main_page():
 
 def rewrite_query(query):
 	return query
+
+@app.route('/upload')
+def upload():
+	return render_template('upload.html')
+
+@app.route('/upload_staging',methods=['POST'])
+def upload_staging():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+
+	if 'password' not in data:
+		js=json.dumps({'result':'failed','message':'Cannot authenticate'})
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	if data['password']!='uploadtutorack':
+		js=json.dumps({'result':'failed','message':'Cannot authenticate'})
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+
+	attachment=request.files['attachment']
+	#save file -> call routine with that file name for staging db -> if no error -> call routine with that file name for prod db
+	#return stats based on error/success
+	app.logger.debug(attachment.filename)
+	attachment_name='attachment_'+attachment.filename+str(datetime.now().time())
+	attachment.save(os.path.join('data',attachment_name))
+	ret=content_entry(os.path.join('data',attachment_name),'localtutor')
+	response={}
+	if ret>=0:
+		ret=content_entry(os.path.join('data',attachment_name),'local_tutor')
+		if ret>=0:
+			response['result']='success'
+			response['message']='Data uploaded into the database - '+str(ret)+' rows uploaded'
+			
+		else:
+			print "problem with data entry in production database"
+			response['result']='failed'
+			response['message']='Data could not be uploaded - database might be in an inconsistent state'
+	else:
+		response['result']='failed'
+		response['message']='No data uploaded'
+
+	print response
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
 
 @app.route('/subjects')
 def subjects():

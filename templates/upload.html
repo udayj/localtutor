@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+
+      <!-- Jumbotron -->
+       
+
+      
+    <hr>
+<div class="row">
+      <div class="col-lg-6 col-md-6">    
+<h2>Submit a file for uploading content into the database</h2>
+<hr>
+    <form id="form">
+  
+  <div class="form-group">
+    <label for="attachment">File to Upload</label>
+    <input type="file" id="attachment">
+    <p class="help-block">Choose a tab separated CSV file from system</p>
+  </div>
+
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" class="form-control" id="password" placeholder="Password">
+  </div>
+  
+  
+  <button type="submit" class="btn btn-default" id="submit">Submit</button>
+</form>
+</div>  
+           
+      <div class="col-lg-6 col-md-6">  
+        <center><h2>Status</h2></center>
+        <br>
+        <div id="status">
+        </div>
+      </div>
+    </div>
+
+   
+
+    
+      
+
+      <!-- Example row of columns -->
+<script>
+$('.result').hover(function(){
+  $(this).css('background-color','#eee');
+},function(){
+  $(this).css('background-color','white');
+});
+</script>   
+
+<script>    
+
+$('#form').submit(function(event){
+
+event.preventDefault();
+
+var data = new FormData();
+data.append('password',$('#password').val());
+data.append('attachment',$('#attachment')[0].files[0]);
+$('#submit').prop('disabled',true);
+
+jQuery.ajax({
+    url: '/upload_staging',
+    data: data,
+    cache: false,
+    contentType: false,
+    processData: false,
+    type: 'POST',
+    success: function(data){
+
+        if(data['result']=='success')
+        {
+          $('#status').html(data['result']+'<br>'+data['message']);
+          $('#status').addClass('alert');
+          $('#status').removeClass('alert-warning');
+          $('#status').addClass('alert-success');
+
+        }
+        else
+        {
+          $('#status').html(data['result']+'<br>'+data['message']);
+          $('#status').addClass('alert');
+          $('#status').removeClass('alert-success'); 
+          $('#status').addClass('alert-warning'); 
+
+          $('#submit').prop('disabled',false);
+        }
+    }
+});
+return false;
+
+});
+
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  }
+});
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+        window.location='search?subject='+name.value.trim();
+    }
+
+</script>  
+{% endblock %}
+
+
+
