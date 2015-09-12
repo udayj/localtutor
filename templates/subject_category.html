@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block content %}
+
+      <!-- Jumbotron -->
+        
+
+     <div class="row">
+      <div class="col-lg-8 col-md-8">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <td>
+                <b>Subject Name</b>
+              </td>
+              <td>
+                <b>Category</b>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subject in subjects %}
+            <tr>
+              <td id="name_{{subject['_id']}}">
+                {{subject['name'].title()}}
+              </td>
+              <td>
+                <input id="category_{{subject['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{subject['category'].title()}}">
+              </td>
+              <td>
+                <button class="btn btn-default" type="submit" id="save_{{subject['_id']}}" onclick="save_category(this.id)">Save</button>
+              </td>
+              <td id="status_{{subject['_id']}}">
+                
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <hr>
+
+
+    
+      
+
+      <!-- Example row of columns -->
+<script>
+
+function save_category(id)
+{
+  new_id=id.substr(5);
+  subject=$('#'+'name_'+new_id).text();
+  category=$('#'+'category_'+new_id).val();
+  var data={}
+  data['subject']=subject;
+  data['category']=category;
+  jQuery.ajax({
+    url: '/save_category',
+    data: data,
+    type: 'POST',
+    success: function(data){
+
+        if(data['result']=='success')
+        {
+          $('#status_'+new_id).html('Successfully updated category');
+          
+
+        }
+        else
+        {
+          $('#status_'+new_id).html('Could not update category');
+          
+
+          
+        }
+    }
+});
+
+}
+
+
+$('.result').hover(function(){
+  $(this).css('background-color','#eee');
+},function(){
+  $(this).css('background-color','white');
+});
+</script>   
+
+<script>     
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  }
+});
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+        window.location='search?subject='+name.value.trim();
+    }
+
+</script>  
+{% endblock %}
+
+
+

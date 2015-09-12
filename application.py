@@ -35,8 +35,13 @@ def content_entry(file_name,db_name):
 			for field in fields:
 				if counter==0:
 					parts=teacher_parts[counter].lower().strip().split(',')
+					subjects=[part.lower().strip() for part in parts]
+					teacher_structured[field]=subjects
+					for subject in subjects:
+						prior_subject_count=db.subjects.find({'name':subject}).count()
+						if prior_subject_count<=0:
+							db.subjects.save({'name':subject,'category':''})
 
-					teacher_structured[field]=[part.lower().strip() for part in parts]
 				elif counter==2:
 					parts=teacher_parts[counter].lower().strip().split(',')
 					teacher_structured[field]=[part.lower().strip() for part in parts]
@@ -57,7 +62,20 @@ def main_page():
 
 
 def rewrite_query(query):
-	return query
+	client=MongoClient()
+	db=client.local_tutor
+	category_count=db.subjects.find({'category':query}).count()
+	if category_count<=0:
+		return [query]
+	subjects=db.subjects.find({'category':query})
+	output=[]
+	for subject in subjects:
+		output.append(subject['name'])
+	
+	subjects=db.subjects.find({'name':query})
+	for subject in subjects:
+		output.append(subject['name'])
+	return output
 
 @app.route('/upload')
 def upload():
@@ -110,6 +128,73 @@ def upload_staging():
 def subjects():
 	client=MongoClient()
 	db=client.local_tutor
+	subjects=db.subjects.find()
+	output=[]
+	for subject in subjects:
+		output.append(subject['name'])
+	output.sort()
+	category_wise={}
+	subjects=db.subjects.find()
+	for subject in subjects:
+		if len(subject['category'])>1:
+			if subject['category'] not in category_wise:
+				category_wise[subject['category']]=[]
+			category_wise[subject['category']].append(subject['name'])
+	print category_wise
+	return render_template('subjects.html',output=output,category_wise=category_wise)
+
+@app.route('/save_category',methods=['POST'])
+def save_category():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip().lower()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+
+	subject=db.subjects.find({'name':data['subject']})
+	try:
+
+		subject=subject.next()
+		subject['category']=data['category']
+		db.subjects.save(subject)
+	except StopIteration:
+		app.logger.error('problem saving subject category for '+data['subject'])
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp		
+
+	response={'result':'success'}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
+
+
+
+@app.route('/subject_category')
+def subject_category():
+
+	def sorter(subject):
+		return subject['name']
+	client=MongoClient()
+	db=client.local_tutor
+	subjects=db.subjects.find()
+	output=[]
+	for subject in subjects:
+		output.append(subject)
+	output.sort(key=sorter)
+	return render_template('subject_category.html',subjects=output)
+
+@app.route('/create_subjects')
+def create_subjects():
+	password=request.args.get('password')
+
+	if password!='createsubjectstutorack':
+		return render_template('error.html')
+
+	client=MongoClient()
+	db=client.local_tutor
 	teachers=db.teachers.find()
 	output=[]
 	output_unique=[]
@@ -122,7 +207,12 @@ def subjects():
 					output_unique.append(individual_match)
 	except StopIteration:
 		pass
-	return render_template('subjects.html',output=output)
+	output.sort()
+	for subject in output:
+		prior_subject_count=db.subjects.find({'name':subject}).count()
+		if prior_subject_count<=0:
+			db.subjects.save({'name':subject,'category':''})
+	return render_template('success_subject.html')
 
 @app.route('/about')
 def about():
@@ -136,8 +226,10 @@ def search():
 		return render_template('search_error.html')
 	client=MongoClient()
 	db=client.local_tutor
+
 	query_modified=rewrite_query(query)
-	teachers=db.teachers.find({'subject':{'$in':[query]}})
+	
+	teachers=db.teachers.find({'subject':{'$in':query_modified}})
 	results=[]
 	try:
 		for teacher in teachers:

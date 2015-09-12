@@ -131,7 +131,7 @@ function search()
         var name=document.getElementById("search");
         if(name==null || name.value.trim()=="")
           return;
-        window.location='search?subject='+name.value.trim();
+        window.location='search?subject='+encodeURIComponent(name.value.trim());
     }
 
 </script>  
