@@ -120,6 +120,10 @@ var subjects = new Bloodhound({
   remote: {
     url: '/options?subject=%QUERY',
     wildcard: '%QUERY'
+  },
+   prefetch : {
+    url: '/options?subject='
+   
   }
 });
 
@@ -141,6 +145,10 @@ function search()
           return;
         window.location='search?subject='+name.value.trim();
     }
+
+function custom_logic(login_status){
+  return;
+}
 
 </script>  
 {% endblock %}

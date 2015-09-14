@@ -22,6 +22,9 @@
         <h2>Search results for {{query.title()}} teachers</h2>
       </div>
     </div>
+    <div style="display:none;">
+      {{current_user.id}}
+    </div>
     <hr>
    <div class="row">
       <div class="col-lg-12 col-md-12">
@@ -38,11 +41,46 @@
                 <div class="row clearfix result">
                   <div class="col-lg-5 col-md-5 col-sm-5">
                     <div class="col-lg-12 col-md-12 col-sm-12">
-                      <b>{{item['name'].title()}}</b>
+                      <b class="tutors" id="{{item['_id']}}">{{item['name'].title()}}</b>
                     </div>
                     <div class="col-lg-12 col-md-12 col-sm-12 text-muted">
-                      Teaches {{item['classroom_type'].title()}}
+                      {% if item['venue'] is equalto 'both' %}
+                      Teaches at both students' home and center
+                      {% else %}
+                      Teaches at {{item['venue']}}
+                      {% endif %}
                     </div>
+                    {% if current_user.id %}
+                    <div class="col-lg-12 col-md-12 col-sm-12 text-muted associations">
+                      
+                      <button id="associate_{{item['_id']}}" type="button" class="btn btn-primary btn-sm" onclick="associate_tutor('{{item['_id']}}','{{current_user.fb_id}}')" 
+                      {% if item['_id'] not in student_tutor_assoc %}
+                      style="display:;"
+                      {% else %}
+                      style="display:none;"
+                      {% endif %}
+                      >I studied under this teacher</button>
+                      
+                      <span id="disassociate_{{item['_id']}}"
+                       {% if item['_id'] in student_tutor_assoc %}
+                      style="display:;"
+                      {% else %}
+                      style="display:none;"
+                      {% endif %}
+                     >
+                      
+
+                      
+                      You studied under this tutor 
+                      <button type="button" class="btn btn-warning btn-sm" onclick="disassociate_tutor('{{item['_id']}}','{{current_user.fb_id}}')">No</button>
+                    </span>
+                   
+                   
+                     </div>
+                    {% endif %}
+                     <div class="col-lg-12 col-md-12 col-sm-12 text-muted associations" style="display:none;color:#5cb85c" id="friend_{{item['_id']}}">
+
+                     </div>
                   </div>
                   <div class="col-lg-7 col-md-7 col-sm-7">
 
@@ -72,6 +110,10 @@
       
 
       <!-- Example row of columns -->
+{% endblock %}
+
+{% block javascript %}
+
 <script>
 $('.result').hover(function(){
   $(this).css('background-color','#eee');
@@ -112,6 +154,10 @@ var subjects = new Bloodhound({
   remote: {
     url: '/options?subject=%QUERY',
     wildcard: '%QUERY'
+  },
+   prefetch : {
+    url: '/options?subject='
+   
   }
 });
 
@@ -125,6 +171,47 @@ $('.input-group #search').typeahead({
   source: subjects
 });
 
+function associate_tutor(tutor_id,student_id){
+
+  data={};
+  data['tutor_id']=tutor_id;
+  data['student_id']=student_id;
+  jQuery.ajax({
+    url: '/associate_student_tutor',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      if(data['result']=='success')
+      {
+        $('#associate_'+tutor_id).css('display','none');
+        $('#disassociate_'+tutor_id).css('display','');
+      }
+    }
+
+});
+}
+
+function disassociate_tutor(tutor_id,student_id){
+
+  data={};
+  data['tutor_id']=tutor_id;
+  data['student_id']=student_id;
+  jQuery.ajax({
+    url: '/disassociate_student_tutor',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      if(data['result']=='success')
+      {
+        $('#disassociate_'+tutor_id).css('display','none');
+        $('#associate_'+tutor_id).css('display','');
+      }
+    }
+
+});
+}
 
 function search()
     {
@@ -133,6 +220,74 @@ function search()
           return;
         window.location='search?subject='+encodeURIComponent(name.value.trim());
     }
+
+
+function custom_logic(login_status)
+{
+  //alert(login_status);
+  utility(login_status);
+}
+
+function utility(login_status){
+
+  
+  if(login_status!='connected'){
+    $('.associations').each(function(){
+      $(this).css('display','none');
+    });
+  }
+  else{
+    friend_tutor();
+  }
+
+}
+
+
+function friend_tutor()
+{
+  //alert('friend_tutor');
+  var tutors=[]
+  console.log($('.tutors').size());
+  $('.tutors').each(function(){
+    tutors.push($(this).attr('id'));
+  });
+  var friends=[]
+   FB.api('/me/friends', function(response) {
+    console.log(response);
+    var ind=0;
+    for(ind=0;ind<response['data'].length;ind++)
+    {
+      friends.push(response['data'][ind]['id']);
+    }
+
+    data={}
+   data['tutors']=tutors;
+   data['friends']=friends;
+   console.log(data);
+   jQuery.ajax({
+    url: '/friend_tutor',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      if(data['result']=='success')
+      {
+        var ind=0;
+        for(ind=0;ind<data['friend_tutor'].length;ind++)
+        {
+          $('#friend_'+data['friend_tutor'][ind]).text('Your friend has studied under this tutor');
+          $('#friend_'+data['friend_tutor'][ind]).css('display','');
+        }
+      }
+    }
+
+});
+  });
+   
+
+}
+
+
 
 </script>  
 {% endblock %}

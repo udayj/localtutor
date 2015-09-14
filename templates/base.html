@@ -79,8 +79,48 @@
     
   </head>
 
-  <body onload="$('#{{active}}').addClass('active');">
-   
+  <body >
+   <script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1487145791581778',
+      xfbml      : true,
+      status: true,
+      version    : 'v2.4'
+    });
+
+    FB.Event.subscribe('auth.statusChange', function(response) {
+    if(response.status == 'connected') {
+        custom_logic(response.status);
+    }
+    else{
+         
+    }
+});
+    FB.Event.subscribe('auth.logout', function(response) {
+    if(response.status == 'connected') {
+        custom_logic(response.status);
+    }
+    else{
+        
+    }
+});
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+function custom_logic(login_status)
+{
+    return;
+}
+  
+</script>
 
     <div class="container">
 
@@ -102,11 +142,20 @@
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li><a href="/">Home</span></a></li>
+      <ul class="nav navbar-nav" id="header">
+        <li><a href="/">Home</a></li>
         <li><a href="/subjects">Subjects</a></li>
         <li><a href="/about">About</a></li>
+        {% if not current_user.id %}
+        <li><button class="btn btn-default" type="button" onclick="fblogin()" style="position:relative;top:4px;">Login using Facebook</button></li>
+        {% endif %}
+
       </ul>
+      {% if current_user.id %}
+      <button id="logout" class="btn btn-default pull-right" type="button" onclick="fblogout()" style="position:relative;top:4px;">Logout</button>
+      <p class="navbar-text pull-right" id="userid">Hi, {{current_user.name}}</p>
+            
+      {% endif %}
       
       
     </div><!-- /.navbar-collapse -->
@@ -116,13 +165,140 @@
       {% block content %}
       {% endblock %}
 
+      <div style="display:none;">
+      <form id="form" method="post" action="/login">
+        <input name="fb_user_id" id="fb_user_id" type="text" value="">
+        <input name="fb_user_name" id="fb_user_name" type="text" value="">
+        <input name="redirect_url" id="redirect_url" type="text" value="">
+        </form>
+      </div>
+
+
       <!--div class="footer">
         <p>&copy; Local Tutor 2015. All rights reserved.</p>
       </div-->
       </div> 
     
      
-    
+    <script>
+    var login_status=null;
+function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    login_status=response.status;
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+      //$('#header li').eq(3).remove();
+      $('#header li').eq(3).html('');
+
+      $('#logout').css('display','');
+      testAPI();
+    } else if (response.status === 'not_authorized') {
+      // The person is logged into Facebook, but not your app.
+      $('#header li').eq(3).html('<button class="btn btn-default" type="button" onclick="fblogin()" style="position:relative;top:4px;">Login using Facebook</button>');
+      $('#userid').text('');
+      $('#logout').css('display','none');
+     alert('not authorized');
+    } else {
+      // The person is not logged into Facebook, so we're not sure if
+      // they are logged into this app or not.
+      $('#header li').eq(3).html('<button class="btn btn-default" type="button" onclick="fblogin()" style="position:relative;top:4px;">Login using Facebook</button>');
+      $('#userid').text('');
+      $('#logout').css('display','none');
+      alert('not yet logged into facebook');
+    }
+  }
+
+function statusChange(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    alert("status change");
+    login_status=response.status;
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+      //$('#header li').eq(3).remove();
+      $('#header li').eq(3).html('');
+       $('#logout').css('display','');
+      /*FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      $('#userid').text('Hi '+ response.name);
+      
+      
+    });*/
+      custom_logic(login_status);
+      
+    } else if (response.status === 'not_authorized') {
+      // The person is logged into Facebook, but not your app.
+      $('#header li').eq(3).html('<button class="btn btn-default" type="button" onclick="fblogin()" style="position:relative;top:4px;">Login using Facebook</button>');
+      $('#userid').text('');
+      $('#logout').css('display','');
+     alert('not authorized');
+    } else {
+      // The person is not logged into Facebook, so we're not sure if
+      // they are logged into this app or not.
+      $('#header li').eq(3).html('<button class="btn btn-default" type="button" onclick="fblogin()" style="position:relative;top:4px;">Login using Facebook</button>');
+      $('#userid').text('');
+      $('#logout').css('display','');
+      alert('not yet logged into facebook');
+    }
+  }
+
+
+
+function fblogout(){
+
+  FB.logout(function(response){
+
+  });
+  var redirect_url=window.location.href;
+  window.location.href='/logout?redirect_url='+encodeURIComponent(redirect_url);
+}
+
+  function fblogin(){
+    FB.login(function(response){
+    statusChangeCallback(response);
+},{scope: 'public_profile,email,user_friends'});
+  }
+
+  function checkLoginState() {
+
+    alert("check login state");
+    /*FB.Event.subscribe('auth.login', function(response) {
+    statusChange(response);
+});*/
+    FB.getLoginStatus(function(response) {
+      statusChange(response);
+    },true);
+
+  }
+
+var userid=null;
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      $('#userid').text('Hi '+ response.name);
+      
+      console.log(response);
+      userid=response.id;
+      $('#fb_user_id').val(response.id);
+      $('#fb_user_name').val(response.name);
+      $('#redirect_url').val(window.location.href);
+      $('#form').submit();
+    });
+
+  }
+
+
+  </script>
     
     
     {% block javascript %}
@@ -130,4 +306,5 @@
   
     {% endblock %}
   </body>
+  
   </html>

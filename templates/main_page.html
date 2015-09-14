@@ -110,6 +110,10 @@ var subjects = new Bloodhound({
   remote: {
     url: '/options?subject=%QUERY',
     wildcard: '%QUERY'
+  },
+  prefetch : {
+    url: '/options?subject='
+   
   }
 });
 
