@@ -444,7 +444,55 @@ def friend_tutor():
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp
 
+@app.route('/friend_tutor_name',methods=['POST'])
+def friend_tutor_name():
+	data={}
+	counter=0
+	for name,value in dict(request.form).iteritems():
+		if name=='tutor':
+			data[name]=value[0].strip()
+		else:
+			data[name]=[element.strip() for element in value]
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	if 'friends[]' not in data or 'tutor' not in data:
+		response={}
+		response={'result':'success'}
+		response['friend_tutor']=[]
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	friends=data['friends[]']
+	tutor=data['tutor']
+	result=[]
+	for friend in friends:
+		count=db.student_tutor.find({'tutor_id':tutor,'student_id':friend}).count()
+		if count>0:
+			result.append(friend)
+			
+	print result
+	response={}
+	response={'result':'success'}
+	response['friend_tutor']=result
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
 
+
+@app.route('/tutor')
+def tutor():
+	tutor_id=request.args.get('id')
+	client=MongoClient()
+	db=client.local_tutor
+	if tutor_id is None:
+		return render_template('error.html')
+	tutor=db.teachers.find({'_id':ObjectId(tutor_id)})
+	try:
+		tutor=tutor.next()
+		return render_template('tutor.html',tutor=tutor)
+	except StopIteration:
+		return render_template('error.html')
 
 
 @app.route('/search')
