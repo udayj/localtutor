@@ -104,11 +104,11 @@ def content_entry(file_name,db_name):
 			if not teacher:
 				break
 			teacher_parts=teacher.split('\t')
-			if len(teacher_parts)<11:
+			if len(teacher_parts)<12:
 				continue
 			teacher_structured={}
 			fields=['subject','name','contact_number','email','age_group','venue',
-			'classroom_type','geographical_location','usp','teacher_type','price']
+			'classroom_type','geographical_location','area','usp','teacher_type','price']
 			counter=0
 			count=count+1
 			for field in fields:
@@ -188,6 +188,7 @@ def logout():
 def rewrite_query(query):
 	client=MongoClient()
 	db=client.local_tutor
+	query=query.lower()
 	category_count=db.subjects.find({'category':query}).count()
 	if category_count<=0:
 		return [query]
