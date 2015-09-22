@@ -34,9 +34,10 @@
         {% for category in categories %}
      
         <div class="col-lg-4 col-md-4 col-sm-12">
-      <h3><a href="/search?subject={{category|urlencode}}">{{category.title()}}</a></h3>
+          {% set actual_category, subjects = category %}
+      <h3><a href="/search?subject={{actual_category|urlencode}}">{{actual_category.title()}}</a></h3>
         <ul>
-        {% for subject in category_wise[category] %}
+        {% for subject in subjects %}
           <li>
           <a href="/search?subject={{subject|urlencode}}">{{subject.title()}}</a>
         </li>

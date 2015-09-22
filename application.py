@@ -10,6 +10,7 @@ from datetime import datetime,timedelta
 import codecs
 import os
 from itsdangerous import URLSafeTimedSerializer
+import operator
 
 SECRET_KEY='SECRET'
 
@@ -251,6 +252,9 @@ def upload_staging():
 
 @app.route('/subjects')
 def subjects():
+	def sorter(item):
+		category, subjects = item
+		return len(subjects)
 	client=MongoClient()
 	db=client.local_tutor
 	subjects=db.subjects.find()
@@ -265,8 +269,10 @@ def subjects():
 			if subject['category'] not in category_wise:
 				category_wise[subject['category']]=[]
 			category_wise[subject['category']].append(subject['name'])
-	print category_wise
-	return render_template('subjects.html',output=output,category_wise=category_wise)
+	print category_wise.items()
+	sorted_category_wise=sorted(category_wise.items(),key=sorter)
+
+	return render_template('subjects.html',output=output,category_wise=sorted_category_wise)
 
 @app.route('/save_category',methods=['POST'])
 def save_category():
