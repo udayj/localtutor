@@ -279,27 +279,66 @@ def save_category():
 	data={}
 	for name,value in dict(request.form).iteritems():
 		data[name]=value[0].strip().lower()
-	app.logger.debug(str(data))
+	
 	client=MongoClient()
 	db=client.local_tutor
-
-	subject=db.subjects.find({'name':data['subject']})
+	if 'id' not in data or 'subject' not in data or 'category' not in data:
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp		
+	_id=data['id']
+	subject=db.subjects.find({'_id':ObjectId(_id)})
+	
 	try:
 
 		subject=subject.next()
 		subject['category']=data['category']
 		db.subjects.save(subject)
+		if data['subject'] == subject['name']:
+			response={'result':'success_category'}
+			js=json.dumps(response)
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp
+		teachers=db.teachers.find({'subject':{'$in':[subject['name']]}})
+		
+		results=[]
+		
+		try:
+			for teacher in teachers:
+				results.append(teacher)
+		except StopIteration:
+			response={'result':'success_category'}
+			js=json.dumps(response)
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp
+		for teacher in results:
+			
+			teacher['subject'].remove(subject['name'])
+			if data['subject'] not in teacher['subject']:
+				teacher['subject'].append(data['subject'])
+			db.teachers.save(teacher)
+		prev_subject=db.subjects.find({'name':data['subject']}).count()
+		
+		if prev_subject>0:
+			
+			db.subjects.remove(subject)
+		else:
+			subject['name']=data['subject']
+			db.subjects.save(subject)
+		response={'result':'success_subject_category'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+
 	except StopIteration:
 		app.logger.error('problem saving subject category for '+data['subject'])
-		response={'result':'failed'}
+		response={'result':'failed_category'}
 		js=json.dumps(response)
 		resp=Response(js,status=200,mimetype='application/json')
 		return resp		
 
-	response={'result':'success'}
-	js=json.dumps(response)
-	resp=Response(js,status=200,mimetype='application/json')
-	return resp
+	
 
 
 

@@ -10,18 +10,31 @@
           <thead>
             <tr>
               <td>
+                Subject Id
+              </td>
+              <td>
                 <b>Subject Name</b>
               </td>
               <td>
                 <b>Category</b>
+              </td>
+              <td>
+                Save
+              </td>
+              <td>
+                Status
               </td>
             </tr>
           </thead>
           <tbody>
             {% for subject in subjects %}
             <tr>
-              <td id="name_{{subject['_id']}}">
-                {{subject['name'].title()}}
+              <td id="{{subject['_id']}}">
+                {{subject['_id']}}
+              </td>
+              <td>
+                <input id="name_{{subject['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{subject['name'].title()}}">
+                
               </td>
               <td>
                 <input id="category_{{subject['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{subject['category'].title()}}">
@@ -51,29 +64,33 @@
 function save_category(id)
 {
   new_id=id.substr(5);
-  subject=$('#'+'name_'+new_id).text();
+  subject=$('#'+'name_'+new_id).val();
   category=$('#'+'category_'+new_id).val();
+  id=$('#'+new_id).text();
   var data={}
   data['subject']=subject;
   data['category']=category;
+  data['id']=id;
   jQuery.ajax({
     url: '/save_category',
     data: data,
     type: 'POST',
     success: function(data){
 
-        if(data['result']=='success')
+        if(data['result']=='success_category')
         {
-          $('#status_'+new_id).html('Successfully updated category');
+          $('#status_'+new_id).html('Successfully updated just category');
           
 
         }
+        else if(data['result']=='success_subject_category')
+        {
+          $('#status_'+new_id).html('Successfully updated subject name and category');
+                   
+        }
         else
         {
-          $('#status_'+new_id).html('Could not update category');
-          
-
-          
+          $('#status_'+new_id).html('Could not update category or subject name');
         }
     }
 });
