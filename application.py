@@ -260,7 +260,10 @@ def subjects():
 	subjects=db.subjects.find()
 	output=[]
 	for subject in subjects:
-		output.append(subject['name'])
+		if 'display_name' not in subject:
+			output.append(subject['name'].title())
+		else:
+			output.append(subject['display_name'])
 	output.sort()
 	category_wise={}
 	subjects=db.subjects.find()
@@ -268,7 +271,10 @@ def subjects():
 		if len(subject['category'])>1:
 			if subject['category'] not in category_wise:
 				category_wise[subject['category']]=[]
-			category_wise[subject['category']].append(subject['name'])
+			if 'display_name' not in subject:
+				category_wise[subject['category']].append(subject['name'].title())
+			else:
+				category_wise[subject['category']].append(subject['display_name'])
 	print category_wise.items()
 	sorted_category_wise=sorted(category_wise.items(),key=sorter)
 
@@ -338,8 +344,56 @@ def save_category():
 		resp=Response(js,status=200,mimetype='application/json')
 		return resp		
 
+@app.route('/save_display_name',methods=['POST'])
+def save_display_name():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
 	
+	client=MongoClient()
+	db=client.local_tutor
+	if 'id' not in data or 'subject' not in data or 'display_name' not in data:
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp		
+	_id=data['id']
 
+	subject=db.subjects.find({'_id':ObjectId(_id)})
+	try:
+		subject=subject.next()
+		if data['display_name'] == '' or len(data['display_name'])<2:
+			response={'result':'failed'}
+			js=json.dumps(response)
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp	
+		else:
+			subject['display_name']=data['display_name']
+			db.subjects.save(subject)
+			response={'result':'success'}
+			js=json.dumps(response)
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp
+	except StopIteration:
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+
+	
+@app.route('/subject_display')
+def subject_display():
+
+	def sorter(subject):
+		return subject['name']
+	client=MongoClient()
+	db=client.local_tutor
+	subjects=db.subjects.find()
+	output=[]
+	for subject in subjects:
+		output.append(subject)
+	output.sort(key=sorter)
+	return render_template('subject_display.html',subjects=output)
 
 
 @app.route('/subject_category')
@@ -355,6 +409,8 @@ def subject_category():
 		output.append(subject)
 	output.sort(key=sorter)
 	return render_template('subject_category.html',subjects=output)
+
+
 
 @app.route('/create_subjects')
 def create_subjects():
@@ -534,9 +590,20 @@ def tutor():
 	if tutor_id is None:
 		return render_template('error.html')
 	tutor=db.teachers.find({'_id':ObjectId(tutor_id)})
+	display_subjects=[]
 	try:
 		tutor=tutor.next()
-		return render_template('tutor.html',tutor=tutor)
+		for subject in tutor['subject']:
+			actual_subject=db.subjects.find({'name':subject})
+			try:
+				actual_subject=actual_subject.next()
+				if 'display_name' not in actual_subject:
+					display_subjects.append(actual_subject['name'].title())
+				else:
+					display_subjects.append(actual_subject['display_name'])
+			except StopIteration:
+				pass		
+		return render_template('tutor.html',tutor=tutor,display_subjects=display_subjects)
 	except StopIteration:
 		return render_template('error.html')
 

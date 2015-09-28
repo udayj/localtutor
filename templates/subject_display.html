@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block content %}
+
+      <!-- Jumbotron -->
+        
+
+     <div class="row">
+      <div class="col-lg-8 col-md-8">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <td>
+                Subject Id
+              </td>
+              <td>
+                <b>Subject Name</b>
+              </td>
+              <td>
+                <b>Display Name</b>
+              </td>
+              <td>
+                Save
+              </td>
+              <td>
+                Status
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subject in subjects %}
+            <tr>
+              <td id="{{subject['_id']}}">
+                {{subject['_id']}}
+              </td>
+              <td id="name_{{subject['_id']}}">
+                {{subject['name'].title()}}
+                
+              </td>
+              <td>
+                <input id="display_name_{{subject['_id']}}" type="text" class="form-control col-lg-12 col-md-12" 
+                {% if 'display_name' in subject %}
+                value="{{subject['display_name']}}"
+                {% endif %}
+                >
+              </td>
+              <td>
+                <button class="btn btn-default" type="submit" id="save_{{subject['_id']}}" onclick="save_display_name(this.id)">Save</button>
+              </td>
+              <td id="status_{{subject['_id']}}">
+                
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <hr>
+
+
+    
+      
+
+      <!-- Example row of columns -->
+<script>
+
+function save_display_name(id)
+{
+  new_id=id.substr(5);
+  subject=$('#'+'name_'+new_id).text();
+  display_name=$('#'+'display_name_'+new_id).val();
+  id=$('#'+new_id).text();
+  var data={}
+  data['subject']=subject;
+  data['display_name']=display_name;
+  data['id']=id;
+  jQuery.ajax({
+    url: '/save_display_name',
+    data: data,
+    type: 'POST',
+    success: function(data){
+
+        if(data['result']=='success')
+        {
+          $('#status_'+new_id).html('Successfully updated display name');
+          
+
+        }
+       
+        else
+        {
+          $('#status_'+new_id).html('Could not update display name');
+        }
+    }
+});
+
+}
+
+
+$('.result').hover(function(){
+  $(this).css('background-color','#eee');
+},function(){
+  $(this).css('background-color','white');
+});
+</script>   
+
+<script>     
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  },
+   prefetch : {
+    url: '/options?subject='
+   
+  }
+});
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+        window.location='search?subject='+name.value.trim();
+    }
+
+function custom_logic(login_status){
+  return;
+}
+
+</script>  
+{% endblock %}
+
+
+

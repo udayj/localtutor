@@ -39,7 +39,7 @@
         <ul>
         {% for subject in subjects %}
           <li>
-          <a href="/search?subject={{subject|urlencode}}">{{subject.title()}}</a>
+          <a href="/search?subject={{subject|urlencode}}">{{subject}}</a>
         </li>
         {% endfor %}
       </ul>
@@ -70,7 +70,7 @@
       <tr>
         {% for subject in subjects %}
         <td>
-          <a href="/search?subject={{subject|urlencode}}">{{subject.title()}}</a>
+          <a href="/search?subject={{subject|urlencode}}">{{subject}}</a>
         </td>
         {% endfor %}
       </tr>

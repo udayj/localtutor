@@ -49,8 +49,8 @@
                   Subjects Taught
                 </td>
                 <td>
-                  {% for subject in tutor['subject'] %}
-                    <a href="/search?subject={{subject}}">{{subject.title()}}</a> 
+                  {% for subject in display_subjects %}
+                    <a href="/search?subject={{subject}}">{{subject}}</a> 
                     <br>
                     {% endfor %}
                 </td>
