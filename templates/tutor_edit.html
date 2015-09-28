@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% block content %}
+
+      <!-- Jumbotron -->
+        <div class="row">
+      <div class="col-lg-8 col-md-8 ">
+      
+      <div class="input-group input-group-md">
+  
+  <input id="search" type="text" class="form-control col-lg-12 col-md-12" placeholder="Search for a teacher eg. Physics" aria-describedby="sizing-addon1"
+  onkeydown="if (event.keyCode==13) { search();}">
+   <span class="input-group-btn">
+        <button class="btn btn-primary" type="button" onclick="search()" style="position:relative;top:-2px;">Search</button>
+      </span>
+</div>
+          
+        </div>
+      </div>
+
+     
+    <hr>
+    <div id="tutor_id" style="display:none;">
+      {{tutor['_id']}}
+    </div>
+
+
+     <div class="row">
+      <div class="col-lg-10 col-md-10">
+          
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <td>
+                  <h3>Tutor Information</h3>
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Name
+                </td>
+                <td>
+                   <input id="name_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['name']}}">
+                
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Subjects Taught
+                </td>
+                <td>
+                  <input id="subject_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12"
+
+                  value="{{tutor['subject']|join(',')}}">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Contact Number
+                </td>
+                <td>
+                 <input id="contact_number_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12"
+
+                  value="{{tutor['contact_number']|join(',')}}">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Geographical Location
+                </td>
+                <td>
+                  <input id="geographical_location_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['geographical_location'].title()}}">
+                  
+                </td>
+              </tr>
+               <tr>
+                <td>
+                  Area
+                </td>
+                <td>
+                  <input id="area_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['area']}}">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Email Id
+                </td>
+                <td>
+                  <input id="email_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['email']}}">  
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Teaches Age Group
+                </td>
+                <td>
+                  <input id="age_group_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['age_group']}}">
+                </td>
+              </tr>
+              
+              <tr>
+                <td>
+                  Venue of Class
+                </td>
+                <td>
+                  <input id="venue_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['venue']}}">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Teaches in group/individually
+                </td>
+                <td>
+                  <input id="classroom_type_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['classroom_type']}}">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Institution/Individual Teacher
+                </td>
+                <td>
+                  <input id="teacher_type_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['teacher_type']}}">
+                </td>
+              </tr>
+              
+            </tbody>
+          </table>
+          <div class="row">
+            <div class="col-lg-12 col-md-12">
+              <div>
+          <button id="save_{{tutor['_id']}}" type="submit" class="btn btn-default" id="submit" onclick="save_tutor_data(this.id)">Submit</button>
+          <br>
+
+            </div>
+          <div id="status_{{tutor['_id']}}">
+          </div>
+          <br>
+          <br>
+      </div>
+    </div>
+      
+
+              </div>  
+            </div>
+
+    
+      
+
+      <!-- Example row of columns -->
+<script>
+
+function save_tutor_data(id)
+{
+  new_id=id.substr(5);
+  name=$('#'+'name_'+new_id).val();
+  subject=$('#'+'subject_'+new_id).val();
+  contact_number=$('#'+'contact_number_'+new_id).val();
+  geographical_location=$('#'+'geographical_location_'+new_id).val();
+  area=$('#'+'area_'+new_id).val();
+  email=$('#'+'email_'+new_id).val();
+  age_group=$('#'+'age_group_'+new_id).val();
+  venue=$('#'+'venue_'+new_id).val();
+  classroom_type=$('#'+'classroom_type_'+new_id).val();
+  teacher_type=$('#'+'teacher_type_'+new_id).val();
+
+  var data={}
+  data['_id']=new_id;
+  data['name']=name;
+  data['subject']=subject;
+  data['contact_number']=contact_number;
+  data['geographical_location']=geographical_location;
+  data['area']=area;
+  data['email']=email;
+  data['age_group']=age_group;
+  data['venue']=venue
+  data['classroom_type']=classroom_type;
+  data['teacher_type']=teacher_type;
+
+  jQuery.ajax({
+    url: '/tutor_edit_save',
+    data: data,
+    type: 'POST',
+    success: function(data){
+
+        if(data['result']=='success')
+        {
+          $('#status_'+new_id).html('Successfully updated tutor data');
+          
+
+        }
+       
+        else
+        {
+          $('#status_'+new_id).html('Could not update tutor data');
+        }
+    }
+});
+
+}
+
+
+$('.result').hover(function(){
+  $(this).css('background-color','#eee');
+},function(){
+  $(this).css('background-color','white');
+});
+</script>   
+
+<script>     
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  },
+  prefetch : {
+    url: '/options?subject='
+   
+  }
+});
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+        window.location='search?subject='+encodeURIComponent(name.value.trim());
+    }
+
+function custom_logic(login_status){
+  friend_tutor();
+}
+
+function friend_tutor(){
+  var tutor_id=$('#tutor_id').text().trim();
+  var friends=[];
+  var friend_names={};
+   FB.api('/me/friends', function(response) {
+    console.log(response);
+    var ind=0;
+    for(ind=0;ind<response['data'].length;ind++)
+    {
+      friends.push(response['data'][ind]['id']);
+      friend_names[response['data'][ind]['id']]=response['data'][ind]['name'];
+    }
+
+    data={}
+   data['tutor']=tutor_id;
+   data['friends']=friends;
+   console.log(data);
+   jQuery.ajax({
+    url: '/friend_tutor_name',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      var result="";
+      var ind=0;
+      console.log(friend_names);
+      console.log(data);
+      for(ind=0;ind<data['friend_tutor'].length;ind++)
+      {
+        result=result+friend_names[data['friend_tutor'][ind]]+"<br>"
+      }
+      $('#friend_names').html(result);
+      $('#friends').css('display','');
+    }
+  });
+ });
+}
+
+</script>  
+{% endblock %}
+
+
+

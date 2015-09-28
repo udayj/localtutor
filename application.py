@@ -607,6 +607,83 @@ def tutor():
 	except StopIteration:
 		return render_template('error.html')
 
+@app.route('/tutor_edit')
+def tutor_edit():
+	tutor_id=request.args.get('id')
+	client=MongoClient()
+	db=client.local_tutor
+	if tutor_id is None:
+		return render_template('error.html')
+	tutor=db.teachers.find({'_id':ObjectId(tutor_id)})
+	display_subjects=[]
+	try:
+		tutor=tutor.next()
+				
+		return render_template('tutor_edit.html',tutor=tutor)
+	except StopIteration:
+		return render_template('error.html')
+
+@app.route('/tutor_edit_save',methods=['POST'])
+def tutor_edit_save():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip().lower()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	if '_id' not in data:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp		
+	tutor=db.teachers.find({'_id':ObjectId(data['_id'])})
+	try:
+		tutor=tutor.next()
+		if data['name']!='' or len(data['name'])>1:
+			tutor['name']=data['name']
+			tutor['subject']=[subject.strip().lower() for subject in data['subject'].split(',')]
+			tutor['contact_number']=[contact_number.strip().lower() for contact_number in data['contact_number'].split(',')]
+			tutor['geographical_location']=data['geographical_location']
+			tutor['area']=data['area']
+			tutor['email']=data['email']
+			tutor['age_group']=data['age_group']
+			tutor['venue']=data['venue']
+			tutor['classroom_type']=data['classroom_type']
+			tutor['teacher_type']=data['teacher_type']
+
+			for subject in tutor['subject']:
+				actual_subject=db.subjects.find({'name':subject})
+				try:
+					actual_subject=actual_subject.next()
+				except StopIteration:
+					actual_subject={}
+					actual_subject['name']=subject
+					actual_subject['category']=''
+					db.subjects.save(actual_subject)
+			
+			db.teachers.save(tutor)
+
+		else:
+			response={}
+			response={'result':'failed'}
+			js=json.dumps(response)
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp			
+
+	except StopIteration:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp		
+
+	response={}
+	response={'result':'success'}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
+
 
 @app.route('/search')
 def search():
