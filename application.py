@@ -11,6 +11,8 @@ import codecs
 import os
 from itsdangerous import URLSafeTimedSerializer
 import operator
+import nltk
+import pycrfsuite
 
 SECRET_KEY='SECRET'
 
@@ -28,6 +30,84 @@ login_manager.login_view = "login"
 login_manager.login_message = u"Please log in to access this page."
 
 login_serializer = URLSafeTimedSerializer(SECRET_KEY)
+
+def set_subject_area():
+	client=MongoClient()
+	db=client.local_tutor
+	subjects_db=db.subjects.find()
+	teachers=db.teachers.find()
+	subjects=[]
+	areas=[]
+	for subject in subjects_db:
+		if len(subject['name'].strip())>1 and subject['name'] not in subjects:
+			subjects.append(subject['name'])
+	for teacher in teachers:
+		if teacher['area'] not in areas and len(teacher['area'].strip())>1:
+			areas.append(teacher['area'])
+	return (subjects,areas)
+
+def npchunk_features(sentence, i, history='O'):
+
+	client=MongoClient()
+	db=client.local_tutor
+	subjects, areas = set_subject_area()
+
+	word = sentence[i]
+	if i==0:
+		prevword = 'START'
+	else:
+		prevword = sentence[i-1]
+
+	if i<2:
+		prevword_more= 'START'
+	else:
+		prevword_more= sentence[i-2]
+
+	if i>=len(sentence)-2:
+		lookahead='END'
+	else:
+		lookahead = sentence[i+2]
+
+	if i==len(sentence)-1:
+		nextword = 'END'
+		
+	else:
+		nextword = sentence[i+1]
+
+	
+
+
+	features = ['word='+word,
+				#'prev_words='+str((prevword,prevword_more)),
+				#'next_words='+str((nextword,lookahead)),
+				#'prev_class='+history,
+				'w_pw='+prevword+word,
+				'w_nw='+word+nextword
+				#'w_prev_class='+word+history
+
+				]
+	
+	is_gazette='n'
+	if word in subjects or word in areas:
+		is_gazette='y'
+	word_prev_bigram=prevword+' '+word
+	p_bigram_gazette='n'
+	if prevword!='START':
+		if word_prev_bigram in subjects or word_prev_bigram in areas:
+			p_bigram_gazette='y'
+	word_next_bigram=word+' '+nextword
+	n_bigram_gazette='n'
+	if nextword !='END':
+		if word_next_bigram in subjects or word_next_bigram in areas:
+			n_bigram_gazette='y'
+
+
+	features.append('is_gazette='+is_gazette)
+	features.append('w_is_gazette='+word+'_'+is_gazette)
+	features.append('p_bigram_gazette='+p_bigram_gazette)
+	features.append('n_bigram_gazette='+n_bigram_gazette)
+	return features
+
 
 class User(UserMixin):
     def __init__(self, name, _id, fb_id,active=True):
@@ -102,12 +182,15 @@ def content_entry(file_name,db_name):
 	try:
 		while True:
 			teacher=f.readline()
+			print teacher
 			if not teacher:
 				break
 			teacher_parts=teacher.split('\t')
+			
 			if len(teacher_parts)<12:
 				continue
 			teacher_structured={}
+
 			fields=['subject','name','contact_number','email','age_group','venue',
 			'classroom_type','geographical_location','area','usp','teacher_type','price']
 			counter=0
@@ -231,6 +314,8 @@ def upload_staging():
 	attachment.save(os.path.join('data',attachment_name))
 	ret=content_entry(os.path.join('data',attachment_name),'localtutor')
 	response={}
+
+	print ret
 	if ret>=0:
 		ret=content_entry(os.path.join('data',attachment_name),'local_tutor')
 		if ret>=0:
@@ -661,7 +746,7 @@ def tutor_edit_save():
 					actual_subject['name']=subject
 					actual_subject['category']=''
 					db.subjects.save(actual_subject)
-			
+
 			db.teachers.save(tutor)
 
 		else:
@@ -684,18 +769,79 @@ def tutor_edit_save():
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp
 
+def tagger(text):
+	tagger=pycrfsuite.Tagger()
+	tagger.open('static/classifier/crf_classifier_main.crfsuite')
+	
+	tokenized_text=nltk.word_tokenize(text)
+	history='O'
+	feature_set=[]
+	for i,word in enumerate(tokenized_text):
+		features=npchunk_features(tokenized_text,i,history)
+		feature_set.append(features)
+	result=zip(tokenized_text,tagger.tag(feature_set))
+	
+	tagged_instance=[(w,'NN',c) for (w,c) in result]
+	tree=nltk.chunk.conlltags2tree(tagged_instance)
+	subject=''
+	area=''
+	for subtree in tree.subtrees(filter=lambda t: t.label() == 'SUBJECT'):
+		print subtree.leaves()
+		subject_parts=[sub for (sub,tag) in subtree.leaves()]
+		subject=' '.join(subject_parts)
+		
+	for subtree in tree.subtrees(filter=lambda t: t.label() == 'LOCATION'):
+		print subtree.leaves()
+		area_parts=[area for (area,tag) in subtree.leaves()]
+		area=' '.join(area_parts)
+
+	return(subject,area)
+
 
 @app.route('/search')
 def search():
 	query=request.args.get('subject')
+	is_classify=request.args.get('classify')
 	if not query or query.strip()=='':
 		return render_template('search_error.html')
 	client=MongoClient()
 	db=client.local_tutor
 
-	query_modified=rewrite_query(query)
-	
-	teachers=db.teachers.find({'subject':{'$in':query_modified}})
+	if is_classify is not None and is_classify=='n':
+		query_modified=rewrite_query(query)
+		
+		teachers=db.teachers.find({'subject':{'$in':query_modified}})
+		results=[]
+		try:
+			for teacher in teachers:
+				results.append(teacher)
+		except StopIteration:
+			return render_template('search_error.html')
+		student_tutor_assoc={}
+		if hasattr(current_user,'id'):
+			for teacher in results:
+				student_teacher=db.student_tutor.find({'tutor_id':str(teacher['_id']),'student_id':current_user.fb_id}).count()
+				if student_teacher>0:
+					student_tutor_assoc[teacher['_id']]=True
+		print student_tutor_assoc
+		return render_template('search_result.html',results=results,query=query,length=(len(results)+1)/2,
+								student_tutor_assoc=student_tutor_assoc)
+
+	subject, area = tagger(query.lower().strip())
+	print 'subject='+subject
+	print 'area='+area
+
+	if len(subject)>0 and len(area)<=0:
+		canonical_subject=rewrite_query(subject)
+		teachers=db.teachers.find({'subject':{'$in':canonical_subject}})
+	if len(subject)<=0 and len(area)>0:
+		teachers=db.teachers.find({'area':area})
+	if len(subject)>0 and len(area)>0:
+		canonical_subject=rewrite_query(subject)
+		teachers=db.teachers.find({'subject':{'$in':canonical_subject},'area':area})
+	if len(subject)<=0 and len(area)<=0:
+		teachers=[]
+
 	results=[]
 	try:
 		for teacher in teachers:
@@ -703,14 +849,25 @@ def search():
 	except StopIteration:
 		return render_template('search_error.html')
 	student_tutor_assoc={}
+	
+	if len(results)==0 and (len(subject)>0 or len(area)>0):
+		teachers=db.teachers.find({'$or':[{'subject':query.lower().strip()},{'area':query.lower().strip()}]})
+		try:
+			for teacher in teachers:
+				results.append(teacher)
+		except StopIteration:
+			return render_template('search_error.html')
+	
 	if hasattr(current_user,'id'):
 		for teacher in results:
 			student_teacher=db.student_tutor.find({'tutor_id':str(teacher['_id']),'student_id':current_user.fb_id}).count()
 			if student_teacher>0:
 				student_tutor_assoc[teacher['_id']]=True
-	print student_tutor_assoc
+
 	return render_template('search_result.html',results=results,query=query,length=(len(results)+1)/2,
 							student_tutor_assoc=student_tutor_assoc)	
+
+
 
 @app.route('/options')
 def options():
