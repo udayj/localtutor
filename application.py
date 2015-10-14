@@ -900,4 +900,12 @@ def options():
 		
 
 if __name__ == "__main__":
-    app.run()
+	import logging
+	from logging.handlers import RotatingFileHandler
+	file_handler = RotatingFileHandler('/home/uday/localtutor/logs/application.log', maxBytes=1024 * 1024 * 100, backupCount=20)
+	file_handler.setLevel(logging.DEBUG)
+	formatter = logging.Formatter("%(asctime)s - %(funcName)s - %(levelname)s - %(message)s")
+	file_handler.setFormatter(formatter)
+	app.logger.addHandler(file_handler)
+	app.logger.error(str(app.config))
+	app.run()
