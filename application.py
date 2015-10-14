@@ -899,7 +899,7 @@ def options():
 	return resp
 		
 
-if __name__ == "__main__":
+if True:
 	import logging
 	from logging.handlers import RotatingFileHandler
 	file_handler = RotatingFileHandler('/home/uday/localtutor/logs/application.log', maxBytes=1024 * 1024 * 100, backupCount=20)
@@ -908,4 +908,7 @@ if __name__ == "__main__":
 	file_handler.setFormatter(formatter)
 	app.logger.addHandler(file_handler)
 	app.logger.error(str(app.config))
+
+if __name__ == "__main__":
+	
 	app.run()
