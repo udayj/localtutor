@@ -13,6 +13,7 @@ from itsdangerous import URLSafeTimedSerializer
 import operator
 import nltk
 import pycrfsuite
+import math
 
 SECRET_KEY='SECRET'
 
@@ -802,6 +803,13 @@ def tagger(text):
 def search():
 	query=request.args.get('subject')
 	is_classify=request.args.get('classify')
+	page=request.args.get('page')
+	if not page or page<1:
+		page=1
+	try:
+		page=int(page)
+	except ValueError:
+		page=1
 	if not query or query.strip()=='':
 		return render_template('search_error.html')
 	client=MongoClient()
@@ -824,8 +832,19 @@ def search():
 				if student_teacher>0:
 					student_tutor_assoc[teacher['_id']]=True
 		print student_tutor_assoc
-		return render_template('search_result.html',results=results,query=query,length=(len(results)+1)/2,
-								student_tutor_assoc=student_tutor_assoc)
+		paginated_results=[]
+		total_pages=1
+		if len(results)>20:
+			total_pages=math.ceil(len(results)/20.0)
+			if page>total_pages:
+				page=1
+			paginated_results=results[(page-1)*20:page*20]
+		else:
+			total_pages=1
+			page=1
+			paginated_results=results
+		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
+								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,classify='n')
 
 	subject, area = tagger(query.lower().strip())
 	print 'subject='+subject
@@ -842,6 +861,7 @@ def search():
 	if len(subject)<=0 and len(area)<=0:
 		teachers=[]
 
+	
 	results=[]
 	try:
 		for teacher in teachers:
@@ -863,9 +883,22 @@ def search():
 			student_teacher=db.student_tutor.find({'tutor_id':str(teacher['_id']),'student_id':current_user.fb_id}).count()
 			if student_teacher>0:
 				student_tutor_assoc[teacher['_id']]=True
+	paginated_results=[]
+	total_pages=1
+	if len(results)>20:
+		total_pages=int(math.ceil(len(results)/20.0))
+		
+		if page>total_pages:
+			page=1
 
-	return render_template('search_result.html',results=results,query=query,length=(len(results)+1)/2,
-							student_tutor_assoc=student_tutor_assoc)	
+		paginated_results=results[(page-1)*20:page*20]
+	else:
+		total_pages=1
+		page=1
+		paginated_results=results
+	
+	return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
+							student_tutor_assoc=student_tutor_assoc,total_pages=int(total_pages),page=page,classify='y')	
 
 
 

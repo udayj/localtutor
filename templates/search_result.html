@@ -8,7 +8,7 @@
       <div class="input-group input-group-md">
   
   <input id="search" type="text" class="form-control col-lg-12 col-md-12" placeholder="{{query}}" aria-describedby="sizing-addon1"
-  onkeydown="if (event.keyCode==13) { search();}">
+  onkeydown="if (event.keyCode==13) { search();}" value="{{query}}">
    <span class="input-group-btn">
         <button class="btn btn-primary" type="button" onclick="search()" style="position:relative;top:-2px;">Search</button>
       </span>
@@ -103,6 +103,22 @@
 </div> 
 <br>
               {% endfor %}
+              <div class="row">
+                <div class="col-lg-4">
+                  <div id="total_pages" style="display:none;">
+                    {{total_pages}}
+                  </div>
+                  <div id="pagination_query" style="display:none">
+                    {{query}}
+                  </div>
+                  <div id="classify" style="display:none" value="{{classify}}">
+                    {{classify}}
+                  </div>
+                  <div id="page" style="display:none" value="{{page}}">
+                    {{page}}
+                  </div>
+                  <div id="page_selection">
+                  </div>
               </div>  
             </div>
 
@@ -309,7 +325,20 @@ function friend_tutor()
 }
 
 
-
+if(parseInt($('#total_pages').html().trim())>1)
+{
+$('#page_selection').bootpag({
+  total: parseInt($('#total_pages').html().trim()),
+  page: parseInt($('#page').html().trim()),
+  leaps:false,
+  maxVisible:5,
+  next:'next',
+  prev:'prev'
+  //href:'/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page={% raw %}{{number}}{% endraw %}"
+}).on("page",function(event,num){
+   window.location='/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page="+num;
+});
+}
 </script>  
 {% endblock %}
 
