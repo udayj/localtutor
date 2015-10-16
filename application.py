@@ -285,6 +285,7 @@ def rewrite_query(query):
 	subjects=db.subjects.find({'name':query})
 	for subject in subjects:
 		output.append(subject['name'])
+	output.append(query)
 	return output
 
 @app.route('/upload')
@@ -708,6 +709,23 @@ def tutor_edit():
 		return render_template('tutor_edit.html',tutor=tutor)
 	except StopIteration:
 		return render_template('error.html')
+
+@app.route('/tutor_delete')
+def tutor_delete():
+	tutor_id=request.args.get('id')
+	if not tutor_id or len(tutor_id.strip())<1:
+		return redirect('/')
+	client=MongoClient()
+	db=client.local_tutor
+	teacher=db.teachers.find({'_id':ObjectId(tutor_id)})
+	try:
+		teacher=teacher.next()
+		db.teachers.remove({'_id':ObjectId(tutor_id)})
+		app.logger.debug('Deleted tutor id:'+tutor_id)
+		return redirect('/')
+	except StopIteration:
+		return redirect('/')
+
 
 @app.route('/tutor_edit_save',methods=['POST'])
 def tutor_edit_save():
