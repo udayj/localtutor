@@ -183,7 +183,7 @@ def content_entry(file_name,db_name):
 	try:
 		while True:
 			teacher=f.readline()
-			print teacher
+			
 			if not teacher:
 				break
 			teacher_parts=teacher.split('\t')
@@ -195,8 +195,15 @@ def content_entry(file_name,db_name):
 			fields=['subject','name','contact_number','email','age_group','venue',
 			'classroom_type','geographical_location','area','usp','teacher_type','price']
 			counter=0
-			count=count+1
+			
+			good_value=True
 			for field in fields:
+
+				if counter==0 or counter==1:
+					teacher_part=teacher_parts[counter].lower().strip()
+					if len(teacher_part)<1:
+						good_value=False
+						break
 				if counter==0:
 					parts=teacher_parts[counter].lower().strip().split(',')
 					subjects=[part.lower().strip() for part in parts]
@@ -211,10 +218,14 @@ def content_entry(file_name,db_name):
 					teacher_structured[field]=[part.lower().strip() for part in parts]
 				else:	
 					teacher_structured[field]=teacher_parts[counter].lower().strip()
+					
 				counter=counter+1
 			
-			db.teachers.save(teacher_structured)
-	except Exception:
+			if good_value==True:
+				count=count+1
+				db.teachers.save(teacher_structured)
+	except Exception as e:
+		print (e)
 		return -100
 	
 	return count
