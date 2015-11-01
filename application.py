@@ -378,6 +378,29 @@ def subjects():
 
 	return render_template('subjects.html',output=output,category_wise=sorted_category_wise)
 
+@app.route('/delete_subject',methods=['POST'])
+def delete_subject():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip().lower()
+		
+	client=MongoClient()
+	db=client.local_tutor
+	print data['id']
+	try:
+		db.subjects.remove({'_id':ObjectId(data['id'])},True)
+		response={'result':'success'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	except Exception as e:
+		logger.debug(e)
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+
+
 @app.route('/save_category',methods=['POST'])
 def save_category():
 	data={}

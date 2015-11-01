@@ -5,7 +5,7 @@
         
 
      <div class="row">
-      <div class="col-lg-8 col-md-8">
+      <div class="col-lg-9 col-md-9">
         <table class="table table-striped">
           <thead>
             <tr>
@@ -42,6 +42,10 @@
               <td>
                 <button class="btn btn-default" type="submit" id="save_{{subject['_id']}}" onclick="save_category(this.id)">Save</button>
               </td>
+              <td>
+                <button class="btn btn-danger" type="submit" id="delete_{{subject['_id']}}" onclick="delete_subject(this.id)">Delete</button>
+              </td>
+
               <td id="status_{{subject['_id']}}">
                 
               </td>
@@ -61,6 +65,37 @@
       <!-- Example row of columns -->
 <script>
 
+function delete_subject(id)
+{
+  new_id=id.substr(7);
+  var data={};
+  data['id']=new_id;
+  $('#'+id).addClass('disabled');
+  jQuery.ajax({
+    url: '/delete_subject',
+    data: data,
+    type: 'POST',
+    success: function(data){
+
+
+          if(data['result']=='success')
+        {
+          $('#status_'+new_id).html('Successfully deleted subject');
+          $('#save_'+new_id).addClass('disabled');
+          
+
+        }
+        else
+        {
+          $('#status_'+new_id).html('Could not delete subject - Refresh page and try again');
+        }
+
+        
+    }
+});
+
+}
+
 function save_category(id)
 {
   new_id=id.substr(5);
@@ -71,13 +106,14 @@ function save_category(id)
   data['subject']=subject;
   data['category']=category;
   data['id']=id;
+  
   jQuery.ajax({
     url: '/save_category',
     data: data,
     type: 'POST',
     success: function(data){
 
-        if(data['result']=='success_category')
+       if(data['result']=='success_category')
         {
           $('#status_'+new_id).html('Successfully updated just category');
           
