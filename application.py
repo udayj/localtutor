@@ -700,8 +700,11 @@ def tutor():
 				else:
 					display_subjects.append(actual_subject['display_name'])
 			except StopIteration:
-				pass		
-		return render_template('tutor.html',tutor=tutor,display_subjects=display_subjects)
+				pass
+		if tutor['area'] != 'online':
+			return render_template('tutor.html',tutor=tutor,display_subjects=display_subjects)
+		else:
+			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects)
 	except StopIteration:
 		return render_template('error.html')
 

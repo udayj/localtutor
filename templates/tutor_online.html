@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% block content %}
+
+      <!-- Jumbotron -->
+        <div class="row">
+      <div class="col-lg-8 col-md-8 ">
+      
+      <div class="input-group input-group-md">
+  
+  <input id="search" type="text" class="form-control col-lg-12 col-md-12" placeholder="Search for a teacher eg. Physics" aria-describedby="sizing-addon1"
+  onkeydown="if (event.keyCode==13) { search();}">
+   <span class="input-group-btn">
+        <button class="btn btn-primary" type="button" onclick="search()" style="position:relative;top:-2px;">Search</button>
+      </span>
+</div>
+          
+        </div>
+      </div>
+
+     
+    <hr>
+    <div id="tutor_id" style="display:none;">
+      {{tutor['_id']}}
+    </div>
+
+
+     <div class="row">
+      <div class="col-lg-10 col-md-10">
+     
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <td>
+                  <h3>Course Information</h3>
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Name
+                </td>
+                <td>
+                  {{tutor['name'].title()}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Subjects Touched
+                </td>
+                <td>
+                  {% for subject in display_subjects %}
+                    <a href="/search?subject={{subject}}">{{subject}}</a> 
+                    <br>
+                    {% endfor %}
+                </td>
+              </tr>
+              
+              <tr>
+                <td>
+                  Online URL
+                </td>
+                <td>
+                  <a href="{{tutor['geographical_location']}}">Link</a>
+                </td>
+              </tr>
+              
+              <tr>
+                <td>
+                  Age Group
+                </td>
+                <td>
+                  {{tutor['age_group'].title()}}
+                </td>
+              </tr>
+              
+              <tr>
+                <td>
+                  Venue
+                </td>
+                <td>
+                  {{tutor['venue']}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Studied in Group/individually
+                </td>
+                <td>
+                  {{tutor['classroom_type'].title()}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Institution/Individual Teacher
+                </td>
+                <td>
+                  {{tutor['teacher_type'].title()}}
+                </td>
+              </tr>
+              <tr style="display:none;" id="friends">
+                <td>
+                  Friends who have taken this course
+                </td>
+                <td id="friend_names">
+                  
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+      
+
+              </div>  
+            </div>
+
+    
+      
+
+      <!-- Example row of columns -->
+<script>
+$('.result').hover(function(){
+  $(this).css('background-color','#eee');
+},function(){
+  $(this).css('background-color','white');
+});
+</script>   
+
+<script>     
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  },
+  prefetch : {
+    url: '/options?subject='
+   
+  }
+});
+
+var suggestion="";
+var classify="y";
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+}).on('typeahead:select', function (obj, suggestion) {
+  suggestion=suggestion['value'];
+  classify="n";
+  window.location='search?subject='+encodeURIComponent(suggestion)+"&classify=n"; 
+  
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+         if(classify!="n")
+        {  
+          
+          window.location='search?subject='+encodeURIComponent(name.value.trim());
+        }
+        else
+        {
+          
+          
+        }
+    }
+
+function custom_logic(login_status){
+  friend_tutor();
+}
+
+function friend_tutor(){
+  var tutor_id=$('#tutor_id').text().trim();
+  var friends=[];
+  var friend_names={};
+   FB.api('/me/friends', function(response) {
+    console.log(response);
+    var ind=0;
+    for(ind=0;ind<response['data'].length;ind++)
+    {
+      friends.push(response['data'][ind]['id']);
+      friend_names[response['data'][ind]['id']]=response['data'][ind]['name'];
+    }
+
+    data={}
+   data['tutor']=tutor_id;
+   data['friends']=friends;
+   console.log(data);
+   jQuery.ajax({
+    url: '/friend_tutor_name',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      var result="";
+      var ind=0;
+      console.log(friend_names);
+      console.log(data);
+      for(ind=0;ind<data['friend_tutor'].length;ind++)
+      {
+        result=result+friend_names[data['friend_tutor'][ind]]+"<br>"
+      }
+      $('#friend_names').html(result);
+      $('#friends').css('display','');
+    }
+  });
+ });
+}
+
+</script>  
+{% endblock %}
+
+
+
