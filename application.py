@@ -1047,68 +1047,71 @@ def search():
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n')
 
-	query=request.args.get('subject')
-	is_classify=request.args.get('classify')
-	page=request.args.get('page')
-	print page
-	
 	try:
-		page=int(page)
-	except Exception,ValueError:
-		page=1
-	if not page or page<1 or page>5:
-		page=1
-	if not query or query.strip()=='':
-		return render_template('search_error.html')
-
-	print page
-	client=MongoClient()
-	db=client.local_tutor
-
-
-
-	response=prepare_query(query,(page-1)*10,None,None,False)
-	
-	total=response['hits']['total']
-	max_score=response['hits']['max_score']
-	results=response['hits']['hits']
-	areas=[]
-	subjects=[]
-	areas_duplicate=[]
-	subjects_duplicate=[]
-	paginated_results=[]
-	for teacher in results:
-		actual_data=teacher['_source']
-		actual_data['_id']=teacher['_id']
-		paginated_results.append(actual_data)
-		if actual_data['area'] not in areas_duplicate:
-			areas_duplicate.append(actual_data['area'])
-			areas.append((actual_data['area'],False))
-		for subject in actual_data['subject']:
-			if subject not in subjects_duplicate and len(subject)>0:
-				subjects_duplicate.append(subject)
-				subjects.append((subject,False))
-
+		query=request.args.get('subject')
+		is_classify=request.args.get('classify')
+		page=request.args.get('page')
+		print page
 		
-	filter_results=False
-	if len(areas)>1 or len(subjects)>1:
-		filter_results=True
+		try:
+			page=int(page)
+		except Exception,ValueError:
+			page=1
+		if not page or page<1 or page>5:
+			page=1
+		if not query or query.strip()=='':
+			return render_template('search_error.html')
+
+		print page
+		client=MongoClient()
+		db=client.local_tutor
 
 
-	student_tutor_assoc={}
-	if hasattr(current_user,'id'):
-		for teacher in paginated_results:
-			student_teacher=db.student_tutor.find({'tutor_id':str(teacher['_id']),'student_id':current_user.fb_id}).count()
-			if student_teacher>0:
-				student_tutor_assoc[teacher['_id']]=True
-	print student_tutor_assoc
-	total_pages=math.ceil(total/10.0)
-	if total_pages>5:
-		total_pages=5
+
+		response=prepare_query(query,(page-1)*10,None,None,False)
 		
-	return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
-							student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
-							areas=areas,subjects=subjects,classify='n')
+		total=response['hits']['total']
+		max_score=response['hits']['max_score']
+		results=response['hits']['hits']
+		areas=[]
+		subjects=[]
+		areas_duplicate=[]
+		subjects_duplicate=[]
+		paginated_results=[]
+		for teacher in results:
+			actual_data=teacher['_source']
+			actual_data['_id']=teacher['_id']
+			paginated_results.append(actual_data)
+			if actual_data['area'] not in areas_duplicate:
+				areas_duplicate.append(actual_data['area'])
+				areas.append((actual_data['area'],False))
+			for subject in actual_data['subject']:
+				if subject not in subjects_duplicate and len(subject)>0:
+					subjects_duplicate.append(subject)
+					subjects.append((subject,False))
+
+			
+		filter_results=False
+		if len(areas)>1 or len(subjects)>1:
+			filter_results=True
+
+
+		student_tutor_assoc={}
+		if hasattr(current_user,'id'):
+			for teacher in paginated_results:
+				student_teacher=db.student_tutor.find({'tutor_id':str(teacher['_id']),'student_id':current_user.fb_id}).count()
+				if student_teacher>0:
+					student_tutor_assoc[teacher['_id']]=True
+		print student_tutor_assoc
+		total_pages=math.ceil(total/10.0)
+		if total_pages>5:
+			total_pages=5
+			
+		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
+								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
+								areas=areas,subjects=subjects,classify='n')
+	except Exception as e:
+		app.logger.error(str(e))
 
 
 
