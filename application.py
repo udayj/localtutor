@@ -14,6 +14,7 @@ import operator
 import nltk
 import pycrfsuite
 import math
+import requests
 
 SECRET_KEY='SECRET'
 
@@ -423,6 +424,8 @@ def save_category():
 		subject['category']=data['category']
 		db.subjects.save(subject)
 		if data['subject'] == subject['name']:
+
+			
 			response={'result':'success_category'}
 			js=json.dumps(response)
 			resp=Response(js,status=200,mimetype='application/json')
@@ -444,6 +447,7 @@ def save_category():
 			teacher['subject'].remove(subject['name'])
 			if data['subject'] not in teacher['subject']:
 				teacher['subject'].append(data['subject'])
+
 			db.teachers.save(teacher)
 		prev_subject=db.subjects.find({'name':data['subject']}).count()
 		
@@ -453,6 +457,7 @@ def save_category():
 		else:
 			subject['name']=data['subject']
 			db.subjects.save(subject)
+
 		response={'result':'success_subject_category'}
 		js=json.dumps(response)
 		resp=Response(js,status=200,mimetype='application/json')
@@ -853,107 +858,261 @@ def tagger(text):
 
 	return(subject,area)
 
+def prepare_query(query,start_from,filter_areas, filter_subjects,is_filter):
+	payload={}
+	payload['query']={}
+	payload['query']['filtered']={}
+	payload['query']['filtered']['query']={}
+	payload['query']['filtered']['query']['bool']={}
+	payload['query']['filtered']['query']['bool']['should']=[]
 
-@app.route('/search')
+	constant_score_query={}
+	constant_score_query['constant_score']={}
+	constant_score_query['constant_score']['query']={}
+	constant_score_query['constant_score']['query']['match']={}
+	constant_score_query['constant_score']['query']['match']['subject']={}
+	constant_score_query['constant_score']['query']['match']['subject']['query']=query
+	constant_score_query['constant_score']['query']['match']['subject']['fuzziness']=1
+
+	constant_score_query4={}
+	constant_score_query4['constant_score']={}
+	constant_score_query4['constant_score']['query']={}
+	constant_score_query4['constant_score']['query']['match']={}
+	constant_score_query4['constant_score']['query']['match']['subject']={}
+	constant_score_query4['constant_score']['query']['match']['subject']['query']=query
+	
+
+	payload['query']['filtered']['query']['bool']['should'].append(constant_score_query)
+	payload['query']['filtered']['query']['bool']['should'].append(constant_score_query4)
+
+	constant_score_query1={}
+	constant_score_query1['constant_score']={}
+	constant_score_query1['constant_score']['query']={}
+	constant_score_query1['constant_score']['query']['match']={}
+	constant_score_query1['constant_score']['query']['match']['area']={}
+	constant_score_query1['constant_score']['query']['match']['area']['query']=query
+	constant_score_query1['constant_score']['query']['match']['area']['fuzziness']=1
+
+
+	constant_score_query2={}
+	constant_score_query2['constant_score']={}
+	constant_score_query2['constant_score']['query']={}
+	constant_score_query2['constant_score']['query']['match']={}
+	constant_score_query2['constant_score']['query']['match']['name']={}
+	constant_score_query2['constant_score']['query']['match']['name']['query']=query
+	constant_score_query2['constant_score']['query']['match']['name']['fuzziness']=1	
+
+
+	constant_score_query3={}
+	constant_score_query3['constant_score']={}
+	constant_score_query3['constant_score']['query']={}
+	constant_score_query3['constant_score']['query']['match']={}
+	constant_score_query3['constant_score']['query']['match']['geographical_location']={}
+	constant_score_query3['constant_score']['query']['match']['geographical_location']['query']=query
+	constant_score_query3['constant_score']['query']['match']['geographical_location']['fuzziness']=1		
+
+	bool_query={}
+	bool_query['bool']={}
+	bool_query['bool']['should']=[]
+	bool_query['bool']['should'].append(constant_score_query1)
+	bool_query['bool']['should'].append(constant_score_query2)
+	bool_query['bool']['should'].append(constant_score_query3)
+
+	payload['query']['filtered']['query']['bool']['should'].append(bool_query)	
+
+	if is_filter:
+		bool_query={}
+		bool_query['bool']={}
+		bool_query['bool']['should']=[]
+		for subject in filter_subjects:
+			bool_query['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
+		for area in filter_areas:
+			bool_query['bool']['should'].append({'term': {'area.not_analyzed':area}})
+		payload['query']['filtered']['filter']=bool_query
+
+	
+
+	print payload
+
+	print 'http://localhost:9200/local_tutor/teachers/_search?size=10&from='+str(start_from)
+	r=requests.post('http://localhost:9200/local_tutor/teachers/_search?size=10&from='+str(start_from),json=payload)
+	
+	json_response=json.loads(r.text)
+	return json_response
+
+
+@app.route('/search',methods=['GET','POST'])
 def search():
-	query=request.args.get('subject')
-	is_classify=request.args.get('classify')
-	page=request.args.get('page')
-	if not page or page<1:
-		page=1
-	try:
-		page=int(page)
-	except ValueError:
-		page=1
-	if not query or query.strip()=='':
-		return render_template('search_error.html')
-	client=MongoClient()
-	db=client.local_tutor
-
-	if is_classify is not None and is_classify=='n':
-		query_modified=rewrite_query(query)
+	if request.method=='POST':
+		query=request.args.get('subject')
 		
-		teachers=db.teachers.find({'subject':{'$in':query_modified}})
-		results=[]
+		page=request.args.get('page')
+		
 		try:
-			for teacher in teachers:
-				results.append(teacher)
-		except StopIteration:
+			page=int(page)
+		except Exception,ValueError:
+			page=1
+		if not page or page<1 or page>5:
+			page=1
+
+		if not query or query.strip()=='':
 			return render_template('search_error.html')
+
+		data={}
+		for name,value in dict(request.form).iteritems():
+			data[name]=[element.strip() for element in value]
+		app.logger.debug(str(data))
+
+		client=MongoClient()
+		db=client.local_tutor
+
+		filter_subjects_string=data['subject_selected'][0].split('|')
+		
+		filter_areas_string=data['areas_selected'][0].split('|')
+		
+		areas_checkboxes=data['areas_checkboxes'][0].split('|')
+		subject_checkboxes=data['subject_checkboxes'][0].split('|')
+		filter_subjects=[]
+		filter_areas=[]
+		is_filter=True
+
+		for subjects in filter_subjects_string:
+			if len(subjects)>0:
+				
+				filter_subjects.append(subjects)
+		for areas in filter_areas_string:
+			if len(areas)>0:
+				
+				filter_areas.append(areas)
+
+
+		print filter_areas
+		print filter_subjects
+
+		response=prepare_query(query,(page-1)*10,filter_areas,filter_subjects,is_filter)
+		
+		
+
+
+		total=response['hits']['total']
+		max_score=response['hits']['max_score']
+		results=response['hits']['hits']
+		areas=[]
+		subjects=[]
+		paginated_results=[]
+		for teacher in results:
+			actual_data=teacher['_source']
+			actual_data['_id']=teacher['_id']
+			paginated_results.append(actual_data)
+			
+
+		areas=[]
+		subjects=[]
+		for area in areas_checkboxes:
+			if len(area)<1:
+				continue
+			if area in filter_areas:
+				areas.append((area,True))
+			else:
+				areas.append((area,False))
+		for subject in subject_checkboxes:
+			if len(subject)<1:
+				continue
+			if subject in filter_subjects:
+				subjects.append((subject,True))
+			else:
+				subjects.append((subject,False))
+
+
+
+
+		filter_results=False
+		if len(areas)>1 or len(subjects)>1:
+			filter_results=True
+
+
 		student_tutor_assoc={}
 		if hasattr(current_user,'id'):
-			for teacher in results:
+			for teacher in paginated_results:
 				student_teacher=db.student_tutor.find({'tutor_id':str(teacher['_id']),'student_id':current_user.fb_id}).count()
 				if student_teacher>0:
 					student_tutor_assoc[teacher['_id']]=True
 		print student_tutor_assoc
-		paginated_results=[]
-		total_pages=1
-		if len(results)>20:
-			total_pages=math.ceil(len(results)/20.0)
-			if page>total_pages:
-				page=1
-			paginated_results=results[(page-1)*20:page*20]
-		else:
-			total_pages=1
-			page=1
-			paginated_results=results
+		total_pages=math.ceil(total/10.0)
+		if total_pages>5:
+			total_pages=5
+		
+			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
-								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,classify='n')
+								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
+								areas=areas,subjects=subjects,classify='n')
 
-	subject, area = tagger(query.lower().strip())
-	print 'subject='+subject
-	print 'area='+area
-
-	if len(subject)>0 and len(area)<=0:
-		canonical_subject=rewrite_query(subject)
-		teachers=db.teachers.find({'subject':{'$in':canonical_subject}})
-	if len(subject)<=0 and len(area)>0:
-		teachers=db.teachers.find({'area':area})
-	if len(subject)>0 and len(area)>0:
-		canonical_subject=rewrite_query(subject)
-		teachers=db.teachers.find({'subject':{'$in':canonical_subject},'area':area})
-	if len(subject)<=0 and len(area)<=0:
-		teachers=[]
-
+	query=request.args.get('subject')
+	is_classify=request.args.get('classify')
+	page=request.args.get('page')
+	print page
 	
-	results=[]
 	try:
-		for teacher in teachers:
-			results.append(teacher)
-	except StopIteration:
+		page=int(page)
+	except Exception,ValueError:
+		page=1
+	if not page or page<1 or page>5:
+		page=1
+	if not query or query.strip()=='':
 		return render_template('search_error.html')
+
+	print page
+	client=MongoClient()
+	db=client.local_tutor
+
+
+
+	response=prepare_query(query,(page-1)*10,None,None,False)
+	
+	total=response['hits']['total']
+	max_score=response['hits']['max_score']
+	results=response['hits']['hits']
+	areas=[]
+	subjects=[]
+	areas_duplicate=[]
+	subjects_duplicate=[]
+	paginated_results=[]
+	for teacher in results:
+		actual_data=teacher['_source']
+		actual_data['_id']=teacher['_id']
+		paginated_results.append(actual_data)
+		if actual_data['area'] not in areas_duplicate:
+			areas_duplicate.append(actual_data['area'])
+			areas.append((actual_data['area'],False))
+		for subject in actual_data['subject']:
+			if subject not in subjects_duplicate and len(subject)>0:
+				subjects_duplicate.append(subject)
+				subjects.append((subject,False))
+
+		
+	filter_results=False
+	if len(areas)>1 or len(subjects)>1:
+		filter_results=True
+
+
 	student_tutor_assoc={}
-	
-	if len(results)==0 and (len(subject)>0 or len(area)>0):
-		teachers=db.teachers.find({'$or':[{'subject':query.lower().strip()},{'area':query.lower().strip()}]})
-		try:
-			for teacher in teachers:
-				results.append(teacher)
-		except StopIteration:
-			return render_template('search_error.html')
-	
 	if hasattr(current_user,'id'):
-		for teacher in results:
+		for teacher in paginated_results:
 			student_teacher=db.student_tutor.find({'tutor_id':str(teacher['_id']),'student_id':current_user.fb_id}).count()
 			if student_teacher>0:
 				student_tutor_assoc[teacher['_id']]=True
-	paginated_results=[]
-	total_pages=1
-	if len(results)>20:
-		total_pages=int(math.ceil(len(results)/20.0))
+	print student_tutor_assoc
+	total_pages=math.ceil(total/10.0)
+	if total_pages>5:
+		total_pages=5
 		
-		if page>total_pages:
-			page=1
-
-		paginated_results=results[(page-1)*20:page*20]
-	else:
-		total_pages=1
-		page=1
-		paginated_results=results
-	
 	return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
-							student_tutor_assoc=student_tutor_assoc,total_pages=int(total_pages),page=page,classify='y')	
+							student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
+							areas=areas,subjects=subjects,classify='n')
+
+
+
+		
 
 
 
@@ -985,6 +1144,7 @@ def options():
 	
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp
+
 		
 
 if True:

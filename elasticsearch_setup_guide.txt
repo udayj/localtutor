@@ -1,0 +1,13 @@
+
+process to create replica set
+db.shutdownServer()
+sudo mongod --fork --port 27017 --dbpath /var/lib/mongodb --replSet rs0 --master --logpath /var/log/mongodb/mongodb_replica.log
+connect using mongo
+rs.initiate()
+
+install elastic search
+install jdk
+set JAVA_HOME path variable
+./bin/elasticsearch -d (for running as a daemon process)
+create index mapping settings
+mongo-connector -m localhost:27017 -t localhost:9200 -d elastic_doc_manager

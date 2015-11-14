@@ -28,7 +28,40 @@
 
     <hr>
    <div class="row">
-      <div class="col-lg-12 col-md-12">
+      <div class="col-lg-2 col-md-2">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div style="display:none;">
+            <form id='filter_form' type="hidden" action='/search?subject={{query}}' method='POST'>
+            </form>
+          </div>
+            {% if filter_results %}
+
+              <div id="area_outer">
+              {% for area in areas %}
+
+              <input class="area_checkbox" type="checkbox" onclick="get_filtered_results()" name="{{area[0]}}"
+              {% if area[1] %}
+              checked
+              {% endif %}
+              >{{area[0]}}<br>
+              {% endfor %}
+            </div>
+            <div id="subject_outer">
+              <hr>
+              {% for subject in subjects %}
+              <input class="subject_checkbox" type="checkbox" onclick="get_filtered_results()" name="{{subject[0]}}"
+              {% if subject[1] %}
+              checked
+              {% endif %}
+              >{{subject[0]}}<br>
+              {% endfor %}
+            </div>
+            {% endif %}
+      </div>
+    </div>
+      </div>
+      <div class="col-lg-10 col-md-10">
         
    
 {% for result in results|batch(2) %}
@@ -121,7 +154,7 @@
 <br>
               {% endfor %}
               <div class="row">
-                <div class="col-lg-4">
+                <div class="col-lg-5">
                   <div id="total_pages" style="display:none;">
                     {{total_pages}}
                   </div>
@@ -353,9 +386,99 @@ $('#page_selection').bootpag({
   prev:'prev'
   //href:'/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page={% raw %}{{number}}{% endraw %}"
 }).on("page",function(event,num){
-   window.location='/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page="+num;
+
+   var url=$('#filter_form').attr('action');
+   url=url+"&page="+num;
+   $('#filter_form').attr('action',url);
+   get_filtered_results();
+   //window.location='/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page="+num;
 });
 }
+
+var selected_area=[];
+var checkboxes_area=[];
+var selected_subject=[];
+var checkboxes_subject=[];
+
+function get_filtered_results(){
+
+  //get list of checkboxes, get list of checkboxes selected
+  //send list to backend
+  //send post request to backend
+  selected_area="";
+  $('#area_outer input:checked').each(function() {
+    selected_area=selected_area+$(this).attr('name')+"|";
+});
+
+  checkboxes_area="";
+  $('.area_checkbox').each(function() {
+    checkboxes_area=checkboxes_area+$(this).attr('name')+"|";
+}); 
+
+  selected_subject="";
+  $('#subject_outer input:checked').each(function() {
+    selected_subject=selected_subject+$(this).attr('name')+"|";
+});
+
+  checkboxes_subject="";
+  $('.subject_checkbox').each(function() {
+    checkboxes_subject=checkboxes_subject+$(this).attr('name')+"|";
+});
+
+ 
+  data={}
+  data['areas_selected']=selected_area;
+  data['areas_checkboxes']=checkboxes_area;
+  data['subject_selected']=selected_subject;
+  data['subject_checkboxes']=checkboxes_subject;
+
+/*jQuery.ajax({
+    url: window.location.href,
+    data: data,
+    type: 'POST',
+    
+    success: function(data)
+    {
+      if(data['result']=='success')
+      {
+        var ind=0;
+        for(ind=0;ind<data['friend_tutor'].length;ind++)
+        {
+          $('#friend_'+data['friend_tutor'][ind]).text('Your friend has studied under this tutor');
+          $('#friend_'+data['friend_tutor'][ind]).css('display','');
+        }
+      }
+    }
+
+});*/
+
+$('#filter_form').submit();
+
+}
+
+$('#filter_form').submit(function(){
+
+  var input1 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "areas_checkboxes").val(checkboxes_area);
+
+  var input2 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "areas_selected").val(selected_area);
+
+  var input3 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "subject_checkboxes").val(checkboxes_subject);
+
+  var input4 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "subject_selected").val(selected_subject);
+  
+  $('#filter_form').append(input1);
+  $('#filter_form').append(input2);
+  $('#filter_form').append(input3);
+  $('#filter_form').append(input4);
+});
 </script>  
 {% endblock %}
 
