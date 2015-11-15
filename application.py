@@ -858,7 +858,7 @@ def tagger(text):
 
 	return(subject,area)
 
-def prepare_query(query,start_from,filter_areas, filter_subjects,is_filter):
+def prepare_query(query,size,start_from,filter_areas, filter_subjects,is_filter):
 	payload={}
 	payload['query']={}
 	payload['query']['filtered']={}
@@ -893,6 +893,16 @@ def prepare_query(query,start_from,filter_areas, filter_subjects,is_filter):
 	constant_score_query1['constant_score']['query']['match']['area']['query']=query
 	constant_score_query1['constant_score']['query']['match']['area']['fuzziness']=1
 
+	constant_score_query6={}
+	constant_score_query6['constant_score']={}
+	constant_score_query6['constant_score']['query']={}
+	constant_score_query6['constant_score']['query']['match']={}
+	constant_score_query6['constant_score']['query']['match']['subject']={}
+	constant_score_query6['constant_score']['query']['match']['subject']['query']=query
+	
+	constant_score_query6['constant_score']['query']['match']['subject']['type']='phrase'
+
+
 
 	constant_score_query2={}
 	constant_score_query2['constant_score']={}
@@ -903,6 +913,8 @@ def prepare_query(query,start_from,filter_areas, filter_subjects,is_filter):
 	constant_score_query2['constant_score']['query']['match']['name']['fuzziness']=1	
 
 
+
+
 	constant_score_query3={}
 	constant_score_query3['constant_score']={}
 	constant_score_query3['constant_score']['query']={}
@@ -911,12 +923,29 @@ def prepare_query(query,start_from,filter_areas, filter_subjects,is_filter):
 	constant_score_query3['constant_score']['query']['match']['geographical_location']['query']=query
 	constant_score_query3['constant_score']['query']['match']['geographical_location']['fuzziness']=1		
 
+	constant_score_query5={}
+	constant_score_query5['constant_score']={}
+	constant_score_query5['constant_score']['query']={}
+	constant_score_query5['constant_score']['query']['match']={}
+	constant_score_query5['constant_score']['query']['match']['subject.not_analyzed']={}
+	constant_score_query5['constant_score']['query']['match']['subject.not_analyzed']['query']=query
+	
+
 	bool_query={}
 	bool_query['bool']={}
 	bool_query['bool']['should']=[]
 	bool_query['bool']['should'].append(constant_score_query1)
-	bool_query['bool']['should'].append(constant_score_query2)
-	bool_query['bool']['should'].append(constant_score_query3)
+
+	bool_query2={}
+	bool_query2['bool']={}
+	bool_query2['bool']['should']=[]
+	bool_query2['bool']['should'].append(constant_score_query2)
+	#bool_query2['bool']['should'].append(constant_score_query3)
+	bool_query2['bool']['should'].append(constant_score_query5)
+	bool_query2['bool']['should'].append(constant_score_query6)
+
+	bool_query['bool']['should'].append(bool_query2)
+	
 
 	payload['query']['filtered']['query']['bool']['should'].append(bool_query)	
 
@@ -934,8 +963,8 @@ def prepare_query(query,start_from,filter_areas, filter_subjects,is_filter):
 
 	print payload
 
-	print 'http://localhost:9200/local_tutor/teachers/_search?size=10&from='+str(start_from)
-	r=requests.post('http://localhost:9200/local_tutor/teachers/_search?size=10&from='+str(start_from),json=payload)
+	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
+	r=requests.post('http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from),json=payload)
 	
 	json_response=json.loads(r.text)
 	return json_response
@@ -952,7 +981,7 @@ def search():
 			page=int(page)
 		except Exception,ValueError:
 			page=1
-		if not page or page<1 or page>5:
+		if not page or page<1 or page>10:
 			page=1
 
 		if not query or query.strip()=='':
@@ -989,7 +1018,7 @@ def search():
 		print filter_areas
 		print filter_subjects
 
-		response=prepare_query(query,(page-1)*10,filter_areas,filter_subjects,is_filter)
+		response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,is_filter)
 		
 		
 
@@ -1039,8 +1068,8 @@ def search():
 					student_tutor_assoc[teacher['_id']]=True
 		print student_tutor_assoc
 		total_pages=math.ceil(total/10.0)
-		if total_pages>5:
-			total_pages=5
+		if total_pages>10:
+			total_pages=10
 		
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
@@ -1057,7 +1086,7 @@ def search():
 			page=int(page)
 		except Exception,ValueError:
 			page=1
-		if not page or page<1 or page>5:
+		if not page or page<1 or page>10:
 			page=1
 		if not query or query.strip()=='':
 			return render_template('search_error.html')
@@ -1066,10 +1095,8 @@ def search():
 		client=MongoClient()
 		db=client.local_tutor
 
+		response=prepare_query(query,100,0,None,None,False)
 
-
-		response=prepare_query(query,(page-1)*10,None,None,False)
-		
 		total=response['hits']['total']
 		max_score=response['hits']['max_score']
 		results=response['hits']['hits']
@@ -1090,10 +1117,25 @@ def search():
 					subjects_duplicate.append(subject)
 					subjects.append((subject,False))
 
-			
 		filter_results=False
 		if len(areas)>1 or len(subjects)>1:
 			filter_results=True
+
+		response=prepare_query(query,10,(page-1)*10,None,None,False)
+		
+		total=response['hits']['total']
+		max_score=response['hits']['max_score']
+		results=response['hits']['hits']
+		
+		paginated_results=[]
+		for teacher in results:
+			actual_data=teacher['_source']
+			actual_data['_id']=teacher['_id']
+			paginated_results.append(actual_data)
+			
+
+			
+		
 
 
 		student_tutor_assoc={}
@@ -1104,8 +1146,8 @@ def search():
 					student_tutor_assoc[teacher['_id']]=True
 		print student_tutor_assoc
 		total_pages=math.ceil(total/10.0)
-		if total_pages>5:
-			total_pages=5
+		if total_pages>10:
+			total_pages=10
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
