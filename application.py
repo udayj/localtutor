@@ -1086,7 +1086,7 @@ def search():
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
-								areas=areas,subjects=subjects,classify='n',app_id=app_id)
+								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total)
 
 	try:
 		query=request.args.get('subject')
@@ -1163,7 +1163,7 @@ def search():
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
-								areas=areas,subjects=subjects,classify='n',app_id=app_id)
+								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total)
 	except Exception as e:
 		app.logger.error(str(e))
 
