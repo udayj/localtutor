@@ -1,4 +1,8 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
+{% block css %}
+<link rel="stylesheet" href="/static/stylesheets/pages/page_search.css">
+{% endblock %}
+
 {% block content %}
 
 <style>
@@ -40,7 +44,7 @@
 
 .tt-suggestion.tt-cursor {
   color: #fff;
-  background-color: #0097cf;
+  background-color: #72c02c;
 
 }
 
@@ -50,33 +54,53 @@
 </style>
 
       <!-- Jumbotron -->
-     <center>
-      <div class="jumbotron" style="background-color:white">
-        <h1>Tutorack</h1>
-      
-        <p class="lead">Find the best teachers on any subject - from Physics and Chemistry to Swimming and Dancing</p>
+    <div class="search-block parallaxBg">
+        <div class="container">
+            <div class="col-md-6 col-md-offset-3">
+                <h1>Find <span class="color-green">Connect</span> Learn</h1>
+                <h3 style="color:white;">Find the best tutors for anything you want to learn</h3>
+                <div class="input-group">
+                    <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing" onkeydown="if (event.keyCode==13) { search();}">
+                    <span class="input-group-btn">
+                        <button class="btn-u btn-u-lg" type="button" style="margin-top:-5px;"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
 
-        <div class="row">
-      <div class="col-lg-8 col-md-8 col-lg-offset-2 col-lg-offset-2">
-      
-      <div class="input-group input-group-md">
-  
-  <input id="search" type="text" class="form-control col-lg-12 col-md-12" placeholder="Search for a teacher eg. Physics" aria-describedby="sizing-addon1"
-  onkeydown="if (event.keyCode==13) { search();}">
-   <span class="input-group-btn">
-        <button class="btn btn-primary" type="button" onclick="search()" style="position:relative;top:-2px;">Search</button>
-      </span>
-</div>
-          
+                
+            </div>
         </div>
-      </div>
-        
-      
-      
-      
     </div>
-  
-      </center>
+    <div class="container content-sm">
+    <div class="row margin-bottom-30">
+          <div class="col-md-4">
+            <div class="service">
+                    <i class="fa fa-compress service-icon"></i>
+              <div class="desc">
+                <h4>Find</h4>
+                        <p>Find tutors, institutes and courses in your city for anything you want to learn like dancing, swimming or even unqiue areas like taekwondo and magic</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="service">
+                    <i class="fa fa-cogs service-icon"></i>
+              <div class="desc">
+                <h4>Connect</h4>
+                        <p>Connect with tutors qucikly and directly. Network with friends who personally know the tutor to decide if they are a good fit</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="service">
+                    <i class="fa fa-rocket service-icon"></i>
+              <div class="desc">
+                <h4>Learn</h4>
+                        <p>Develop new interests or harness old ones. Enhance your knowledge through any learning medium that suits you</p>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
 
 <script>     
 function options(subject)
@@ -159,6 +183,9 @@ function search()
       <!-- Example row of columns -->
      
 {% endblock %}
+
+
+
 
 
 

@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Tutorack</title>
+    <meta name="description" content="{{meta_description}}">
+    <meta name="author" content="LocalTutor">
+
+    <!-- Le styles -->
+    <link href="/static/stylesheets/bootstrap_unify.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/stylesheets/style.css">
+    <!-- CSS Header and Footer -->
+    <link rel="stylesheet" href="/static/stylesheets/headers/header-default.css">
+    <link rel="stylesheet" href="/static/stylesheets/footers/footer-v1.css">
+
+    <!-- CSS Implementing Plugins -->
+    <link rel="stylesheet" href="/static/stylesheets/animate.css">
+    <link rel="stylesheet" href="/static/stylesheets/line-icons/line-icons.css">
+    <link rel="stylesheet" href="/static/stylesheets/font-awesome/css/font-awesome.min.css">
+    <!--link rel="stylesheet" href="/static/stylesheets/owl-carousel/owl-carousel/owl.carousel.css"-->
+    <link rel="stylesheet" href="/static/stylesheets/sky-forms-pro/skyforms/css/sky-forms.css">
+    <link rel="stylesheet" href="/static/stylesheets/sky-forms-pro/skyforms/custom/custom-sky-forms.css">
+    <!--[if lt IE 9]><link rel="stylesheet" href="assets/plugins/sky-forms-pro/skyforms/css/sky-forms-ie8.css"><![endif]-->
+
+    <!-- CSS Page Style -->
+    {% block css %}
+    {% endblock %}
+    
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-67871253-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <!--script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script-->
+    <!--script src="//code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script-->
+    <script src="/static/javascript/bootstrap.min.js"></script>
+    <script src="/static/javascript/jquery.bootpag.min.js"></script>
+    <script src="/static/javascript/typeahead.bundle.js"></script>
+    <script src="/static/javascript/app.js"></script>
+    <script src="/static/javascript/custom.js"></script>
+    <!--script src="/static/javascript/typeahead.jquery.min.js"></script-->
+
+    
+  <!--script src="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script-->
+  
+
+    
+    
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <style>
+
+.twitter-typeahead { width: 100%; } 
+.tt-hint { width: 100%; } 
+.tt-input{ width: 100%; } 
+.tt-dropdown-menu { width: 100%; } 
+
+.tt-query {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+  color: #999
+}
+
+.tt-menu {    // used to be tt-dropdown-menu in older versions
+  width: 422px;
+  margin-top: 4px;
+  padding: 4px 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+  padding: 3px 20px;
+  line-height: 24px;
+}
+
+.tt-suggestion.tt-cursor {
+  color: #fff;
+  background-color: #72c02c;
+
+}
+
+.tt-suggestion p {
+  margin: 0;
+}
+</style>
+
+    
+  </head>
+
+<body >
+   <script>
+  window.fbAsyncInit = function() {
+    FB.init({
+        appId : {{app_id}},
+      //appId      : '1487145791581778',
+      xfbml      : true,
+      status: true,
+      version    : 'v2.4'
+    });
+
+    FB.Event.subscribe('auth.statusChange', function(response) {
+    if(response.status == 'connected') {
+        custom_logic(response.status);
+    }
+    else{
+         
+    }
+});
+    FB.Event.subscribe('auth.logout', function(response) {
+    if(response.status == 'connected') {
+        custom_logic(response.status);
+    }
+    else{
+        
+    }
+});
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+function custom_logic(login_status)
+{
+    return;
+}
+  
+</script>
+<div class="wrapper">
+    <!--=== Header ===-->
+    <div class="header">
+        <div class="container">
+            <!-- Logo -->
+            <a class="logo" href="index.html">
+                <h1>Tutorack</h1>
+            </a>
+            <!-- End Logo -->
+
+            <!-- Topbar -->
+            <!--div class="topbar" style="margin:-5px;">
+                <ul class="loginbar pull-right">
+                    
+                    
+                    <li><a href="page_faq.html">Login</a></li>
+                    <li class="topbar-devider"></li>
+                    <li><a href="page_login.html">Login using Facebook</a></li>
+                </ul>
+            </div>
+            <br>
+            <br-->
+            <!-- End Topbar -->
+
+            <!-- Toggle get grouped for better mobile display -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="fa fa-bars"></span>
+            </button>
+            <!-- End Toggle -->
+        </div><!--/end container-->
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse mega-menu navbar-responsive-collapse">
+            <div class="container">
+                <ul class="nav navbar-nav">
+                    <!-- Home -->
+                     <li class="active">
+                        <a href="/" >
+                            Home
+                        </a>
+                    </li>
+                    
+                    <!-- End Home -->
+
+                    <!-- Pages -->
+                   <li>
+                        <a href="/subjects" >
+                            Subjects
+                        </a>
+                   </li>
+                    <!-- End Pages -->
+
+                    <!-- Blog -->
+                    <li>
+                        <a href="/about" >
+                            About
+                        </a>
+                    </li>
+                    {% if not current_user.id %}
+                     <li>
+                         
+                        <a href="#"  onclick="fblogin()">
+                            Login Using Facebook
+                        </a>
+                    </li>
+
+                        {% endif %}
+
+                         {% if current_user.id %}
+                         <li>
+                         <a href="#" onclick="fblogout()">
+                            Logout
+                        </a>
+                    </li>
+                    <li>
+                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick="">
+                            Hi, {{current_user.name}}
+                        </a>
+                        
+                    </li>
+                    {% endif %}
+                    
+                   
+                   
+                </ul>
+            </div><!--/end container-->
+        </div><!--/navbar-collapse-->
+    </div>
+    <!--=== End Header ===-->
+
+    <!--=== Search Block ===-->
+
+    {% block content %}
+     {% endblock %}
+    <!--/container-->
+    <!--=== End Search Block ===-->
+
+    <!--=== Content ===--><div style="display:none;">
+      <form id="form" method="post" action="/login">
+        <input name="fb_user_id" id="fb_user_id" type="text" value="">
+        <input name="fb_user_name" id="fb_user_name" type="text" value="">
+        <input name="redirect_url" id="redirect_url" type="text" value="">
+        </form>
+      </div>
+
+
+      <!--div class="footer">
+        <p>&copy; Local Tutor 2015. All rights reserved.</p>
+      </div-->
+      </div> 
+    
+     
+    <script>
+    var login_status=null;
+function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    login_status=response.status;
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+      //$('#header li').eq(3).remove();
+      $('#header li').eq(3).html('');
+
+      $('#logout').css('display','');
+      testAPI();
+    } else if (response.status === 'not_authorized') {
+      // The person is logged into Facebook, but not your app.
+      $('#header li').eq(3).html('<button class="btn btn-default" type="button" onclick="fblogin()" style="position:relative;top:4px;">Login using Facebook</button>');
+      $('#userid').text('');
+      $('#logout').css('display','none');
+     alert('not authorized');
+    } else {
+      // The person is not logged into Facebook, so we're not sure if
+      // they are logged into this app or not.
+      $('#header li').eq(3).html('<button class="btn btn-default" type="button" onclick="fblogin()" style="position:relative;top:4px;">Login using Facebook</button>');
+      $('#userid').text('');
+      $('#logout').css('display','none');
+      alert('not yet logged into facebook');
+    }
+  }
+
+function statusChange(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    alert("status change");
+    login_status=response.status;
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+      //$('#header li').eq(3).remove();
+      $('#header li').eq(3).html('');
+       $('#logout').css('display','');
+      /*FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      $('#userid').text('Hi '+ response.name);
+      
+      
+    });*/
+      custom_logic(login_status);
+      
+    } else if (response.status === 'not_authorized') {
+      // The person is logged into Facebook, but not your app.
+      $('#header li').eq(3).html('<button class="btn btn-default" type="button" onclick="fblogin()" style="position:relative;top:4px;">Login using Facebook</button>');
+      $('#userid').text('');
+      $('#logout').css('display','');
+     alert('not authorized');
+    } else {
+      // The person is not logged into Facebook, so we're not sure if
+      // they are logged into this app or not.
+      $('#header li').eq(3).html('<button class="btn btn-default" type="button" onclick="fblogin()" style="position:relative;top:4px;">Login using Facebook</button>');
+      $('#userid').text('');
+      $('#logout').css('display','');
+      alert('not yet logged into facebook');
+    }
+  }
+
+
+
+function fblogout(){
+
+  FB.logout(function(response){
+
+  });
+  var redirect_url=window.location.href;
+  window.location.href='/logout?redirect_url='+encodeURIComponent(redirect_url);
+}
+
+  function fblogin(){
+    FB.login(function(response){
+    statusChangeCallback(response);
+},{scope: 'public_profile,email,user_friends'});
+  }
+
+  function checkLoginState() {
+
+    alert("check login state");
+    /*FB.Event.subscribe('auth.login', function(response) {
+    statusChange(response);
+});*/
+    FB.getLoginStatus(function(response) {
+      statusChange(response);
+    },true);
+
+  }
+
+var userid=null;
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      $('#userid').text('Hi '+ response.name);
+      
+      console.log(response);
+      userid=response.id;
+      $('#fb_user_id').val(response.id);
+      $('#fb_user_name').val(response.name);
+      $('#redirect_url').val(window.location.href);
+      $('#form').submit();
+    });
+
+  }
+
+
+  </script>
+    
+    
+    {% block javascript %}
+    
+  
+    {% endblock %}
+    <div class="container content">
+        <!-- Top Categories -->
+     
+        <!-- End Top Categories -->
+    </div><!--/container-->
+    <!--=== End Content ===-->
+
+    <!--=== Parallax Counter ===-->
+    
+    <!--=== End Parallax Counter ===-->
+
+    <!--=== Container Part ===-->
+    
+    <!--=== Container Part ===-->
+
+    <!--=== Container Part ===-->
+    
+    <!--=== Container Part ===-->
+    
+    <!--=== Container Part ===-->
+
+    <!--=== Footer Version 1 ===-->
+    <div class="footer-v1">
+        
+
+        <div class="copyright">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>
+                            2015 &copy; All Rights Reserved.
+                           <a href="/disclaimer">Disclaimer</a> | <a href="/disclaimer">Terms of Service</a>
+                        </p>
+                    </div>
+
+                    <!-- Social Links -->
+                    
+                    <!-- End Social Links -->
+                </div>
+            </div>
+        </div><!--/copyright-->
+    </div>
+    <!--=== End Footer Version 1 ===-->
+</div><!--/End Wrapepr-->
+
+<!-- JS Global Compulsory -->
+
+<!-- JS Implementing Plugins -->
+<script type="text/javascript" src="/static/javascript/back-to-top.js"></script>
+<!--script type="text/javascript" src="assets/plugins/smoothScroll.js"></script-->
+<script type="text/javascript" src="/static/javascript/jquery.parallax.js"></script>
+<!--script type="text/javascript" src="assets/plugins/counter/waypoints.min.js"></script>
+<script type="text/javascript" src="assets/plugins/counter/jquery.counterup.min.js"></script>
+<script type="text/javascript" src="assets/plugins/owl-carousel/owl-carousel/owl.carousel.js"></script-->
+<!-- JS Customization -->
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        App.init();
+        App.initCounter();
+        App.initParallaxBg();
+        //OwlCarousel.initOwlCarousel();
+    });
+</script>
+<!--[if lt IE 9]>
+    <script src="assets/plugins/respond.js"></script>
+    <script src="assets/plugins/html5shiv.js"></script>
+    <script src="assets/plugins/placeholder-IE-fixes.js"></script>
+<![endif]-->
+
+</body>
+</html>

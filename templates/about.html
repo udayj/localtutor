@@ -1,31 +1,66 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 {% block content %}
 
       <!-- Jumbotron -->
-        <div class="row">
-      <div class="col-lg-8 col-md-8 ">
-      
-      <div class="input-group input-group-md">
-  
-  <input id="search" type="text" class="form-control col-lg-12 col-md-12" placeholder="Search for a teacher eg. Physics" aria-describedby="sizing-addon1"
-  onkeydown="if (event.keyCode==13) { search();}">
-   <span class="input-group-btn">
-        <button class="btn btn-primary" type="button" onclick="search()" style="position:relative;top:-2px;">Search</button>
-      </span>
-</div>
-          
-        </div>
-      </div>
+           <div class="search-block-v2">
+        <div class="container" style="margin-top:30px;">
+            <div class="col-md-6 ">
+              
+                <div class="input-group">
 
-     
-    <hr>
-   <div class="row">
-      <div class="col-lg-8 col-md-8">
-        <div class="well">
-      At Tutorack, we are trying to make the best of teachers in any field available to people who want to learn. We are presently covering more than 50 different subjects and plan to include hundreds of more new subjects. 
-    </div>
-              </div>  
+                    <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing etc." value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="{{query}}">
+                    <span class="input-group-btn">
+                        <button class="btn-u" type="button" style="margin-top:-5px;"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+                 
             </div>
+            <br>
+            <hr>
+        </div>
+        
+    </div>
+
+    <div class="container">
+      <div class="col-lg-8 col-md-8">
+     <div class="shadow-wrapper">
+                    <div class="tag-box tag-box-v1 box-shadow shadow-effect-2">
+                        <h2>The Mission</h2>
+                        <p>At Tutorack, we are trying to make the best of teachers in any field available to people who want to learn. We are presently covering more than 500 different subjects and more subjects are added everyday. Finding good  tutors and courses should not be a barrier for people wanting to learn. </p>
+                    </div>
+                </div>
+              </div>
+
+      <div class="col-lg-8 col-md-8">
+     <div class="shadow-wrapper">
+                    <div class="tag-box tag-box-v1 box-shadow shadow-effect-2">
+                        <h2>Find</h2>
+                        <p>Find tutors, institutes and courses in your city for anything you want to learn like dancing, swimming or even unqiue areas like taekwondo and magic</p>
+                    </div>
+                </div>
+              </div>
+
+<div class="col-lg-8 col-md-8">
+     <div class="shadow-wrapper">
+                    <div class="tag-box tag-box-v1 box-shadow shadow-effect-2">
+                        <h2>Connect</h2>
+                        <p>Connect with tutors qucikly and directly. Network with friends who personally know the tutor to decide if they are a good fit</p>
+                    </div>
+                </div>
+              </div>
+
+            <div class="col-lg-8 col-md-8">
+     <div class="shadow-wrapper">
+                    <div class="tag-box tag-box-v1 box-shadow shadow-effect-2">
+                        <h2>Learn</h2>
+                        <p>Develop new interests or harness old ones. Enhance your knowledge through any learning medium that suits you</p>
+                    </div>
+                </div>
+              </div>
+
+            </div>
+    
+   
 
     
       

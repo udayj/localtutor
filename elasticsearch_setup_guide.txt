@@ -11,3 +11,8 @@ set JAVA_HOME path variable
 ./bin/elasticsearch -d (for running as a daemon process)
 create index mapping settings
 mongo-connector -m localhost:27017 -t localhost:9200 -d elastic_doc_manager
+elasticsearch.in.sh script has settings for jvm heap size etc
+set environment variables in /etc/environment
+
+create swap space on vps
+https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04

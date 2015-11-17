@@ -16,17 +16,23 @@ import pycrfsuite
 import math
 import requests
 
+
+
+
 SECRET_KEY='SECRET'
 
 
 SALT='123456789passwordsalt'
 
 app = Flask(__name__)
+app.config.from_envvar('CONFIG')
+
 app.debug=True
 app.secret_key=SECRET_KEY
 
 
 REMEMBER_COOKIE_DURATION=timedelta(days=365)
+app_id=app.config['FACEBOOK_APP_ID']
 login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.login_message = u"Please log in to access this page."
@@ -234,7 +240,7 @@ def content_entry(file_name,db_name):
 
 @app.route('/')
 def main_page():
-	return render_template('main_page.html')
+	return render_template('main_page.html',app_id=app_id)
 
 @app.route('/login',methods=['POST'])
 def login():
@@ -569,7 +575,12 @@ def create_subjects():
 @app.route('/about')
 def about():
 	
-	return render_template('about.html')
+	return render_template('about.html',app_id=app_id)
+
+@app.route('/disclaimer')
+def disclaimer():
+	
+	return render_template('disclaimer.html',app_id=app_id)
 
 @app.route('/associate_student_tutor',methods=['POST'])
 def associate_student_tutor():
@@ -669,6 +680,7 @@ def friend_tutor():
 	response={'result':'success'}
 	response['friend_tutor']=result
 	js=json.dumps(response)
+	print response
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp
 
@@ -730,9 +742,9 @@ def tutor():
 			except StopIteration:
 				pass
 		if tutor['area'] != 'online':
-			return render_template('tutor.html',tutor=tutor,display_subjects=display_subjects)
+			return render_template('tutor.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id)
 		else:
-			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects)
+			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id)
 	except StopIteration:
 		return render_template('error.html')
 
@@ -1074,7 +1086,7 @@ def search():
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
-								areas=areas,subjects=subjects,classify='n')
+								areas=areas,subjects=subjects,classify='n',app_id=app_id)
 
 	try:
 		query=request.args.get('subject')
@@ -1151,7 +1163,7 @@ def search():
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
-								areas=areas,subjects=subjects,classify='n')
+								areas=areas,subjects=subjects,classify='n',app_id=app_id)
 	except Exception as e:
 		app.logger.error(str(e))
 
