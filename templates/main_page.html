@@ -154,7 +154,7 @@ $('.input-group #search').typeahead({
 }).on('typeahead:select', function (obj, suggestion) {
   suggestion=suggestion['value'];
   classify="n";
-  window.location='search?subject='+encodeURIComponent(suggestion)+"&classify=n"; 
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion)+"&classify=n"; 
   
 })
 ;
@@ -168,7 +168,7 @@ function search()
         if(classify!="n")
         {  
           
-          window.location='search?subject='+encodeURIComponent(name.value.trim());
+          window.location='search?is_pre_filter=y&subject='+encodeURIComponent(name.value.trim());
         }
         else
         {

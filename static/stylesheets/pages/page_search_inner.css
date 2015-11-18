@@ -19,7 +19,7 @@
 ------------------------------------*/
 /*Related-search*/
 .s-results .related-search  {
-	border-right: 1px solid #eee;
+	border-right: 0px solid #eee;
 }
 
 .s-results .related-search h3 {

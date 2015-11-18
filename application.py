@@ -870,6 +870,41 @@ def tagger(text):
 
 	return(subject,area)
 
+def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,is_filter):
+	
+	payload={}
+	payload['query']={}
+	payload['query']['filtered']={}
+	payload['query']['filtered']['filter']={}
+	
+
+	if is_filter:
+		bool_query={}
+		bool_query['bool']={}
+		bool_query['bool']['should']=[]
+		for subject in filter_subjects:
+			bool_query['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
+		for area in filter_areas:
+			bool_query['bool']['should'].append({'term': {'area.not_analyzed':area}})
+		bool_query['bool']['must']=[]
+		bool_query['bool']['must'].append({'term':{'subject.not_analyzed':query}})
+		payload['query']['filtered']['filter']=bool_query
+	else:
+		bool_query={}
+		bool_query['bool']={}
+		bool_query['bool']['must']=[]
+		bool_query['bool']['must'].append({'term':{'subject.not_analyzed':query}})
+		payload['query']['filtered']['filter']=bool_query
+
+	print payload
+
+	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
+	r=requests.post('http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from),json=payload)
+	
+	json_response=json.loads(r.text)
+	return json_response
+
+
 def prepare_query(query,size,start_from,filter_areas, filter_subjects,is_filter):
 	payload={}
 	payload['query']={}
@@ -999,6 +1034,7 @@ def search():
 		if not query or query.strip()=='':
 			return render_template('search_error.html')
 
+		query=query.lower()
 		data={}
 		for name,value in dict(request.form).iteritems():
 			data[name]=[element.strip() for element in value]
@@ -1030,7 +1066,12 @@ def search():
 		print filter_areas
 		print filter_subjects
 
-		response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,is_filter)
+		is_pre_filter=request.args.get('is_pre_filter')
+
+		if is_pre_filter and is_pre_filter=='y':
+			response=prepare_query_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,is_filter)
+		else:
+			response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,is_filter)
 		
 		
 
@@ -1103,11 +1144,19 @@ def search():
 		if not query or query.strip()=='':
 			return render_template('search_error.html')
 
+		query=query.lower()
 		print page
 		client=MongoClient()
 		db=client.local_tutor
 
-		response=prepare_query(query,100,0,None,None,False)
+		is_pre_filter=request.args.get('is_pre_filter')
+
+		if is_pre_filter and is_pre_filter=='y':
+			response=prepare_query_filtered(query,100,0,None,None,False)
+			is_pre_filter='y'
+		else:
+			response=prepare_query(query,100,0,None,None,False)
+			is_pre_filter='n'
 
 		total=response['hits']['total']
 		max_score=response['hits']['max_score']
@@ -1129,11 +1178,31 @@ def search():
 					subjects_duplicate.append(subject)
 					subjects.append((subject,False))
 
+		areas.sort()
+		if ('online',False) in areas:
+			areas.remove(('online',False))
+			areas=[('online',False)]+areas
+
+		app.logger.debug(areas)
+
+		subjects.sort()
+
+
+		if is_pre_filter=='y':
+			subjects=[]
 		filter_results=False
 		if len(areas)>1 or len(subjects)>1:
 			filter_results=True
 
-		response=prepare_query(query,10,(page-1)*10,None,None,False)
+
+		
+
+		if is_pre_filter and is_pre_filter=='y':
+			response=prepare_query_filtered(query,10,(page-1)*10,None,None,False)
+			is_pre_filter='y'
+		else:
+			response=prepare_query(query,10,(page-1)*10,None,None,False)
+			is_pre_filter='n'
 		
 		total=response['hits']['total']
 		max_score=response['hits']['max_score']

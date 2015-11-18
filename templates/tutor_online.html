@@ -59,7 +59,7 @@
                 </td>
                 <td>
                   {% for subject in display_subjects %}
-                    <a href="/search?subject={{subject}}">{{subject}}</a> 
+                    <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y">{{subject}}</a> 
                     <br>
                     {% endfor %}
                 </td>

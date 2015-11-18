@@ -38,11 +38,11 @@
      
         <div class="col-lg-4 col-md-4 col-sm-12">
           {% set actual_category, subjects = category %}
-      <h3><a href="/search?subject={{actual_category|urlencode}}&classify=n">{{actual_category.title()}}</a></h3>
+      <h3><a href="/search?subject={{actual_category|urlencode}}">{{actual_category.title()}}</a></h3>
         <ul>
         {% for subject in subjects %}
           <li>
-          <a href="/search?subject={{subject|urlencode}}&classify=n">{{subject}}</a>
+          <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y">{{subject}}</a>
         </li>
         {% endfor %}
       </ul>
@@ -75,7 +75,7 @@
       <tr>
         {% for subject in subjects %}
         <td>
-          <a href="/search?subject={{subject|urlencode}}&classify=n">{{subject}}</a>
+          <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y">{{subject}}</a>
         </td>
         {% endfor %}
       </tr>

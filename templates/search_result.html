@@ -55,7 +55,7 @@
 
     <div class="container s-results margin-bottom-50">
         <div class="row">
-            <div class="col-md-2 related-search">
+            <div class="col-md-2 hidden-xs related-search">
                 <div class="row">
                    <div style="display:none;">
             <form id='filter_form' type="hidden" action='/search?subject={{query}}' method='POST'>
@@ -64,32 +64,37 @@
 
           {% if filter_results %}
 
-              <div id="area_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:15px;">
-                <h3>Filter by Area</h3>
+            {% if areas|length > 0 %}
+            <h3>Filter by Area</h3>
+              <div id="area_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
+                
                 <ul class="list-unstyled" >
                   
               {% for area in areas %}
 
-              <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results()" name="{{area[0]}}"
+              <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{area[0]}}"
               {% if area[1] %}
               checked
               {% endif %}
-              ><i></i>{{area[0]}}</label></li>
+              ><i></i>{{area[0].title()}}</label></li>
               {% endfor %}
            
             </ul>
 
             </div>
+            {% endif %}
             
+            {% if subjects|length > 0 %}
+            <h3>Filter by Subject</h3>
             <div id="subject_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;">
-              <h3>Filter by Subject</h3>
+              
               <ul class="list-unstyled">
               {% for subject in subjects %}
-              <li><label class="checkbox"><input class="subject_checkbox" type="checkbox" onclick="get_filtered_results()" name="{{subject[0]}}"
+              <li><label class="checkbox"><input class="subject_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{subject[0]}}"
               {% if subject[1] %}
               checked
               {% endif %}
-              ><i></i>{{subject[0]}}</label></li>
+              ><i></i>{{subject[0].title()}}</label></li>
               {% endfor %}
             </div>
             {% endif %}
@@ -97,13 +102,17 @@
                     
 
                    
+                
+                {% else %}
+                <h3>No Filters</h3>
+                {% endif %}
                 </div>
             </div><!--/col-md-2-->
             <div class="col-md-10">
-                <span class="results-number">About {{total}} results</span>
+                <span class="results-number" style="margin-bottom:30px;">{{total}} results</span>
                 <!-- Begin Inner Results -->
                 {% for item in results%}
-                <div class="inner-results">
+                <div class="inner-results" style="margin-top:-20px;">
                   <h3><a class="tutors" href="/tutor?id={{item['_id']}}" id="{{item['_id']}}">{{item['name'].title()}}</a></h3>
                     
                     <ul class="list-inline up-ul">
@@ -151,9 +160,10 @@
                        {% endif %}
                     </p>
 
+                    {% if current_user.id %}
                     <ul class="list-inline down-ul">
                         <li>
-                           {% if current_user.id %}
+                           
                    <button id="associate_{{item['_id']}}" type="button" class="btn-u btn-u-sm" onclick="associate_tutor('{{item['_id']}}','{{current_user.fb_id}}')"  
                       {% if item['_id'] not in student_tutor_assoc %}
                       style="display:;"
@@ -180,7 +190,7 @@
                      </span>
                    </li>
                      
-                    {% endif %}
+                    
                      
 
                     
@@ -189,6 +199,7 @@
                        
                         
                     </ul>
+                    {% endif %}
                 </div>
                 <hr>
                 {% endfor %}
@@ -305,7 +316,7 @@ $('.input-group #search').typeahead({
 }).on('typeahead:select', function (obj, suggestion) {
   suggestion=suggestion['value'];
   classify="n";
-  window.location='search?subject='+encodeURIComponent(suggestion)+"&classify=n"; 
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion); 
   
 });
 
@@ -451,7 +462,7 @@ $('#page_selection').bootpag({
   //href:'/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page={% raw %}{{number}}{% endraw %}"
 }).on("page",function(event,num){
 
-   var url=$('#filter_form').attr('action');
+   var url=window.location.href;
    url=url+"&page="+num;
    $('#filter_form').attr('action',url);
    get_filtered_results();
@@ -464,11 +475,13 @@ var checkboxes_area=[];
 var selected_subject=[];
 var checkboxes_subject=[];
 
+
 function get_filtered_results(){
 
   //get list of checkboxes, get list of checkboxes selected
   //send list to backend
   //send post request to backend
+
   selected_area="";
   $('#area_outer input:checked').each(function() {
     selected_area=selected_area+$(this).attr('name')+"|";
@@ -518,6 +531,14 @@ function get_filtered_results(){
 
 $('#filter_form').submit();
 
+}
+
+function get_filtered_results_pre()
+{
+
+  var url=window.location.href;
+  $('#filter_form').attr('action',url);
+  get_filtered_results();
 }
 
 $('#filter_form').submit(function(){
