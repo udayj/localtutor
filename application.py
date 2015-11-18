@@ -240,7 +240,7 @@ def content_entry(file_name,db_name):
 
 @app.route('/')
 def main_page():
-	return render_template('main_page.html',app_id=app_id)
+	return render_template('main_page.html',app_id=app_id,active='main')
 
 @app.route('/login',methods=['POST'])
 def login():
@@ -383,7 +383,7 @@ def subjects():
 	print category_wise.items()
 	sorted_category_wise=sorted(category_wise.items(),key=sorter)
 
-	return render_template('subjects.html',output=output,category_wise=sorted_category_wise)
+	return render_template('subjects.html',output=output,category_wise=sorted_category_wise,active='subjects')
 
 @app.route('/delete_subject',methods=['POST'])
 def delete_subject():
@@ -575,7 +575,7 @@ def create_subjects():
 @app.route('/about')
 def about():
 	
-	return render_template('about.html',app_id=app_id)
+	return render_template('about.html',app_id=app_id,active='about')
 
 @app.route('/disclaimer')
 def disclaimer():

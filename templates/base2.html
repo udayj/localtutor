@@ -9,6 +9,10 @@
     <title>Tutorack</title>
     <meta name="description" content="{{meta_description}}">
     <meta name="author" content="LocalTutor">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
     <!-- Le styles -->
     <link href="/static/stylesheets/bootstrap_unify.min.css" rel="stylesheet">
@@ -114,7 +118,7 @@
     
   </head>
 
-<body >
+<body onload="$('#{{active}}').addClass('active');">
    <script>
   window.fbAsyncInit = function() {
     FB.init({
@@ -194,7 +198,7 @@ function custom_logic(login_status)
             <div class="container">
                 <ul class="nav navbar-nav">
                     <!-- Home -->
-                     <li class="active">
+                     <li id="main">
                         <a href="/" >
                             Home
                         </a>
@@ -203,7 +207,7 @@ function custom_logic(login_status)
                     <!-- End Home -->
 
                     <!-- Pages -->
-                   <li>
+                   <li id="subjects">
                         <a href="/subjects" >
                             Subjects
                         </a>
@@ -211,7 +215,7 @@ function custom_logic(login_status)
                     <!-- End Pages -->
 
                     <!-- Blog -->
-                    <li>
+                    <li id="about">
                         <a href="/about" >
                             About
                         </a>
@@ -252,6 +256,7 @@ function custom_logic(login_status)
 
     {% block content %}
      {% endblock %}
+
     <!--/container-->
     <!--=== End Search Block ===-->
 

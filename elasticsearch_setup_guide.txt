@@ -10,7 +10,7 @@ install jdk
 set JAVA_HOME path variable
 ./bin/elasticsearch -d (for running as a daemon process)
 create index mapping settings
-mongo-connector -m localhost:27017 -t localhost:9200 -d elastic_doc_manager
+mongo-connector -m localhost:27017 -t localhost:9200 -d elastic_doc_manager - this command only from elasticsearch/elasticsearch2.0.0
 elasticsearch.in.sh script has settings for jvm heap size etc
 set environment variables in /etc/environment
 
