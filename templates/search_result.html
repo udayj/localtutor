@@ -463,7 +463,13 @@ $('#page_selection').bootpag({
 }).on("page",function(event,num){
 
    var url=window.location.href;
+   var n=url.indexOf("page");
+   if(n==-1){
    url=url+"&page="+num;
+ }
+ else{
+  url=url.substring(0,n)+"&page="+num;
+ }
    $('#filter_form').attr('action',url);
    get_filtered_results();
    //window.location='/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page="+num;
