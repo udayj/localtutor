@@ -543,6 +543,13 @@ function get_filtered_results_pre()
 {
 
   var url=window.location.href;
+  var n=url.indexOf("page");
+   if(n==-1){
+  
+ }
+ else{
+  url=url.substring(0,n);
+ }
   $('#filter_form').attr('action',url);
   get_filtered_results();
 }
