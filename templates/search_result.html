@@ -111,8 +111,10 @@
             <div class="col-md-10">
                 <span class="results-number" style="margin-bottom:30px;">{{total}} results</span>
                 <!-- Begin Inner Results -->
-                {% for item in results%}
-                <div class="inner-results" style="margin-top:-20px;">
+                {% for result in results | batch(2) %}
+                <div class="inner-results row clearfix">
+                  {% for item in result %}
+                <div class=" col-lg-6 col-md-6 col-sm-12" style="margin-top:-20px;">
                   <h3><a class="tutors" href="/tutor?id={{item['_id']}}" id="{{item['_id']}}">{{item['name'].title()}}</a></h3>
                     
                     <ul class="list-inline up-ul">
@@ -183,12 +185,15 @@
 
                       
                       You studied under this tutor 
-                      <button type="button" class="btn-u btn-u-red btn-u-sm" onclick="disassociate_tutor('{{item['_id']}}','{{current_user.fb_id}}')">No</button>
+
+                      <button type="button" class="btn-u btn-u-dark btn-u-sm" onclick="disassociate_tutor('{{item['_id']}}','{{current_user.fb_id}}')">No</button>
+
+
+                   
+                   
                     </span>
-                    <li>
-                   <span class="label label-blue" style="display:none;" id="friend_{{item['_id']}}">
-                     </span>
-                   </li>
+
+                    
                      
                     
                      
@@ -196,11 +201,17 @@
                     
 
                         </li>
+                        <li>
+                    <span  class="label label-default" style="display:none;cursor:pointer;" id="friend_{{item['_id']}}">
+                     </span>
+                   </li>
                        
                         
                     </ul>
                     {% endif %}
                 </div>
+                {% endfor %}
+              </div>
                 <hr>
                 {% endfor %}
                 <!-- Begin Inner Results -->
