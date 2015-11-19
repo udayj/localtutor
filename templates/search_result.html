@@ -114,7 +114,7 @@
                 {% for result in results | batch(2) %}
                 <div class="inner-results row clearfix">
                   {% for item in result %}
-                <div class=" col-lg-6 col-md-6 col-sm-12" style="margin-top:-20px;">
+                <div class=" col-lg-6 col-md-6 col-sm-12" style="margin-bottom:20px;">
                   <h3><a class="tutors" href="/tutor?id={{item['_id']}}" id="{{item['_id']}}">{{item['name'].title()}}</a></h3>
                     
                     <ul class="list-inline up-ul">
