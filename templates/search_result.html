@@ -86,7 +86,7 @@
             
             {% if subjects|length > 0 %}
             <h3>Filter by Subject</h3>
-            <div id="subject_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;">
+            <div id="subject_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
               
               <ul class="list-unstyled">
               {% for subject in subjects %}
@@ -96,6 +96,26 @@
               {% endif %}
               ><i></i>{{subject[0].title()}}</label></li>
               {% endfor %}
+            </div>
+            {% endif %}
+
+             {% if venue|length > 0 %}
+            <h3>Filter by Venue</h3>
+              <div id="venue_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
+                
+                <ul class="list-unstyled" >
+                  
+              {% for v in venue %}
+
+              <li><label class="checkbox"><input class="venue_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{v[0]}}"
+              {% if v[1] %}
+              checked
+              {% endif %}
+              ><i></i>{{v[0]}}</label></li>
+              {% endfor %}
+           
+            </ul>
+
             </div>
             {% endif %}
 
@@ -491,6 +511,9 @@ var selected_area=[];
 var checkboxes_area=[];
 var selected_subject=[];
 var checkboxes_subject=[];
+var selected_venue=[];
+var checkboxes_venue=[];
+
 
 
 function get_filtered_results(){
@@ -509,6 +532,8 @@ function get_filtered_results(){
     checkboxes_area=checkboxes_area+$(this).attr('name')+"|";
 }); 
 
+
+
   selected_subject="";
   $('#subject_outer input:checked').each(function() {
     selected_subject=selected_subject+$(this).attr('name')+"|";
@@ -518,13 +543,23 @@ function get_filtered_results(){
   $('.subject_checkbox').each(function() {
     checkboxes_subject=checkboxes_subject+$(this).attr('name')+"|";
 });
+selected_venue="";
+  $('#venue_outer input:checked').each(function() {
+    selected_venue=selected_venue+$(this).attr('name')+"|";
+});
 
+  checkboxes_venue="";
+  $('.venue_checkbox').each(function() {
+    checkboxes_venue=checkboxes_venue+$(this).attr('name')+"|";
+}); 
  
   data={}
   data['areas_selected']=selected_area;
   data['areas_checkboxes']=checkboxes_area;
   data['subject_selected']=selected_subject;
   data['subject_checkboxes']=checkboxes_subject;
+  data['venue_selected']=selected_venue;
+  data['venue_checkboxes']=checkboxes_venue;
 
 /*jQuery.ajax({
     url: window.location.href,
@@ -582,11 +617,23 @@ $('#filter_form').submit(function(){
   var input4 = $("<input>")
                .attr("type", "hidden")
                .attr("name", "subject_selected").val(selected_subject);
+
+  var input5 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "venue_checkboxes").val(checkboxes_venue);
+
+  var input6 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "venue_selected").val(selected_venue);
+
   
   $('#filter_form').append(input1);
   $('#filter_form').append(input2);
   $('#filter_form').append(input3);
   $('#filter_form').append(input4);
+  $('#filter_form').append(input5);
+  $('#filter_form').append(input6);
+
 });
 </script>  
 {% endblock %}

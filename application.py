@@ -870,7 +870,7 @@ def tagger(text):
 
 	return(subject,area)
 
-def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,is_filter):
+def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter):
 	
 	payload={}
 	payload['query']={}
@@ -886,6 +886,8 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,i
 			bool_query['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
 		for area in filter_areas:
 			bool_query['bool']['should'].append({'term': {'area.not_analyzed':area}})
+		for venue in filter_venues:
+			bool_query['bool']['should'].append({'term': {'venue':venue}})
 		bool_query['bool']['must']=[]
 		bool_query['bool']['must'].append({'term':{'subject.not_analyzed':query}})
 		payload['query']['filtered']['filter']=bool_query
@@ -905,7 +907,7 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,i
 	return json_response
 
 
-def prepare_query(query,size,start_from,filter_areas, filter_subjects,is_filter):
+def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter):
 	payload={}
 	payload['query']={}
 	payload['query']['filtered']={}
@@ -1004,6 +1006,8 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,is_filter)
 			bool_query['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
 		for area in filter_areas:
 			bool_query['bool']['should'].append({'term': {'area.not_analyzed':area}})
+		for venue in filter_venues:
+			bool_query['bool']['should'].append({'term': {'venue':venue}})
 		payload['query']['filtered']['filter']=bool_query
 
 	
@@ -1046,11 +1050,18 @@ def search():
 		filter_subjects_string=data['subject_selected'][0].split('|')
 		
 		filter_areas_string=data['areas_selected'][0].split('|')
+
+		filter_venue_string=data['venue_selected'][0].split('|')
+
+
 		
 		areas_checkboxes=data['areas_checkboxes'][0].split('|')
 		subject_checkboxes=data['subject_checkboxes'][0].split('|')
+		venue_checkboxes=data['venue_checkboxes'][0].split('|')
+
 		filter_subjects=[]
 		filter_areas=[]
+		filter_venues=[]
 		is_filter=True
 
 		for subjects in filter_subjects_string:
@@ -1061,17 +1072,24 @@ def search():
 			if len(areas)>0:
 				
 				filter_areas.append(areas)
+		for venue in filter_venue_string:
+			if venue.lower()=='center':
+				filter_venues.append('center')
+				filter_venues.append('centre')
+			if venue.lower()=='student\'s home':
+				filter_venues.append('students home')
 
 
 		print filter_areas
 		print filter_subjects
+		print filter_venues
 
 		is_pre_filter=request.args.get('is_pre_filter')
 
 		if is_pre_filter and is_pre_filter=='y':
-			response=prepare_query_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,is_filter)
+			response=prepare_query_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,filter_venues,is_filter)
 		else:
-			response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,is_filter)
+			response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,filter_venues,is_filter)
 		
 		
 
@@ -1090,6 +1108,7 @@ def search():
 
 		areas=[]
 		subjects=[]
+		venues=[]
 		for area in areas_checkboxes:
 			if len(area)<1:
 				continue
@@ -1105,11 +1124,27 @@ def search():
 			else:
 				subjects.append((subject,False))
 
+		for venue in venue_checkboxes:
+			if len(venue)<1:
+				continue
+
+			if venue=='Student\'s Home':
+
+				if 'students home' in filter_venues:
+					venues.append((venue,True))
+				else:
+					venues.append((venue,False))
+			if venue=='Center':
+				if 'center' in filter_venues or 'centre' in filter_venues:
+					venues.append((venue,True))
+				else:
+					venues.append((venue,False))
+
 
 
 
 		filter_results=False
-		if len(areas)>1 or len(subjects)>1:
+		if len(areas)>1 or len(subjects)>1 or len(venues)>1:
 			filter_results=True
 
 
@@ -1127,7 +1162,7 @@ def search():
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
-								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total)
+								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total)
 
 	try:
 		query=request.args.get('subject')
@@ -1152,10 +1187,10 @@ def search():
 		is_pre_filter=request.args.get('is_pre_filter')
 
 		if is_pre_filter and is_pre_filter=='y':
-			response=prepare_query_filtered(query,100,0,None,None,False)
+			response=prepare_query_filtered(query,100,0,None,None,None,False)
 			is_pre_filter='y'
 		else:
-			response=prepare_query(query,100,0,None,None,False)
+			response=prepare_query(query,100,0,None,None,None,False)
 			is_pre_filter='n'
 
 		total=response['hits']['total']
@@ -1166,6 +1201,8 @@ def search():
 		areas_duplicate=[]
 		subjects_duplicate=[]
 		paginated_results=[]
+		sh_present=False
+		center_present=False
 		for teacher in results:
 			actual_data=teacher['_source']
 			actual_data['_id']=teacher['_id']
@@ -1177,6 +1214,16 @@ def search():
 				if subject not in subjects_duplicate and len(subject)>0:
 					subjects_duplicate.append(subject)
 					subjects.append((subject,False))
+			if actual_data['venue']=='center' or actual_data['venue']=='centre':
+				center_present=True
+			if actual_data['venue']=='students home':
+				sh_present=True
+		venue=[]
+		if sh_present==True:
+			venue.append(('Student\'s Home',False))
+		if center_present==True:
+			venue.append(('Center',False))
+
 
 		areas.sort()
 		if ('online',False) in areas:
@@ -1191,17 +1238,17 @@ def search():
 		if is_pre_filter=='y':
 			subjects=[]
 		filter_results=False
-		if len(areas)>1 or len(subjects)>1:
+		if len(areas)>1 or len(subjects)>1 or len(venue)>1:
 			filter_results=True
 
 
 		
 
 		if is_pre_filter and is_pre_filter=='y':
-			response=prepare_query_filtered(query,10,(page-1)*10,None,None,False)
+			response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False)
 			is_pre_filter='y'
 		else:
-			response=prepare_query(query,10,(page-1)*10,None,None,False)
+			response=prepare_query(query,10,(page-1)*10,None,None,None,False)
 			is_pre_filter='n'
 		
 		total=response['hits']['total']
@@ -1232,7 +1279,7 @@ def search():
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
-								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total)
+								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue)
 	except Exception as e:
 		app.logger.error(str(e))
 
