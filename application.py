@@ -856,19 +856,164 @@ def tagger(text):
 	
 	tagged_instance=[(w,'NN',c) for (w,c) in result]
 	tree=nltk.chunk.conlltags2tree(tagged_instance)
-	subject=''
-	area=''
+	tagged_subjects=[]
+	tagged_areas=[]
 	for subtree in tree.subtrees(filter=lambda t: t.label() == 'SUBJECT'):
+		print 'SUBJECTS'
 		print subtree.leaves()
 		subject_parts=[sub for (sub,tag) in subtree.leaves()]
-		subject=' '.join(subject_parts)
+		tagged_subjects.append(' '.join(subject_parts))
+		
 		
 	for subtree in tree.subtrees(filter=lambda t: t.label() == 'LOCATION'):
+		print 'AREAS'
 		print subtree.leaves()
 		area_parts=[area for (area,tag) in subtree.leaves()]
-		area=' '.join(area_parts)
+		tagged_areas.append(' '.join(area_parts))
+		
+	print (tagged_subjects,tagged_areas)
+	return(tagged_subjects,tagged_areas)
 
-	return(subject,area)
+def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,
+									actual_tagged_subjects,actual_tagged_areas):
+	payload={}
+	payload['query']={}
+	payload['query']['filtered']={}
+	payload['query']['filtered']['query']={}
+	payload['query']['filtered']['query']['bool']={}
+	payload['query']['filtered']['query']['bool']['should']=[]
+
+	payload['query']['filtered']['query']['bool']['must']=[]
+
+	payload_machine={}
+	payload_machine['query']={}
+	payload_machine['query']['bool']={}
+	payload_machine['query']['bool']['should']=[]
+	for sub in actual_tagged_subjects:
+		payload_machine['query']['bool']['should'].append(
+			{'constant_score':{'query':{'match':{'subject' : {'query':sub, 'type': 'phrase'}}}}})
+		payload_machine['query']['bool']['should'].append(
+			{'term' : {'subject.not_analyzed':sub}})
+
+	payload['query']['filtered']['query']['bool']['must'].append(payload_machine)
+
+	payload_machine={}
+	payload_machine['query']={}
+	payload_machine['query']['bool']={}
+	payload_machine['query']['bool']['should']=[]
+	for sub in actual_tagged_areas:
+		payload_machine['query']['bool']['should'].append(
+			{'constant_score':{'query':{'match':{'area' : {'query':sub, 'type': 'phrase'}}}}})
+
+	payload['query']['filtered']['query']['bool']['must'].append(payload_machine)
+
+
+
+
+	constant_score_query={}
+	constant_score_query['constant_score']={}
+	constant_score_query['constant_score']['query']={}
+	constant_score_query['constant_score']['query']['match']={}
+	constant_score_query['constant_score']['query']['match']['subject']={}
+	constant_score_query['constant_score']['query']['match']['subject']['query']=query
+	constant_score_query['constant_score']['query']['match']['subject']['fuzziness']=1
+
+	constant_score_query4={}
+	constant_score_query4['constant_score']={}
+	constant_score_query4['constant_score']['query']={}
+	constant_score_query4['constant_score']['query']['match']={}
+	constant_score_query4['constant_score']['query']['match']['subject']={}
+	constant_score_query4['constant_score']['query']['match']['subject']['query']=query
+	
+
+	payload['query']['filtered']['query']['bool']['should'].append(constant_score_query)
+	payload['query']['filtered']['query']['bool']['should'].append(constant_score_query4)
+
+	constant_score_query1={}
+	constant_score_query1['constant_score']={}
+	constant_score_query1['constant_score']['query']={}
+	constant_score_query1['constant_score']['query']['match']={}
+	constant_score_query1['constant_score']['query']['match']['area']={}
+	constant_score_query1['constant_score']['query']['match']['area']['query']=query
+	constant_score_query1['constant_score']['query']['match']['area']['fuzziness']=1
+
+	constant_score_query6={}
+	constant_score_query6['constant_score']={}
+	constant_score_query6['constant_score']['query']={}
+	constant_score_query6['constant_score']['query']['match']={}
+	constant_score_query6['constant_score']['query']['match']['subject']={}
+	constant_score_query6['constant_score']['query']['match']['subject']['query']=query
+	
+	constant_score_query6['constant_score']['query']['match']['subject']['type']='phrase'
+
+
+
+	constant_score_query2={}
+	constant_score_query2['constant_score']={}
+	constant_score_query2['constant_score']['query']={}
+	constant_score_query2['constant_score']['query']['match']={}
+	constant_score_query2['constant_score']['query']['match']['name']={}
+	constant_score_query2['constant_score']['query']['match']['name']['query']=query
+	constant_score_query2['constant_score']['query']['match']['name']['fuzziness']=1	
+
+
+
+
+	constant_score_query3={}
+	constant_score_query3['constant_score']={}
+	constant_score_query3['constant_score']['query']={}
+	constant_score_query3['constant_score']['query']['match']={}
+	constant_score_query3['constant_score']['query']['match']['geographical_location']={}
+	constant_score_query3['constant_score']['query']['match']['geographical_location']['query']=query
+	constant_score_query3['constant_score']['query']['match']['geographical_location']['fuzziness']=1		
+
+	constant_score_query5={}
+	constant_score_query5['constant_score']={}
+	constant_score_query5['constant_score']['query']={}
+	constant_score_query5['constant_score']['query']['match']={}
+	constant_score_query5['constant_score']['query']['match']['subject.not_analyzed']={}
+	constant_score_query5['constant_score']['query']['match']['subject.not_analyzed']['query']=query
+	
+
+	bool_query={}
+	bool_query['bool']={}
+	bool_query['bool']['should']=[]
+	bool_query['bool']['should'].append(constant_score_query1)
+
+	bool_query2={}
+	bool_query2['bool']={}
+	bool_query2['bool']['should']=[]
+	bool_query2['bool']['should'].append(constant_score_query2)
+	#bool_query2['bool']['should'].append(constant_score_query3)
+	bool_query2['bool']['should'].append(constant_score_query5)
+	bool_query2['bool']['should'].append(constant_score_query6)
+
+	bool_query['bool']['should'].append(bool_query2)
+	
+
+	payload['query']['filtered']['query']['bool']['should'].append(bool_query)	
+
+	if is_filter:
+		bool_query={}
+		bool_query['bool']={}
+		bool_query['bool']['should']=[]
+		for subject in filter_subjects:
+			bool_query['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
+		for area in filter_areas:
+			bool_query['bool']['should'].append({'term': {'area.not_analyzed':area}})
+		for venue in filter_venues:
+			bool_query['bool']['should'].append({'term': {'venue':venue}})
+		payload['query']['filtered']['filter']=bool_query
+
+	
+
+	print payload
+
+	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
+	r=requests.post('http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from),json=payload)
+	
+	json_response=json.loads(r.text)
+	return json_response
 
 def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter):
 	
@@ -1021,6 +1166,7 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 	return json_response
 
 
+
 @app.route('/search',methods=['GET','POST'])
 def search():
 	if request.method=='POST':
@@ -1059,10 +1205,23 @@ def search():
 		subject_checkboxes=data['subject_checkboxes'][0].split('|')
 		venue_checkboxes=data['venue_checkboxes'][0].split('|')
 
+		actual_tagged_subjects=[s for s in data['actual_tagged_subjects'][0].split('|') if len(s)>0]
+		actual_tagged_areas=[s for s in data['actual_tagged_areas'][0].split('|') if len(s)>0]
+
+
+		print actual_tagged_subjects
+		print actual_tagged_areas
+
 		filter_subjects=[]
 		filter_areas=[]
 		filter_venues=[]
 		is_filter=True
+		is_machine_filtered=False
+		
+
+
+		if len(actual_tagged_subjects)>0 or len(actual_tagged_areas)>0:
+			is_machine_filtered=True
 
 		for subjects in filter_subjects_string:
 			if len(subjects)>0:
@@ -1089,7 +1248,11 @@ def search():
 		if is_pre_filter and is_pre_filter=='y':
 			response=prepare_query_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,filter_venues,is_filter)
 		else:
-			response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,filter_venues,is_filter)
+			if is_machine_filtered:
+				response=prepare_query_machine_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,
+													filter_venues,is_filter,actual_tagged_subjects,actual_tagged_areas)
+			else:
+				response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,filter_venues,is_filter)
 		
 		
 
@@ -1162,7 +1325,9 @@ def search():
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
-								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total)
+								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total,
+								actual_tagged_subjects='|'.join(actual_tagged_subjects),
+								actual_tagged_areas='|'.join(actual_tagged_areas))
 
 	try:
 		query=request.args.get('subject')
@@ -1179,18 +1344,48 @@ def search():
 		if not query or query.strip()=='':
 			return render_template('search_error.html')
 
-		query=query.lower()
+		query=query.lower().strip()
 		print page
 		client=MongoClient()
 		db=client.local_tutor
 
+		
+
 		is_pre_filter=request.args.get('is_pre_filter')
+
+		is_machine_filtered=False
+		actual_tagged_subjects=[]
+		actual_tagged_areas=[]
 
 		if is_pre_filter and is_pre_filter=='y':
 			response=prepare_query_filtered(query,100,0,None,None,None,False)
 			is_pre_filter='y'
 		else:
-			response=prepare_query(query,100,0,None,None,None,False)
+			tagged_subjects, tagged_areas = tagger(query)
+			print 'tagged_subjects:'+str(tagged_subjects)
+			print tagged_areas
+			print len(tagged_subjects)
+			for sub in tagged_subjects:
+				print sub
+				if db.subjects.find({'name':sub}).count()>0:
+					actual_tagged_subjects.append(sub)
+			for a in tagged_areas:
+				if db.teachers.find({'area':a}).count()>0:
+					actual_tagged_areas.append(a)
+
+			print 'actual subjects:'+str(actual_tagged_subjects)
+			print 'actual areas:'+str(actual_tagged_areas)
+
+			if len(actual_tagged_subjects)>0 or len(actual_tagged_areas)>0:
+				is_machine_filtered=True
+
+			if is_machine_filtered==True:
+				print 'machine_filtered results'
+				print actual_tagged_subjects
+				print actual_tagged_areas
+				response=prepare_query_machine_filtered(query,100,0,None,None,None,False,actual_tagged_subjects,actual_tagged_areas)
+			else:
+				response=prepare_query(query,100,0,None,None,None,False)
 			is_pre_filter='n'
 
 		total=response['hits']['total']
@@ -1237,18 +1432,38 @@ def search():
 
 		if is_pre_filter=='y':
 			subjects=[]
+		new_subjects=[]
+		if is_machine_filtered and len(actual_tagged_subjects)>=1:
+			for s in subjects:
+				for a in actual_tagged_subjects:
+					if s[0].find(a)!=-1:
+						new_subjects.append((s[0],False))
+						break
+			subjects=new_subjects
+		if len(subjects)==1:
+			subjects=[]
+		if is_machine_filtered and len(actual_tagged_areas)==1:
+			areas=[]
+
 		filter_results=False
 		if len(areas)>1 or len(subjects)>1 or len(venue)>1:
 			filter_results=True
 
 
-		
+		tagged_subjects=[]
+		tagged_areas=[]
 
 		if is_pre_filter and is_pre_filter=='y':
 			response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False)
 			is_pre_filter='y'
 		else:
-			response=prepare_query(query,10,(page-1)*10,None,None,None,False)
+
+
+			if is_machine_filtered==True:
+				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,
+														actual_tagged_subjects,actual_tagged_areas)
+			else:
+				response=prepare_query(query,10,(page-1)*10,None,None,None,False)
 			is_pre_filter='n'
 		
 		total=response['hits']['total']
@@ -1279,7 +1494,9 @@ def search():
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
-								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue)
+								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
+								actual_tagged_subjects='|'.join(actual_tagged_subjects),
+								actual_tagged_areas='|'.join(actual_tagged_areas))
 	except Exception as e:
 		app.logger.error(str(e))
 

@@ -247,6 +247,13 @@
                 <div class="text-left" id="page_selection">
                     
                 </div>
+
+                <div class="margin-bottom-30">
+                  {% if results|length < 4 %}
+                  <br><br><br><br><br><br><br><br>
+                  {% endif %}
+                </div>
+
             </div><!--/col-md-10-->
  
           </div>
@@ -513,6 +520,10 @@ var selected_subject=[];
 var checkboxes_subject=[];
 var selected_venue=[];
 var checkboxes_venue=[];
+var actual_tagged_subjects="{{actual_tagged_subjects}}";
+var actual_tagged_areas="{{actual_tagged_areas}}";
+
+
 
 
 
@@ -521,6 +532,7 @@ function get_filtered_results(){
   //get list of checkboxes, get list of checkboxes selected
   //send list to backend
   //send post request to backend
+
 
   selected_area="";
   $('#area_outer input:checked').each(function() {
@@ -626,6 +638,14 @@ $('#filter_form').submit(function(){
                .attr("type", "hidden")
                .attr("name", "venue_selected").val(selected_venue);
 
+  var input7 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "actual_tagged_subjects").val(actual_tagged_subjects);
+
+  var input8 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "actual_tagged_areas").val(actual_tagged_areas);
+
   
   $('#filter_form').append(input1);
   $('#filter_form').append(input2);
@@ -633,6 +653,8 @@ $('#filter_form').submit(function(){
   $('#filter_form').append(input4);
   $('#filter_form').append(input5);
   $('#filter_form').append(input6);
+  $('#filter_form').append(input7);
+  $('#filter_form').append(input8);
 
 });
 </script>  
