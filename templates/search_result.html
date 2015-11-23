@@ -20,7 +20,7 @@
 
                     <input id="search" type="text" class="form-control" placeholder="{{query}}" value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="{{query}}">
                     <span class="input-group-btn">
-                        <button class="btn-u" type="button" style="margin-top:-5px;"><i class="fa fa-search"></i></button>
+                        <button class="btn-u" type="button" style="margin-top:-5px;" onclick="search()"><i class="fa fa-search"></i></button>
                     </span>
                 </div>
                  
@@ -409,16 +409,10 @@ function search()
         var name=document.getElementById("search");
         if(name==null || name.value.trim()=="")
           return;
-        if(classify!="n")
-        {  
+        
           
           window.location='search?subject='+encodeURIComponent(name.value.trim());
-        }
-        else
-        {
-          
-          
-        }
+        
     }
 
 

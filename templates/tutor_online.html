@@ -10,7 +10,7 @@
 
                     <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing etc." value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="{{query}}">
                     <span class="input-group-btn">
-                        <button class="btn-u" type="button" style="margin-top:-5px;"><i class="fa fa-search"></i></button>
+                        <button class="btn-u" type="button" style="margin-top:-5px;" onclick="search()"><i class="fa fa-search"></i></button>
                     </span>
                 </div>
                  
@@ -191,7 +191,7 @@ $('.input-group #search').typeahead({
 }).on('typeahead:select', function (obj, suggestion) {
   suggestion=suggestion['value'];
   classify="n";
-  window.location='search?subject='+encodeURIComponent(suggestion)+"&classify=n"; 
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion); 
   
 });
 

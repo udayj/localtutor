@@ -62,7 +62,7 @@
                 <div class="input-group">
                     <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing" onkeydown="if (event.keyCode==13) { search();}">
                     <span class="input-group-btn">
-                        <button class="btn-u btn-u-lg" type="button" style="margin-top:-5px;"><i class="fa fa-search"></i></button>
+                        <button class="btn-u btn-u-lg" type="button" style="margin-top:-5px;" onclick="search()"><i class="fa fa-search"></i></button>
                     </span>
                 </div>
 
@@ -165,16 +165,9 @@ function search()
         var name=document.getElementById("search");
         if(name==null || name.value.trim()=="")
           return;
-        if(classify!="n")
-        {  
-          
-          window.location='search?is_pre_filter=y&subject='+encodeURIComponent(name.value.trim());
-        }
-        else
-        {
-          
-          
-        }
+        
+          window.location='search?subject='+encodeURIComponent(name.value.trim());
+        
 
     }
 

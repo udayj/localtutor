@@ -11,7 +11,7 @@
 
                     <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing etc." value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="{{query}}">
                     <span class="input-group-btn">
-                        <button class="btn-u" type="button" style="margin-top:-5px;"><i class="fa fa-search"></i></button>
+                        <button class="btn-u" type="button" style="margin-top:-5px;" onclick="search()"><i class="fa fa-search"></i></button>
                     </span>
                 </div>
                  
@@ -108,8 +108,15 @@ var subjects = new Bloodhound({
   remote: {
     url: '/options?subject=%QUERY',
     wildcard: '%QUERY'
+  },
+   prefetch : {
+    url: '/options?subject='
+   
   }
 });
+
+var suggestion="";
+var classify="y";
 
 $('.input-group #search').typeahead({
   hint: true,
@@ -119,6 +126,11 @@ $('.input-group #search').typeahead({
   name: 'subjects',
   display: 'value',
   source: subjects
+}).on('typeahead:select', function (obj, suggestion) {
+  suggestion=suggestion['value'];
+  classify="n";
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion); 
+  
 });
 
 
@@ -127,7 +139,7 @@ function search()
         var name=document.getElementById("search");
         if(name==null || name.value.trim()=="")
           return;
-        window.location='search?subject='+name.value.trim();
+        window.location='search?subject='+encodeURIComponent(name.value.trim());
     }
 
 </script>  
