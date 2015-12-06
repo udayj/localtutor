@@ -16,3 +16,12 @@ set environment variables in /etc/environment
 
 create swap space on vps
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04
+
+show index settings
+curl -XGET 'http://localhost:9200/local_tutor/_settings'
+
+show cluster health
+curl -XGET 'http://localhost:9200/_cat/indices?v'
+
+show field mappings
+curl -XGET 'http://localhost:9200/local_tutor/_mapping/teachers'
