@@ -55,8 +55,11 @@
 
     <div class="container s-results margin-bottom-50">
         <div class="row">
-            <div class="col-md-2 hidden-xs related-search">
-                <div class="row">
+          <button type="button" class="btn-u visible-xs" data-toggle="collapse" data-target="#filter-options" style="margin-left:1em;margin-bottom:0.5em;" onclick="toggler()">
+            <i class="fa fa-sliders"> Filters </i>
+          </button>
+            <div id="filter-options" class="col-md-2 related-search hidden-xs">
+                <div class="row" style="margin-left:0.1em";>
                    <div style="display:none;">
             <form id='filter_form' type="hidden" action='/search?subject={{query}}' method='POST'>
             </form>
@@ -651,6 +654,17 @@ $('#filter_form').submit(function(){
   $('#filter_form').append(input8);
 
 });
+
+function toggler(){
+
+  if ($('#filter-options').hasClass('hidden-xs')==true)
+  {
+    $('#filter-options').removeClass('hidden-xs');
+  }
+  else{
+    $('#filter-options').addClass('hidden-xs'); 
+  }
+}
 </script>  
 {% endblock %}
 
