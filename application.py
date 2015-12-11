@@ -242,6 +242,10 @@ def content_entry(file_name,db_name):
 def main_page():
 	return render_template('main_page.html',app_id=app_id,active='main')
 
+@app.route('/mooc_list')
+def mooc_list():
+	return render_template('mooc_list.html',app_id=app_id,active='main')
+
 @app.route('/login',methods=['POST'])
 def login():
 
@@ -926,7 +930,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 	constant_score_query4['constant_score']['query']['match']['subject']['query']=query
 	
 
-	payload['query']['filtered']['query']['bool']['should'].append(constant_score_query)
+	#payload['query']['filtered']['query']['bool']['should'].append(constant_score_query)
 	payload['query']['filtered']['query']['bool']['should'].append(constant_score_query4)
 
 	constant_score_query1={}
@@ -935,7 +939,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 	constant_score_query1['constant_score']['query']['match']={}
 	constant_score_query1['constant_score']['query']['match']['area']={}
 	constant_score_query1['constant_score']['query']['match']['area']['query']=query
-	constant_score_query1['constant_score']['query']['match']['area']['fuzziness']=1
+	#constant_score_query1['constant_score']['query']['match']['area']['fuzziness']=1
 
 	constant_score_query6={}
 	constant_score_query6['constant_score']={}
@@ -1076,7 +1080,7 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 	constant_score_query4['constant_score']['query']['match']['subject']['query']=query
 	
 
-	payload['query']['filtered']['query']['bool']['should'].append(constant_score_query)
+	#payload['query']['filtered']['query']['bool']['should'].append(constant_score_query)
 	payload['query']['filtered']['query']['bool']['should'].append(constant_score_query4)
 
 	constant_score_query1={}
@@ -1085,7 +1089,7 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 	constant_score_query1['constant_score']['query']['match']={}
 	constant_score_query1['constant_score']['query']['match']['area']={}
 	constant_score_query1['constant_score']['query']['match']['area']['query']=query
-	constant_score_query1['constant_score']['query']['match']['area']['fuzziness']=1
+	#constant_score_query1['constant_score']['query']['match']['area']['fuzziness']=1
 
 	constant_score_query6={}
 	constant_score_query6['constant_score']={}
@@ -1104,7 +1108,7 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 	constant_score_query2['constant_score']['query']['match']={}
 	constant_score_query2['constant_score']['query']['match']['name']={}
 	constant_score_query2['constant_score']['query']['match']['name']['query']=query
-	constant_score_query2['constant_score']['query']['match']['name']['fuzziness']=1	
+	#constant_score_query2['constant_score']['query']['match']['name']['fuzziness']=1	
 
 
 
