@@ -1,0 +1,143 @@
+{% extends "base2.html" %}
+
+
+
+{% block content %}
+
+
+    <div class="container">
+        <div class="search-block-v2">
+        <div class="container" style="margin-top:30px;">
+            <div class="col-md-6 ">
+              
+                <div class="input-group">
+
+                    <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing etc." value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="{{query}}">
+                    <span class="input-group-btn">
+                        <button class="btn-u" type="button" style="margin-top:-0.4em;" onclick="search()"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+                 
+            </div>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+<div class="row">
+            <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
+            	<br>
+              <div class="alert alert-danger fade in">There seems to be a problem with activating this account. Please contact support@tutorack.com. </div>
+              </div>
+          </div>
+      </div>
+<br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+
+
+
+<script>
+$('.result').hover(function(){
+  $(this).css('background-color','#eee');
+},function(){
+  $(this).css('background-color','white');
+});
+</script>   
+
+<script>     
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  },
+  prefetch : {
+    url: '/options?subject='
+   
+  }
+});
+
+var suggestion="";
+var classify="y";
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+}).on('typeahead:select', function (obj, suggestion) {
+  suggestion=suggestion['value'];
+  classify="n";
+  window.location='search?subject='+encodeURIComponent(suggestion)+"&classify=n"; 
+  
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+        if(classify!="n")
+        {  
+          
+          window.location='search?subject='+encodeURIComponent(name.value.trim());
+        }
+        else
+        {
+          
+          
+        }
+    }
+
+function custom_logic(login_status){
+  return;
+}
+
+</script>  
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base2.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block css %}
+
+<link rel="stylesheet" href="/static/stylesheets/pages/page_search.css">
+<link rel="stylesheet" href="/static/stylesheets/pages/page_faq1.css">
+{% endblock %}
+
+
+{% block content %}
+
+
+
+    <div class="search-block parallaxBg">
+        <div class="container">
+            <div class="col-md-6 col-md-offset-3">
+                <h1>THANK YOU !</h1>
+                <h3 style="color:white;"></h3>
+               
+
+                
+            </div>
+        </div>
+    </div>
+
+<div class="container content">     
+        <div class="row">            
+            <div class="col-md-9">
+            	<div class="headline"><h2>Welcome to Tutorack</h2></div>
+                <ul class="list-unstyled who margin-bottom-30">
+            	
+            	<br>
+            	Follow the link we emailed you to activate your account.
+            </div>
+              <div class="col-md-3">
+                <!-- Contacts -->
+                <div class="headline"><h2>Contacts</h2></div>
+                <ul class="list-unstyled who margin-bottom-30">
+                    <li><i class="fa fa-home"></i>India</li>
+                    <li><i class="fa fa-envelope-o"></i>connect@tutorack.com</li>
+                    <li><i class="fa fa-phone"></i>+91-9830906922</li>
+                    <li><i class="fa fa-globe"></i>https://www.tutorack.com</li>
+                </ul>
+
+        </div>
+    </div>
+</div>
+
+
+
+  
+      
+<script>
+$('#form').submit(function(){
+      var username=$('#username').val();
+      var email=$('#email').val()
+      var password=$('#password').val();
+      var confirm_password=$('#confirm_password').val();
+      if(email==null || email.trim()=="" || password==null || password.trim()=="" || username==null || username.trim()=="")
+      {
+        alert("Email, password and name cannot be empty");
+        return false;
+
+      }
+      if(password!=confirm_password)
+      {
+        alert("Passwords do not match");
+        return false;
+      }
+      if(password.length<5)
+      {
+        alert("Password should be atleast 5 characters");
+        return false;
+      }
+
+
+    });
+$('#login').submit(function(){
+      var name=$('#name').val();
+  var password=$('#login_password').val();
+  if(name==null || name.trim()=="" || password==null || password.trim()=="")
+  {
+    alert("Email/Username/Password cannot be empty");
+    return false;
+  }
+    });
+  
+
+
+</script>
+{% endblock %}
+
+

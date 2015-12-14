@@ -15,6 +15,8 @@ import nltk
 import pycrfsuite
 import math
 import requests
+import hashlib
+import multiprocessing
 
 
 
@@ -118,11 +120,14 @@ def npchunk_features(sentence, i, history='O'):
 
 
 class User(UserMixin):
-    def __init__(self, name, _id, fb_id,active=True):
+    def __init__(self, name, _id, fb_id=None,password=None,email=None,activation_hash=None,active=True):
         self.name = name
         self.id = _id
         self.fb_id=fb_id
         self.active=active
+        self.password=password
+        self.email=email
+        self.activation_hash=activation_hash
     
     def is_active(self):
         return self.active
@@ -132,7 +137,7 @@ class User(UserMixin):
         """
         Encode a secure token for cookie
         """
-        data = [str(self.id), self.fb_id]
+        data = [str(self.id)]
         return login_serializer.dumps(data)
 
 @login_manager.user_loader
@@ -144,11 +149,39 @@ def load_user(_id):
 	user=db.users.find({'_id':ObjectId(_id)})
 	try:
 		user=user.next()
-		
-		ret_user=User(name=user['name'],fb_id=user['fb_id'],_id=str(user['_id']),active=True)
+		if 'fb_id' in user and user['fb_id']!=None:
+			ret_user=User(name=user['name'],fb_id=user['fb_id'],_id=str(user['_id']),active=True)
+		else:
+			ret_user=User(name=user['name'],_id=str(user['_id']),active=True)
 		return ret_user
 	except StopIteration:
 		return None
+
+@app.route('/activate')
+def activate():
+	activation_hash=request.args.get('hash')
+	if not activation_hash:
+		return render_template('activate_error.html')
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	user=db.users.find({'activation_hash':activation_hash})
+	
+	try:
+		user=user.next()
+		user_active=False
+		user_active=user['active']
+		user['active']=True
+		db.users.save(user)
+		ret_user=User(name=user['name'],email=user['email'],password="",active=user['active'],_id=str(user['_id']))
+		login_user(ret_user)
+
+		
+		
+		return render_template('activate.html')
+	except StopIteration:
+		return render_template('activate_error.html')
+
+
 
 @login_manager.token_loader
 def load_token(token):
@@ -176,7 +209,7 @@ def load_token(token):
     user = load_user(data[0])
  
     #Check Password and return user or None
-    if user and data[1] == user.fb_id:
+    if user:
         return user
     return None
 
@@ -282,6 +315,203 @@ def login():
 			return redirect(data['redirect_url'])
 		else:
 			return render_template('error.html')
+
+@app.route('/signup',methods=['GET','POST'])
+def signup():
+	def send_mail(data,files):
+		result=requests.post(
+        "https://api.mailgun.net/v2/tutorack.com/messages",
+        auth=("api", "key-1b9979216cd5d2f065997d3d53852cd6"),
+        files=files,
+        data=data)
+
+	if request.method=='GET':
+		return render_template('signup.html',active='signup')
+	else:
+		
+		data={}
+		for name,value in dict(request.form).iteritems():
+			data[name]=value[0]
+		username=None
+		if 'username' in data:
+			username=data['username']
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		salt='tutorackactivateusingtoken'
+		activation_hash=hashlib.sha512(salt+data['email']).hexdigest()[10:30]
+		
+		exist_user=db.users.find({'email':data['email']})
+		try:
+			exist_user.next()
+			return render_template('signup.html',active='signup',signup_error='Email already exists',username=username,email=data['email'])
+		except StopIteration:
+			pass
+
+		_id=db.users.save({'name':username,
+					   'email':data['email'],
+					   'password':hashlib.sha512(SALT+data['password']).hexdigest(),
+					   'activation_hash':activation_hash,
+					   'active':False})
+		#user=User(name=username,email=data['email'],password=data['password'],active=False,id=str(_id))
+		
+		app.logger.debug('Sending activation email to:'+data['email'])
+		html_content=render_template("activate_email.html",name=username, url=app.config['HOST']+'/activate?hash='+activation_hash)
+		data={"from": "Tutorack <admin@tutorack.com>",
+              "to": [data['email']],
+              "subject": 'Welcome to Tutorack',
+              "text": 'Click this link to activate your account '+app.config['HOST']+'/activate?hash='+activation_hash,
+              "html":html_content}
+		#app.logger.debug(activation_hash)
+		#app.logger.debug(str(app.extensions['mail'].server))
+		try:
+			p=multiprocessing.Process(target=send_mail,args=(data,None,))
+			p.start()
+		except Exception:
+			db.users.remove({'_id':_id})
+			return render_template('signup.html',signup_error='Problem sending email. Account not created. Try again later.',
+									username=username,email=data['email'])
+		return render_template('checkmail.html')
+
+@app.route('/change-password',methods=['GET','POST'])
+def change_password():
+	def send_mail(data,files):
+		result=requests.post(
+        "https://api.mailgun.net/v2/remindica.com/messages",
+        auth=("api", "key-1b9979216cd5d2f065997d3d53852cd6"),
+        files=files,
+        data=data)
+	if request.method=='GET':
+		forgot_password_hash=request.args.get('hash')
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		if not forgot_password_hash:
+			return render_template('change-password.html',error="Incorrect password reset link")
+		user=db.users.find({'forgot_password_hash':forgot_password_hash})
+		try:
+			user=user.next()
+			if 'forgot_password' in user and user['forgot_password']==True:
+				return render_template('change-password.html',email=user['email'])
+			else:
+				return render_template('change-password.html',
+					error="Password already changed using this link - please request another password reset",email=user['email'])
+		except StopIteration:
+			return render_template('change-password.html',error='Problem with this link - please contact support@remindica.com')
+
+	else:
+		data={}
+		for name,value in dict(request.form).iteritems():
+			data[name]=value[0]
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		
+		email=None
+		if 'email' in data and 'password' in data:
+			email=data['email']
+			password=data['password']
+		else:
+			app.logger.debug('Change password form submitted without email/password')
+			return render_template('change-password.html',error="Please re-enter details to reset password")
+
+		user=db.users.find({'email':email})
+		
+		try:
+			user=user.next()
+			if user['forgot_password']!=True:
+				return render_template('change-password.html',error='Please request another password reset link')	
+			user['password']=hashlib.sha512(SALT+password).hexdigest()
+			user['forgot_password']=False
+			db.users.save(user)
+			return render_template('change-password.html',success='Password changed successfully')
+		except StopIteration:
+			return render_template('change-password.html',error='Please request another password reset link')
+
+
+@app.route('/forgot-password',methods=['GET','POST'])
+def forgot_password():
+	def send_mail(data,files):
+		result=requests.post(
+        "https://api.mailgun.net/v2/tutorack.com/messages",
+        auth=("api", "key-1b9979216cd5d2f065997d3d53852cd6"),
+        files=files,
+        data=data)
+	if request.method=='GET':
+		return render_template('forgot-password.html')
+	else:
+		data={}
+		for name,value in dict(request.form).iteritems():
+			data[name]=value[0]
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		salt='tutorackforgotpassword'
+		email=None
+		if 'email' in data:
+			email=data['email']
+		else:
+			app.logger.debug('Forgot password form submitted without email')
+			return render_template('forgot-password.html',error="Please enter correct email id to reset password")	
+
+		user=db.users.find({'email':email})
+		forgot_password_hash=hashlib.sha512(salt+data['email']).hexdigest()[10:30]
+		try:
+			user=user.next()
+			user['forgot_password_hash']=forgot_password_hash
+			user['forgot_password']=True
+			db.users.save(user)
+			html_content=render_template("forgot_password_email.html",url=app.config['HOST']+'/change-password?hash='+forgot_password_hash)
+			data={"from": "Tutorack <support@tutorack.com>",
+	              "to": email,
+	              "subject": 'Reset your password',
+	              "text": 'Click this link to change your password '+app.config['HOST']+'/change-password?hash='+forgot_password_hash,
+	              "html":html_content}
+			try:
+				p=multiprocessing.Process(target=send_mail,args=(data,None,))
+				p.start()
+				
+				return render_template('forgot-password.html',success="Password reset instructions sent to your email id")
+			except:
+				return render_template('forgot-password.html',error="Could not send password reset instructions - please try again")
+		except StopIteration:
+			return render_template('forgot-password.html',error="Please enter correct email id to reset password")			
+
+
+
+@app.route('/login2',methods=['GET','POST'])
+def login2():
+	
+	
+	if request.method=='GET':
+		return render_template('login2.html',active='login2')
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0]
+	username=None
+	if 'username' in data and 'password' in data:
+		username=data['username']
+		password=data['password']
+	else:
+		app.logger.debug('Login Form submitted without fields')
+		return render_template('login2.html',active='login2')
+	remember_me=False
+	if 'remember_me' in data:
+		if data['remember_me']=='on':
+			remember_me=True
+
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	password=hashlib.sha512(SALT+password).hexdigest()
+	user=db.users.find({'email':username,'password':password})
+	try:
+		user=user.next()
+		ret_user=User(name=user['name'],email=user['email'],password=user['password'],active=user['active'],_id=str(user['_id']))
+		if login_user(ret_user,remember=remember_me):
+			flash('Logged in!')
+			return redirect('/')
+		else:
+			return render_template('login2.html',error='Cannot login. Account still inactive',active='login2')
+	except StopIteration:
+		return render_template('login2.html',error='Cannot login. Wrong credentials',
+								active='login2')
+
 	
 @app.route('/logout')
 def logout():
@@ -290,7 +520,7 @@ def logout():
 	redirect_url=request.args.get('redirect_url')
 	if redirect_url is not None:
 		return redirect(redirect_url)
-	redirect('/')
+	return redirect('/')
 
 def rewrite_query(query):
 	client=MongoClient()

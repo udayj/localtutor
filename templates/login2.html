@@ -1,0 +1,93 @@
+{% extends "base2.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/stylesheets/jquery-ui.min.css">
+<link rel="stylesheet" href="/static/stylesheets/page_log_reg_v1.css">
+{% endblock %}
+
+{% block content %}
+
+
+
+<div class="breadcrumbs">
+  <div class="container">
+    <h1 class="pull-left">
+      User Login
+    </h1>
+  </div>
+</div>
+{% if error|length >0 %}
+<div class="container">
+<div class="row">
+  <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
+      <br>
+          <div class="alert alert-danger fade in">{{error}}</div>
+        </div>
+      </div>
+    </div>
+{% endif %}
+
+
+<div class="container content">   
+      <div class="row">
+            <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
+                <form class="reg-page" action="/login2" method="post" id="form">
+                    <div class="reg-header">            
+                        <h2>Login to your account</h2>
+                        <p>Don't have an account yet? Click <a href="/signup" class="color-green">Sign Up</a> to create a new account.</p>
+                    </div>
+
+                    <div class="input-group margin-bottom-20">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                        
+                        <input type="text" id="name" class="form-control" name="username" placeholder="Email Id">
+                    </div>                    
+                    <div class="input-group margin-bottom-20">
+                        <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                      
+                        <input type="password" id="login_password" class="form-control" name="password" placeholder="Password" onkeydown="if (event.keyCode==19) { document.getElementById('login_submit').focus();}">
+                    </div>                    
+
+                    <div class="row">
+                        <!--div class="col-md-6" style="padding-left:30px;">
+                          <label class="checkbox">
+                          <input name="remember_me" id="remember_me" type="checkbox">
+                          Stay signed in
+                          </label>                                                 
+                        </div-->
+                        <div class="col-md-6">
+                            <button class="btn-u pull-right" type="submit">Login</button>                        
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h4>Forgot your password ?</h4>
+                    <p>no worries, <a class="color-green" href="/forgot-password">click here</a> to reset your password.</p>
+                </form>            
+            </div>
+        </div><!--/row-->
+    </div><!--/container-->   
+
+
+        
+      
+
+      
+<script>
+
+$('#form').submit(function(){
+
+  
+      var name=$('#name').val();
+  var password=$('#login_password').val();
+  if(name==null || name.trim()=="" || password==null || password.trim()=="")
+  {
+    alert("Email/Password cannot be empty");
+    return false;
+  }
+    });
+
+
+</script>
+      {% endblock %}
