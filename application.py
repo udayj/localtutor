@@ -816,6 +816,76 @@ def disclaimer():
 	
 	return render_template('disclaimer.html',app_id=app_id)
 
+@app.route('/like_student_tutor',methods=['POST'])
+def like_student_tutor():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	if 'tutor_id' not in data or 'student_id' not in data:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	tutor_id=data['tutor_id']
+	student_id=data['student_id']
+	like=db.student_tutor_like.find({'tutor_id':tutor_id,'student_id':student_id}).count()
+	if like>0:
+		app.logger.error('Extra entries for student tutor association '+tutor_id+' '+student_id)
+		response={}
+		response={'result':'success'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp	
+
+	like={}
+	like['tutor_id']=tutor_id
+	like['student_id']=student_id
+	db.student_tutor_like.save(like)
+	response={}
+	response={'result':'success'}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
+
+@app.route('/dislike_student_tutor',methods=['POST'])
+def dislike_student_tutor():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	if 'tutor_id' not in data or 'student_id' not in data:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+
+	tutor_id=data['tutor_id']
+	student_id=data['student_id']
+
+	like=db.student_tutor_like.find({'tutor_id':tutor_id,'student_id':student_id}).count()
+	if like==0:
+		app.logger.error('No entries for student tutor association '+tutor_id+' '+student_id)
+		response={}
+		response={'result':'success'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	num=db.student_tutor_like.remove({'tutor_id':tutor_id,'student_id':student_id})
+	app.logger.debug(str(num)+' student teacher associations removed')
+	response={}
+	response={'result':'success'}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
+
+
 @app.route('/associate_student_tutor',methods=['POST'])
 def associate_student_tutor():
 	data={}
@@ -1555,13 +1625,25 @@ def search():
 		total_pages=math.ceil(total/10.0)
 		if total_pages>10:
 			total_pages=10
-		
+
+		teacher_likes={}
+
+		for teacher in paginated_results:
 			
+			teacher['likes']=db.student_tutor_like.find({'tutor_id':str(teacher['_id'])}).count()
+			
+		student_tutor_like={}
+		if hasattr(current_user,'id'):
+			for teacher in paginated_results:
+				student_teacher=db.student_tutor_like.find({'tutor_id':str(teacher['_id']),'student_id':current_user.id}).count()
+				if student_teacher>0:
+					student_tutor_like[teacher['_id']]=True
+
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),
-								actual_tagged_areas='|'.join(actual_tagged_areas))
+								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like)
 
 	try:
 		query=request.args.get('subject')
@@ -1725,12 +1807,23 @@ def search():
 		total_pages=math.ceil(total/10.0)
 		if total_pages>10:
 			total_pages=10
+
+		for teacher in paginated_results:
+			
+			teacher['likes']=db.student_tutor_like.find({'tutor_id':str(teacher['_id'])}).count()
+
+		student_tutor_like={}
+		if hasattr(current_user,'id'):
+			for teacher in paginated_results:
+				student_teacher=db.student_tutor_like.find({'tutor_id':str(teacher['_id']),'student_id':current_user.id}).count()
+				if student_teacher>0:
+					student_tutor_like[teacher['_id']]=True
 			
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),
-								actual_tagged_areas='|'.join(actual_tagged_areas))
+								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like)
 	except Exception as e:
 		app.logger.error(str(e))
 

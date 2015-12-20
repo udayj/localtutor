@@ -137,6 +137,10 @@
                 {% for result in results | batch(2) %}
                 <div class="inner-results row clearfix">
                   {% for item in result %}
+                  <script>
+                  buffer["{{item['_id']}}"]=0;
+                  </script>
+
                 <div class=" col-lg-6 col-md-6 col-sm-12" style="margin-bottom:20px;">
                   <h3><a class="tutors" href="/tutor?id={{item['_id']}}" id="{{item['_id']}}">{{item['name'].title()}}</a></h3>
                     
@@ -184,11 +188,58 @@
                        {{item['geographical_location'].title()}}
                        {% endif %}
                     </p>
+                    
+                    <ul id="like_section_{{item['_id']}}" class="list-inline down-ul"
+                     {% if item['likes'] > 0 %}
+                    style="display:;"
+                    {% else %}
+                    style="display:none;"
+                    {% endif %}
+                    >
+                      <li>
+                         {% if item['likes'] == 0 %}
+                    <span id="likes_{{item['_id']}}">
+                     
+                      </span>
+                    {% endif %}
 
-                    {% if current_user.fb_id %}
+                    {% if item['likes'] > 2 %}
+                    <span id="likes_{{item['_id']}}">
+                      {% if item['_id'] in student_tutor_like %}
+                      You and {{item['likes'] - 1}} people like this teacher 
+                      {% else %}
+                      {{item['likes']}} people like this teacher 
+                      {% endif %}
+                      </span>
+                    {% endif %}
+                    {% if item['likes'] == 2 %}
+                    <span id="likes_{{item['_id']}}">
+                      {% if item['_id'] in student_tutor_like %}
+                      You and {{item['likes'] -1}} person like this teacher 
+                      {% else %}
+                      {{item['likes']}} people like this teacher 
+                      {% endif %}
+                      </span>
+                    {% endif %}
+                    {% if item['likes'] == 1 %}
+                    <span id="likes_{{item['_id']}}">
+                      {% if item['_id'] in student_tutor_like %}
+                      You like this teacher 
+                      {% else %}
+                      {{item['likes']}} person likes this teacher 
+                      {% endif %}
+                      </span>
+                    {% endif %}
+
+                  </li>
+                </ul>
+                   
+
+                   
+                    {% if current_user.id %}
                     <ul class="list-inline down-ul">
                         <li>
-                           
+                          {% if current_user.fb_id %}
                    <button id="associate_{{item['_id']}}" type="button" class="btn-u btn-u-sm" onclick="associate_tutor('{{item['_id']}}','{{current_user.fb_id}}')"  
                       {% if item['_id'] not in student_tutor_assoc %}
                       style="display:;"
@@ -215,8 +266,29 @@
                    
                    
                     </span>
+                    {% endif %}
 
-                    
+                     {% if current_user.id %}
+                  <!-- <ul class="list-inline down-ul">
+                    <li> -->
+                    <button id="like_{{item['_id']}}" type="button" class="btn-u btn-u-sm" onclick="like_tutor('{{item['_id']}}', '{{current_user.id}}',{{item['likes']}})" 
+                    {% if item['_id'] not in student_tutor_like %}
+                    style="display:;"
+                    {% else %}
+                    style="display:none;"
+                    {% endif %}
+                    ><i class="fa fa-thumbs-up"></i> Like</button>
+
+                    <button id="dislike_{{item['_id']}}" type="button" class="btn-u btn-u-sm btn-u-light-green" onclick="dislike_tutor('{{item['_id']}}', '{{current_user.id}}',{{item['likes']}})" 
+                    {% if item['_id'] in student_tutor_like %}
+                    style="display:;"
+                    {% else %}
+                    style="display:none;"
+                    {% endif %}
+                    ><i class="fa fa-thumbs-down"></i> Un-like</button>
+            <!--      </li>
+                </ul> -->
+                    {% endif %}
                      
                     
                      
@@ -232,6 +304,8 @@
                         
                     </ul>
                     {% endif %}
+
+
                 </div>
                 {% endfor %}
               </div>
@@ -360,6 +434,96 @@ $('.input-group #search').typeahead({
   window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion); 
   
 });
+
+
+
+
+function like_tutor(tutor_id,student_id,likes){
+
+  data={};
+  data['tutor_id']=tutor_id;
+  data['student_id']=student_id;
+  
+  likes=parseInt(likes);
+  jQuery.ajax({
+    url: '/like_student_tutor',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      if(data['result']=='success')
+      {
+        $('#like_'+tutor_id).css('display','none');
+        $('#dislike_'+tutor_id).css('display','');
+        if(likes+buffer[""+tutor_id]==0)
+        {
+          $('#like_section_'+tutor_id).css('display','');
+          $('#likes_'+tutor_id).html('You like this teacher');
+        }
+        if(likes+buffer[""+tutor_id]==1)
+        {
+          $('#like_section_'+tutor_id).css('display','');
+          $('#likes_'+tutor_id).html('You and '+'1 person like this teacher');
+        }
+        if(likes+buffer[""+tutor_id]>1)
+        {
+          $('#like_section_'+tutor_id).css('display','');
+          $('#likes_'+tutor_id).html('You and '+(likes+buffer[""+tutor_id])+' people like this teacher');
+        }
+        buffer[""+tutor_id]=buffer[""+tutor_id]+1;
+
+      }
+    }
+
+});
+}
+
+function dislike_tutor(tutor_id,student_id,likes){
+
+  data={};
+  data['tutor_id']=tutor_id;
+  data['student_id']=student_id;
+  likes=parseInt(likes);
+  jQuery.ajax({
+    url: '/dislike_student_tutor',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      if(data['result']=='success')
+      {
+        $('#dislike_'+tutor_id).css('display','none');
+        $('#like_'+tutor_id).css('display','');
+      }
+      if(likes+buffer[""+tutor_id]<=1)
+        {
+          $('#like_section_'+tutor_id).css('display','none');
+          
+        }
+      if(likes+buffer[""+tutor_id]==2)
+        {
+          $('#like_section_'+tutor_id).css('display','');
+          $('#likes_'+tutor_id).html('1 person likes this teacher');
+        }
+      if(likes+buffer[""+tutor_id]>2)
+        {
+          $('#like_section_'+tutor_id).css('display','');
+          if(buffer[""+tutor_id]>0)
+          {
+          
+          $('#likes_'+tutor_id).html(likes+' people like this teacher');
+        }
+        else {
+         $('#likes_'+tutor_id).html((likes-1)+' people like this teacher'); 
+        }
+
+        }
+        buffer[""+tutor_id]=buffer[""+tutor_id]-1;
+    }
+
+});
+}
+
 
 function associate_tutor(tutor_id,student_id){
 
