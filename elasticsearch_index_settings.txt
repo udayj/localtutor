@@ -25,8 +25,8 @@
                     "accountancy,accounting,accounts,auditing,commerce",
                     "economics,eco",
                     "biology,bio",
-                    "finance,financial",
-                    "information technology=>it"
+                    "finance,financial"
+                   
 
                         ]
                       },
@@ -44,9 +44,12 @@
         "english_index": {
           "tokenizer":  "standard",
           "filter": [
-            "english_possessive_stemmer",
+
             "lowercase",
             "my_synonym_filter",
+            "english_possessive_stemmer",
+            
+            
             "english_stop",
             
             "english_stemmer"
@@ -65,7 +68,7 @@
           "filter": [
             
             "lowercase",
-            "search_synonym_filter",
+            "my_synonym_filter",
             "english_possessive_stemmer",
             "english_stop",
             "english_stemmer"

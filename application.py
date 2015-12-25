@@ -111,11 +111,25 @@ def npchunk_features(sentence, i, history='O'):
 		if word_next_bigram in subjects or word_next_bigram in areas:
 			n_bigram_gazette='y'
 
+	p_trigram_gazette='n'
+	p_trigram=prevword_more+' '+prevword+' '+word
+	if p_trigram in subjects or p_trigram in areas:
+		p_trigram_gazette='y'
+	n_trigram_gazette='n'
+	n_trigram=word+' '+nextword+' '+lookahead
+	if n_trigram in subjects or n_trigram in areas:
+		n_trigram_gazette='y'
+
+
 
 	features.append('is_gazette='+is_gazette)
 	features.append('w_is_gazette='+word+'_'+is_gazette)
 	features.append('p_bigram_gazette='+p_bigram_gazette)
 	features.append('n_bigram_gazette='+n_bigram_gazette)
+	features.append('w_pw_ppw='+prevword_more+' '+prevword+' '+word)
+	features.append('w_nw_nnw='+word+' '+nextword+' '+lookahead)
+	features.append('p_trigram_gazette='+p_trigram_gazette)
+	features.append('n_trigram_gazette='+n_trigram_gazette)
 	return features
 
 
@@ -1258,6 +1272,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 	constant_score_query2['constant_score']['query']['match']={}
 	constant_score_query2['constant_score']['query']['match']['name']={}
 	constant_score_query2['constant_score']['query']['match']['name']['query']=query
+	constant_score_query2['constant_score']['query']['match']['name']['type']='phrase'
 	constant_score_query2['constant_score']['query']['match']['name']['fuzziness']=1	
 
 
@@ -1331,20 +1346,28 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 		bool_query={}
 		bool_query['bool']={}
 		bool_query['bool']['should']=[]
-		for subject in filter_subjects:
-			bool_query['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
+		#for subject in filter_subjects:
+
+		#	bool_query['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
 		for area in filter_areas:
 			bool_query['bool']['should'].append({'term': {'area.not_analyzed':area}})
 		for venue in filter_venues:
 			bool_query['bool']['should'].append({'term': {'venue':venue}})
+		
 		bool_query['bool']['must']=[]
-		bool_query['bool']['must'].append({'term':{'subject.not_analyzed':query}})
+		bool_query_inner={}
+		bool_query_inner['bool']={}
+		bool_query_inner['bool']['must']=[]
+		for subject in filter_subjects:
+			bool_query['bool']['must'].append({'term': {'subject.not_analyzed':subject}})
+		
+		
 		payload['query']['filtered']['filter']=bool_query
 	else:
 		bool_query={}
 		bool_query['bool']={}
-		bool_query['bool']['must']=[]
-		bool_query['bool']['must'].append({'term':{'subject.not_analyzed':query}})
+		bool_query['bool']['should']=[]
+		bool_query['bool']['should'].append({'term':{'subject.not_analyzed':query}})
 		payload['query']['filtered']['filter']=bool_query
 
 	print payload
@@ -1408,6 +1431,7 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 	constant_score_query2['constant_score']['query']['match']={}
 	constant_score_query2['constant_score']['query']['match']['name']={}
 	constant_score_query2['constant_score']['query']['match']['name']['query']=query
+	constant_score_query2['constant_score']['query']['match']['name']['type']='phrase'
 	#constant_score_query2['constant_score']['query']['match']['name']['fuzziness']=1	
 
 
@@ -1550,7 +1574,13 @@ def search():
 		is_pre_filter=request.args.get('is_pre_filter')
 
 		if is_pre_filter and is_pre_filter=='y':
-			response=prepare_query_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,filter_venues,is_filter)
+			categories=get_category([query])
+			if len(categories)<1:
+				response=prepare_query_filtered(query,10,(page-1)*10,filter_areas,[query],filter_venues,is_filter)
+			else:
+				response=prepare_query_machine_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,
+													filter_venues,is_filter,actual_tagged_subjects,actual_tagged_areas)
+				
 		else:
 			if is_machine_filtered:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,
@@ -1672,22 +1702,51 @@ def search():
 		is_machine_filtered=False
 		actual_tagged_subjects=[]
 		actual_tagged_areas=[]
+		categories=[]
+		filter_subjects=[]
 
 		if is_pre_filter and is_pre_filter=='y':
-			response=prepare_query_filtered(query,100,0,None,None,None,False)
+			categories=get_category([query])
+			if len(categories)<1:
+				response=prepare_query_filtered(query,500,0,None,None,None,False)
+			else:
+				for tagged_category in categories:
+					print 'category:'+tagged_category
+					subjects_in_categories=db.subjects.find({'category':tagged_category})
+					for s in subjects_in_categories:
+						filter_subjects.append(s['name'])
+					filter_subjects.append(tagged_category)
+				
+				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,filter_subjects,actual_tagged_areas)
+				
 			is_pre_filter='y'
 		else:
 			tagged_subjects, tagged_areas = tagger(query)
 			print 'tagged_subjects:'+str(tagged_subjects)
 			print tagged_areas
 			print len(tagged_subjects)
+
+			for a in tagged_areas:
+				if db.teachers.find({'area':a}).count()>0:
+					actual_tagged_areas.append(a)
+
+			tagged_categories=get_category(tagged_subjects)
+
+
+			if len(tagged_categories)>0:
+
+
+				for tagged_category in tagged_categories:
+					print 'category:'+tagged_category
+					subjects_in_categories=db.subjects.find({'category':tagged_category})
+					for s in subjects_in_categories:
+						actual_tagged_subjects.append(s['name'])
+
 			for sub in tagged_subjects:
 				print sub
 				if db.subjects.find({'name':sub}).count()>0:
 					actual_tagged_subjects.append(sub)
-			for a in tagged_areas:
-				if db.teachers.find({'area':a}).count()>0:
-					actual_tagged_areas.append(a)
+			
 
 			print 'actual subjects:'+str(actual_tagged_subjects)
 			print 'actual areas:'+str(actual_tagged_areas)
@@ -1699,9 +1758,9 @@ def search():
 				print 'machine_filtered results'
 				print actual_tagged_subjects
 				print actual_tagged_areas
-				response=prepare_query_machine_filtered(query,100,0,None,None,None,False,actual_tagged_subjects,actual_tagged_areas)
+				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,actual_tagged_subjects,actual_tagged_areas)
 			else:
-				response=prepare_query(query,100,0,None,None,None,False)
+				response=prepare_query(query,500,0,None,None,None,False)
 			is_pre_filter='n'
 
 		total=response['hits']['total']
@@ -1746,7 +1805,7 @@ def search():
 		subjects.sort()
 
 
-		if is_pre_filter=='y':
+		if is_pre_filter=='y' and len(categories)<1:
 			subjects=[]
 		new_subjects=[]
 		if is_machine_filtered and len(actual_tagged_subjects)>=1:
@@ -1756,6 +1815,14 @@ def search():
 						new_subjects.append((s[0],False))
 						break
 			subjects=new_subjects
+		if is_pre_filter and len(categories)>0:
+			for s in subjects:
+				for a in filter_subjects:
+					if s[0].find(a)!=-1:
+						new_subjects.append((s[0],False))
+						break
+			subjects=new_subjects
+
 		if len(subjects)==1:
 			subjects=[]
 		if is_machine_filtered and len(actual_tagged_areas)==1:
@@ -1770,8 +1837,15 @@ def search():
 		tagged_areas=[]
 
 		if is_pre_filter and is_pre_filter=='y':
-			response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False)
+
+			if len(categories)<1:
+				response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False)
+			else:
+				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,
+														filter_subjects,actual_tagged_areas)
+				
 			is_pre_filter='y'
+			actual_tagged_subjects=filter_subjects
 		else:
 
 
@@ -1830,6 +1904,21 @@ def search():
 
 
 		
+def get_category(tagged_subjects):
+	client=MongoClient()
+	db=client.local_tutor
+	subjects=db.subjects.find()
+	categories=[]
+	for subject in subjects:
+		if subject['category'] not in categories:
+			categories.append(subject['category'])
+	tagged_categories=[]
+	for tagged_subject in tagged_subjects:
+		if tagged_subject in categories:
+			tagged_categories.append(tagged_subject)
+	return tagged_categories
+
+
 
 
 
