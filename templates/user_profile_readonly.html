@@ -1,0 +1,222 @@
+{% extends "base2.html" %}
+{% block content %}
+
+      <!-- Jumbotron -->
+        <div class="search-block-v2">
+        <div class="container" style="margin-top:30px;">
+            <div class="col-md-6 ">
+              
+                <div class="input-group">
+
+                    <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing etc." value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="{{query}}">
+                    <span class="input-group-btn">
+                        <button class="btn-u" type="button" style="margin-top:-0.4em;" onclick="search()"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+                 
+            </div>
+            <br>
+            <hr>
+        </div>
+        
+    </div>
+
+     
+    <div class="container">
+    
+
+
+     <div class="row">
+      <div class="col-lg-10 col-md-10">
+        <div class="panel panel-u margin-bottom-40">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-user"></i>{{name.title()}}</h3>
+                    </div>
+                    <div class="panel-body">
+     
+          <table class="table table-striped table-hover">
+            
+            <tbody>
+             
+              <tr>
+                <td>
+                  Studied At
+                </td>
+                <td>
+                  {{school}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Wishes to Learn
+                </td>
+                <td>
+                  {% for subject in wish_list%}
+                    {{subject}}<br>
+                    {% endfor %}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Favorite Teacher/Course
+                </td>
+                <td>
+                  {{favorite}}
+                </td>
+              </tr>
+              
+              
+            
+              <tr style="display:none;" id="friends">
+                <td>
+                  Facebook Friends on Tutorack
+                </td>
+                <td id="friend_names">
+                  
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+      
+
+              </div>  
+            </div>
+          </div>
+        </div>
+      </div>
+
+    
+      
+
+      <!-- Example row of columns -->
+<script>
+$('.result').hover(function(){
+  $(this).css('background-color','#eee');
+},function(){
+  $(this).css('background-color','white');
+});
+</script>   
+
+<script>     
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  },
+  prefetch : {
+    url: '/options?subject='
+   
+  }
+});
+
+var suggestion="";
+var classify="y";
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+}).on('typeahead:select', function (obj, suggestion) {
+  suggestion=suggestion['value'];
+  classify="n";
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion); 
+  
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+         if(classify!="n")
+        {  
+          
+          window.location='search?subject='+encodeURIComponent(name.value.trim());
+        }
+        else
+        {
+          
+          
+        }
+    }
+
+function custom_logic(login_status){
+  //friend_tutor();
+}
+
+function friend_tutor(){
+  var tutor_id=$('#tutor_id').text().trim();
+  var friends=[];
+  var friend_names={};
+   FB.api('/me/friends', function(response) {
+    console.log(response);
+    var ind=0;
+    for(ind=0;ind<response['data'].length;ind++)
+    {
+      friends.push(response['data'][ind]['id']);
+      friend_names[response['data'][ind]['id']]=response['data'][ind]['name'];
+    }
+
+    data={}
+   data['tutor']=tutor_id;
+   data['friends']=friends;
+   console.log(data);
+   jQuery.ajax({
+    url: '/friend_tutor_name',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      var result="";
+      var ind=0;
+      console.log(friend_names);
+      console.log(data);
+      for(ind=0;ind<data['friend_tutor'].length;ind++)
+      {
+        result=result+friend_names[data['friend_tutor'][ind]]+"<br>"
+      }
+      $('#friend_names').html(result);
+      $('#friends').css('display','');
+    }
+  });
+ });
+}
+
+</script>  
+{% endblock %}
+
+
+

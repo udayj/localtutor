@@ -25,3 +25,6 @@ curl -XGET 'http://localhost:9200/_cat/indices?v'
 
 show field mappings
 curl -XGET 'http://localhost:9200/local_tutor/_mapping/teachers'
+
+delete index
+curl -XDELETE 'http://localhost:9200/_all'

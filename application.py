@@ -289,9 +289,112 @@ def content_entry(file_name,db_name):
 def main_page():
 	return render_template('main_page.html',app_id=app_id,active='main')
 
-@app.route('/mooc_list')
-def mooc_list():
-	return render_template('mooc_list.html',app_id=app_id,active='main')
+@app.route('/user_profile')
+def user_profile():
+	user_id=request.args.get('id')
+	
+	if not user_id or user_id=='':
+		return render_template('error.html')
+
+	
+	client=MongoClient()
+	db=client.local_tutor
+	user=db.users.find({'_id':ObjectId(user_id)})
+	try:
+		user=user.next()
+		name=user['name']
+		age=''
+		school=''
+		wish_list=''
+		favorite=''
+
+		if 'age' in user:
+			age=user['age']
+		if 'school' in user:
+			school=user['school']
+		if 'wish_list' in user:
+			wish_list=user['wish_list']
+		if 'favorite' in user:
+			favorite=user['favorite']
+		
+		if hasattr(current_user,'id') and current_user.id==user_id:
+			return render_template('user_profile.html',name=name,age=age,
+				school=school, wish_list=','.join(wish_list),favorite=favorite,app_id=app_id)
+		else:
+			return render_template('user_profile_readonly.html',name=name,
+				school=school, wish_list=wish_list,favorite=favorite,app_id=app_id)
+
+	except:
+		return render_template('error.html')
+
+@login_required
+@app.route('/save_user_data',methods=['POST'])
+def save_user_data():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+	_id=current_user.id
+	client=MongoClient()
+	db=client.local_tutor
+	user=db.users.find({'_id':ObjectId(_id)})
+	try:
+		user=user.next()
+		if 'age' not in data or 'school' not in data or 'wish_list' not in data or 'favorite' not in data:
+			js=json.dumps({'result':'failed'})
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp
+		user['age']=data['age']
+		user['school']=data['school']
+		user['wish_list']=data['wish_list'].split(',')
+		user['favorite']=data['favorite']
+		db.users.save(user)
+		print 'saved user data'
+		js=json.dumps({'result':'success'})
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	except:
+		print 'problem with user data'
+		js=json.dumps({'result':'failed'})
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+
+@app.route('/get_friends',methods=['POST'])
+def get_friends():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=[element.strip() for element in value]
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	if 'friends[]' not in data:
+		response={}
+		response={'result':'success'}
+		response['friends']=[]
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	friends=data['friends[]']
+	result=[]
+	for friend in friends:
+		user=db.users.find({'fb_id':friend})
+		try:
+			user=user.next()
+			actual_user={}
+			actual_user['_id']=str(user['_id'])
+			actual_user['fb_id']=user['fb_id']
+			result.append(actual_user)
+		except:
+			pass
+	
+	print result
+	response={}
+	response={'result':'success'}
+	response['friends']=result
+	js=json.dumps(response)
+	print response
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
 
 @app.route('/login',methods=['POST'])
 def login():
@@ -631,7 +734,7 @@ def subjects():
 	print category_wise.items()
 	sorted_category_wise=sorted(category_wise.items(),key=sorter)
 
-	return render_template('subjects.html',output=output,category_wise=sorted_category_wise,active='subjects')
+	return render_template('subjects.html',output=output,category_wise=sorted_category_wise,active='subjects',app_id=app_id)
 
 @app.route('/delete_subject',methods=['POST'])
 def delete_subject():
