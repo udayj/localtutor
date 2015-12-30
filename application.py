@@ -417,7 +417,7 @@ def login():
 		app.logger.debug(ret_user.fb_id)
 		app.logger.debug(ret_user.active)
 		if login_user(ret_user,force=True):
-			return redirect(data['redirect_url'])
+			return redirect('/user_profile?id='+ret_user.id)
 		else:
 			return render_template('error.html')
 	except StopIteration:
@@ -426,10 +426,9 @@ def login():
 		user['name']=data['fb_user_name']
 		_id=db.users.save(user)
 		ret_user=User(name=user['name'],_id=_id,fb_id=user['fb_id'])
-		app.logger.debug(ret_user)
-		app.logger.debug(ret_user.active)
+		
 		if login_user(ret_user, force=True):
-			return redirect(data['redirect_url'])
+			return redirect('/user_profile?id='+ret_user.id)
 		else:
 			return render_template('error.html')
 
@@ -622,7 +621,7 @@ def login2():
 		ret_user=User(name=user['name'],email=user['email'],password=user['password'],active=user['active'],_id=str(user['_id']))
 		if login_user(ret_user,remember=remember_me):
 			flash('Logged in!')
-			return redirect('/')
+			return redirect('/user_profile?id='+ret_user.id)
 		else:
 			return render_template('login2.html',error='Cannot login. Account still inactive',active='login2')
 	except StopIteration:
