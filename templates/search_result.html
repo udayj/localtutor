@@ -55,10 +55,10 @@
 
     <div class="container s-results margin-bottom-50">
         <div class="row">
-          <button type="button" class="btn-u visible-xs" data-toggle="collapse" data-target="#filter-options" style="margin-left:1em;margin-bottom:0.5em;" onclick="toggler()">
+          <button type="button" class="btn-u visible-sm visible-xs" data-toggle="collapse" data-target="#filter-options" style="margin-left:1em;margin-bottom:0.5em;" onclick="toggler()">
             <i class="fa fa-sliders"> Filters </i>
           </button>
-            <div id="filter-options" class="col-md-2 related-search hidden-xs">
+            <div id="filter-options" class="col-md-2 related-search hidden-xs hidden-sm">
                 <div class="row" style="margin-left:0.1em";>
                    <div style="display:none;">
             <form id='filter_form' type="hidden" action='/search?subject={{query}}' method='POST'>
@@ -67,44 +67,10 @@
 
           {% if filter_results %}
 
-            {% if areas|length > 0 %}
-            <h3>Filter by Area</h3>
-              <div id="area_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
-                
-                <ul class="list-unstyled" >
-                  
-              {% for area in areas %}
-
-              <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{area[0]}}"
-              {% if area[1] %}
-              checked
-              {% endif %}
-              ><i></i>{{area[0].title()}}</label></li>
-              {% endfor %}
+            {% if venue|length > 0 %}
            
-            </ul>
-
-            </div>
-            {% endif %}
-            
-            {% if subjects|length > 0 %}
-            <h3>Filter by Subject</h3>
-            <div id="subject_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
-              
-              <ul class="list-unstyled">
-              {% for subject in subjects %}
-              <li><label class="checkbox"><input class="subject_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{subject[0]}}"
-              {% if subject[1] %}
-              checked
-              {% endif %}
-              ><i></i>{{subject[0].title()}}</label></li>
-              {% endfor %}
-            </div>
-            {% endif %}
-
-             {% if venue|length > 0 %}
-            <h3>Filter by Venue</h3>
               <div id="venue_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
+                 <h3>Filter by Venue</h3>
                 
                 <ul class="list-unstyled" >
                   
@@ -121,6 +87,44 @@
 
             </div>
             {% endif %}
+
+            {% if areas|length > 0 %}
+           
+              <div id="area_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
+                 <h3 >Filter by Area</h3>
+                <ul class="list-unstyled" >
+                  
+              {% for area in areas %}
+
+              <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{area[0]}}"
+              {% if area[1] %}
+              checked
+              {% endif %}
+              ><i></i>{{area[0].title()}}</label></li>
+              {% endfor %}
+           
+            </ul>
+
+            </div>
+            
+            {% endif %}
+            
+            {% if subjects|length > 0 %}
+            
+            <div id="subject_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
+              <h3>Filter by Subject</h3>
+              <ul class="list-unstyled">
+              {% for subject in subjects %}
+              <li><label class="checkbox"><input class="subject_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{subject[0]}}"
+              {% if subject[1] %}
+              checked
+              {% endif %}
+              ><i></i>{{subject[0].title()}}</label></li>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+           
 
                     
 
@@ -824,9 +828,11 @@ function toggler(){
   if ($('#filter-options').hasClass('hidden-xs')==true)
   {
     $('#filter-options').removeClass('hidden-xs');
+    $('#filter-options').removeClass('hidden-sm');
   }
   else{
     $('#filter-options').addClass('hidden-xs'); 
+    $('#filter-options').addClass('hidden-sm'); 
   }
 }
 </script>  
