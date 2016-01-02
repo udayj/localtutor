@@ -600,6 +600,7 @@ def login2():
 	data={}
 	for name,value in dict(request.form).iteritems():
 		data[name]=value[0]
+	print data
 	username=None
 	if 'username' in data and 'password' in data:
 		username=data['username']
@@ -611,7 +612,7 @@ def login2():
 	if 'remember_me' in data:
 		if data['remember_me']=='on':
 			remember_me=True
-
+	
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
 	password=hashlib.sha512(SALT+password).hexdigest()
@@ -621,7 +622,10 @@ def login2():
 		ret_user=User(name=user['name'],email=user['email'],password=user['password'],active=user['active'],_id=str(user['_id']))
 		if login_user(ret_user,remember=remember_me):
 			flash('Logged in!')
-			return redirect('/user_profile?id='+ret_user.id)
+			if 'redirect_url' in data:
+				return redirect(data['redirect_url'])
+			else:		
+				return redirect('/user_profile?id='+ret_user.id)
 		else:
 			return render_template('login2.html',error='Cannot login. Account still inactive',active='login2')
 	except StopIteration:
