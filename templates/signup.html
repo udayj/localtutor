@@ -30,7 +30,7 @@
 <div class="container content">
         <div class="row">
             <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-                <form class="reg-page" id="form" action="/signup" method="post">
+                <form class="reg-page" id="form_signup" action="/signup" method="post">
                     <div class="reg-header">
                         <h2>Register a new account</h2>
                         <p>Already Signed Up? Click <a href="/login2" class="color-green">Sign In</a> to login your account.</p>                    
@@ -72,7 +72,7 @@
     </div><!--/container-->		
 
 <script>
-$('#form').submit(function(){
+$('#form_signup').submit(function(){
       var username=$('#username').val();
       var email=$('#email').val()
       var password=$('#password').val();

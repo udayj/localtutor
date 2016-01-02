@@ -383,6 +383,7 @@ function fblogout(){
 }
 
   function fblogin(){
+
     FB.login(function(response){
     statusChangeCallback(response);
 },{scope: 'public_profile,email,user_friends'});
@@ -411,7 +412,7 @@ var userid=null;
       userid=response.id;
       $('#fb_user_id').val(response.id);
       $('#fb_user_name').val(response.name);
-      $('#redirect_url').val(window.location.href);
+      $('#redirect_url').val(window.location);
       $('#form').submit();
     });
 

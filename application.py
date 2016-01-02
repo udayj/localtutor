@@ -417,7 +417,10 @@ def login():
 		app.logger.debug(ret_user.fb_id)
 		app.logger.debug(ret_user.active)
 		if login_user(ret_user,force=True):
-			return redirect('/user_profile?id='+ret_user.id)
+			if 'redirect_url' in data:
+				return redirect('/user_profile?id='+ret_user.id)
+			else:
+				return redirect('/user_profile?id='+ret_user.id)
 		else:
 			return render_template('error.html')
 	except StopIteration:
@@ -428,7 +431,10 @@ def login():
 		ret_user=User(name=user['name'],_id=_id,fb_id=user['fb_id'])
 		
 		if login_user(ret_user, force=True):
-			return redirect('/user_profile?id='+ret_user.id)
+			if 'redirect_url' in data:
+				return redirect('/user_profile?id='+ret_user.id)
+			else:	
+				return redirect('/user_profile?id='+ret_user.id)
 		else:
 			return render_template('error.html')
 
@@ -442,7 +448,7 @@ def signup():
         data=data)
 
 	if request.method=='GET':
-		return render_template('signup.html',active='signup')
+		return render_template('signup.html',active='signup',app_id=app_id)
 	else:
 		
 		data={}
@@ -459,7 +465,7 @@ def signup():
 		exist_user=db.users.find({'email':data['email']})
 		try:
 			exist_user.next()
-			return render_template('signup.html',active='signup',signup_error='Email already exists',username=username,email=data['email'])
+			return render_template('signup.html',active='signup',signup_error='Email already exists',username=username,email=data['email'],app_id=app_id)
 		except StopIteration:
 			pass
 
@@ -485,8 +491,8 @@ def signup():
 		except Exception:
 			db.users.remove({'_id':_id})
 			return render_template('signup.html',signup_error='Problem sending email. Account not created. Try again later.',
-									username=username,email=data['email'])
-		return render_template('checkmail.html')
+									username=username,email=data['email'],app_id=app_id)
+		return render_template('checkmail.html',app_id=app_id)
 
 @app.route('/change-password',methods=['GET','POST'])
 def change_password():
@@ -596,7 +602,7 @@ def login2():
 	
 	
 	if request.method=='GET':
-		return render_template('login2.html',active='login2')
+		return render_template('login2.html',active='login2',app_id=app_id)
 	data={}
 	for name,value in dict(request.form).iteritems():
 		data[name]=value[0]
@@ -607,7 +613,7 @@ def login2():
 		password=data['password']
 	else:
 		app.logger.debug('Login Form submitted without fields')
-		return render_template('login2.html',active='login2')
+		return render_template('login2.html',active='login2',app_id=app_id)
 	remember_me=False
 	if 'remember_me' in data:
 		if data['remember_me']=='on':
@@ -627,10 +633,10 @@ def login2():
 			else:		
 				return redirect('/user_profile?id='+ret_user.id)
 		else:
-			return render_template('login2.html',error='Cannot login. Account still inactive',active='login2')
+			return render_template('login2.html',error='Cannot login. Account still inactive',active='login2',app_id=app_id)
 	except StopIteration:
 		return render_template('login2.html',error='Cannot login. Wrong credentials',
-								active='login2')
+								active='login2',app_id=app_id)
 
 	
 @app.route('/logout')

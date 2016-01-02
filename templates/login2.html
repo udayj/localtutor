@@ -24,14 +24,14 @@
           <div class="alert alert-danger fade in">{{error}}</div>
         </div>
       </div>
-    </div>
+</div>
 {% endif %}
 
 
 <div class="container content">   
       <div class="row">
             <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
-                <form class="reg-page" action="/login2" method="post" id="form">
+                <form class="reg-page" action="/login2" method="post" id="form_login">
                     <div class="reg-header">            
                         <h2>Login to your account</h2>
                         <p>Don't have an account yet? Click <a href="/signup" class="color-green">Sign Up</a> to create a new account.</p>
@@ -76,7 +76,7 @@
       
 <script>
 
-$('#form').submit(function(){
+$('#form_login').submit(function(){
 
   
       var name=$('#name').val();
