@@ -135,6 +135,16 @@
                   {{tutor['teacher_type'].title()}}
                 </td>
               </tr>
+              {% if tutor['usp']|length >0 %}
+              <tr>
+                <td>
+                  Additional Info
+                </td>
+                <td>
+                  {{tutor['usp'].title()}}
+                </td>
+              </tr>
+              {% endif %}
               <tr style="display:none;" id="friends">
                 <td>
                   Friends who have studied under this tutor
