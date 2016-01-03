@@ -418,7 +418,7 @@ def login():
 		app.logger.debug(ret_user.active)
 		if login_user(ret_user,force=True):
 			if 'redirect_url' in data:
-				return redirect('/user_profile?id='+ret_user.id)
+				return redirect(data['redirect_url'])
 			else:
 				return redirect('/user_profile?id='+ret_user.id)
 		else:
@@ -2070,7 +2070,7 @@ def result_feedback():
 	db=client.local_tutor
 	feedback=db.satisfaction.find()
 	return render_template('result_feedback.html',feedback=feedback)
-	
+
 
 @app.route('/result_satisfaction',methods=['POST'])
 def result_satisfaction():
