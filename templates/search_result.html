@@ -92,6 +92,13 @@
               {% endif %}
               ><i></i>{{v[0]}}</label></li>
               {% endfor %}
+              {% if areas[0][0]=='online' %}
+              <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="online"
+              {% if areas[0][1] %}
+              checked
+              {% endif %}
+              ><i></i>Online</label></li>
+              {% endif %}
            
             </ul>
 
@@ -105,12 +112,13 @@
                 <ul class="list-unstyled" >
                   
               {% for area in areas %}
-
+              {% if area[0]!='online' %}
               <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{area[0]}}"
               {% if area[1] %}
               checked
               {% endif %}
               ><i></i>{{area[0].title()}}</label></li>
+              {% endif %}
               {% endfor %}
            
             </ul>
@@ -878,7 +886,12 @@ function get_filtered_results(){
 });
 selected_venue="";
   $('#venue_outer input:checked').each(function() {
+    if($(this).attr('name')=='online'){
+      selected_area=selected_area+$(this).attr('name')+"|";   
+    }
+    else{
     selected_venue=selected_venue+$(this).attr('name')+"|";
+  }
 });
 
   checkboxes_venue="";
