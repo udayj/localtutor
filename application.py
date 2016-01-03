@@ -2063,6 +2063,51 @@ def options():
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp
 
+@login_required
+@app.route('/result_feedback')
+def result_feedback():
+	client=MongoClient()
+	db=client.local_tutor
+	feedback=db.satisfaction.find()
+	return render_template('result_feedback.html',feedback=feedback)
+	
+
+@app.route('/result_satisfaction',methods=['POST'])
+def result_satisfaction():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+
+	if '_id' not in data or 'satisfy' not in data or 'query' not in data:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	user=db.users.find({'_id':ObjectId(data['_id'])})
+	try:
+		user=user.next()
+		result={}
+		result['id']=str(user['_id'])
+		result['name']=user['name']
+		result['query']=data['query']
+		result['satisfy']=data['satisfy']
+		_id=db.satisfaction.save(result)
+		response={}
+		response={'result':'success'}
+		response={'satisfy_id':str(_id)}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	except:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
 		
 
 if True:

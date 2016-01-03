@@ -23,6 +23,16 @@
                         <button class="btn-u" type="button" style="margin-top:-0.4em;" onclick="search()"><i class="fa fa-search"></i></button>
                     </span>
                 </div>
+                {% if current_user.id %}
+                <h5 id="question_satisfy" class="note" style="display:inline;"> Found the search results satisfactory ? 
+
+                </h5> 
+                <button id="yes_satisfy" class="btn btn-u btn-xs" type="button" onclick="result_satisfaction('yes')">Yes</button>
+                  <button id="no_satisfy" class="btn btn-u btn-xs" type="button"  onclick="result_satisfaction('no')">No</button>
+                  <div id="message_satisfy" style="display:none;color:#999;">Great, thanks for the feedback ! </div>
+                  <div id="message_satisfy_no" style="display:none;color:#999;">Thanks for the feedback - we'll definitely improve the results and appreciate your help.</div>
+
+                {% endif %}
                  
             </div>
         </div>
@@ -456,6 +466,54 @@
 {% block javascript %}
 
 <script>
+function result_satisfaction(satisfy){
+
+  if(satisfy=='yes'){
+
+    $('#yes_satisfy').css('display','none');
+    $('#no_satisfy').css('display','none');
+    $('#question_satisfy').css('display','none');
+    $('#message_satisfy').css('display','');
+    data={}
+    data['_id']='{{current_user.id}}';
+    data['satisfy']='yes';
+    data['query']='{{query}}';
+
+    jQuery.ajax({
+    url: '/result_satisfaction',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+    }
+  });
+   
+
+  }
+  if(satisfy=='no'){
+    $('#yes_satisfy').css('display','none');
+    $('#no_satisfy').css('display','none');
+    $('#question_satisfy').css('display','none');
+    $('#message_satisfy_no').css('display','');
+    data={}
+    data['_id']='{{current_user.id}}';
+    data['satisfy']='no';
+    data['query']='{{query}}';
+
+    jQuery.ajax({
+    url: '/result_satisfaction',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+
+    }
+  });
+  }
+
+
+}
+
 $('#form_login').submit(function(){
 
       
