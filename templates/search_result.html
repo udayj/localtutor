@@ -92,7 +92,7 @@
               {% endif %}
               ><i></i>{{v[0]}}</label></li>
               {% endfor %}
-              {% if areas[0][0]=='online' %}
+              {% if areas|length>0 and areas[0][0]=='online' %}
               <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="online"
               {% if areas[0][1] %}
               checked
