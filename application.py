@@ -134,7 +134,7 @@ def npchunk_features(sentence, i, history='O'):
 
 
 class User(UserMixin):
-    def __init__(self, name, _id, fb_id=None,password=None,email=None,activation_hash=None,active=True):
+    def __init__(self, name, _id, fb_id=None,password=None,email=None,activation_hash=None,active=True,user_type='user'):
         self.name = name
         self.id = _id
         self.fb_id=fb_id
@@ -142,6 +142,7 @@ class User(UserMixin):
         self.password=password
         self.email=email
         self.activation_hash=activation_hash
+        self.user_type=user_type
     
     def is_active(self):
         return self.active
@@ -166,7 +167,10 @@ def load_user(_id):
 		if 'fb_id' in user and user['fb_id']!=None:
 			ret_user=User(name=user['name'],fb_id=user['fb_id'],_id=str(user['_id']),active=True)
 		else:
-			ret_user=User(name=user['name'],_id=str(user['_id']),active=True)
+			if 'user_type' in user and user['user_type']=='tutor':
+				ret_user=User(name=user['name'],_id=str(user['_id']),active=True,user_type=user['user_type'])	
+			else:
+				ret_user=User(name=user['name'],_id=str(user['_id']),active=True)
 		return ret_user
 	except StopIteration:
 		return None
@@ -187,10 +191,24 @@ def activate():
 		user['active']=True
 		db.users.save(user)
 		ret_user=User(name=user['name'],email=user['email'],password="",active=user['active'],_id=str(user['_id']))
-		login_user(ret_user)
+		
 
 		
-		
+		if 'user_type' in user and user['user_type']=='tutor':
+			fields=['subject','name','contact_number','email','age_group','venue',
+			'classroom_type','geographical_location','area','usp','teacher_type','price']
+			teacher_structured={}
+			for field in fields:
+				teacher_structured[field]=''
+			teacher_structured['name']=user['name']
+			teacher_structured['email']=user['email']
+			teacher_structured['contact_number']=[user['phone']]
+			_id=db.teachers.save(teacher_structured)
+			user['tutor_id']=str(_id)
+			db.users.save(user)
+			return render_template('activate_tutor.html')	
+
+		login_user(ret_user)
 		return render_template('activate.html')
 	except StopIteration:
 		return render_template('activate_error.html')
@@ -293,6 +311,7 @@ def main_page():
 def user_profile():
 	user_id=request.args.get('id')
 	
+	
 	if not user_id or user_id=='':
 		return render_template('error.html')
 
@@ -302,6 +321,19 @@ def user_profile():
 	user=db.users.find({'_id':ObjectId(user_id)})
 	try:
 		user=user.next()
+		if 'user_type' in user and user['user_type']=='tutor' and hasattr(current_user,'id') and current_user.id==user_id:
+			if 'tutor_id' not in user:
+				raise Exception
+			tutor_id=user['tutor_id']
+			tutor=db.teachers.find({'_id':ObjectId(tutor_id)})
+			tutor=tutor.next()
+			return render_template('tutor_profile.html',tutor=tutor)
+
+		if 'user_type' in user and user['user_type']=='tutor':
+
+			return redirect('/tutor?id='+user['tutor_id'])
+
+
 		name=user['name']
 		age=''
 		school=''
@@ -321,10 +353,12 @@ def user_profile():
 			return render_template('user_profile.html',name=name,age=age,
 				school=school, wish_list=','.join(wish_list),favorite=favorite,app_id=app_id)
 		else:
+
 			return render_template('user_profile_readonly.html',name=name,
 				school=school, wish_list=wish_list,favorite=favorite,app_id=app_id)
 
-	except:
+	except Exception as e:
+		app.logger.error(str(e))
 		return render_template('error.html')
 
 @login_required
@@ -494,6 +528,68 @@ def signup():
 									username=username,email=data['email'],app_id=app_id)
 		return render_template('checkmail.html',app_id=app_id)
 
+@app.route('/signup_tutor',methods=['GET','POST'])
+def signup_tutor():
+	def send_mail(data,files):
+		result=requests.post(
+        "https://api.mailgun.net/v2/tutorack.com/messages",
+        auth=("api", "key-1b9979216cd5d2f065997d3d53852cd6"),
+        files=files,
+        data=data)
+
+	if request.method=='GET':
+		return render_template('signup_tutor.html',app_id=app_id)
+	else:
+		
+		data={}
+		for name,value in dict(request.form).iteritems():
+			data[name]=value[0]
+		username=None
+		if 'username' in data:
+			username=data['username']
+		if 'username' not in data or 'password' not in data or 'email' not in data or 'phone' not in data:
+			return render_template('signup_tutor.html',active='signup',signup_error='Incomplete data submitted',username=username,email=data['email'],app_id=app_id)
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		salt='tutorackactivateusingtoken'
+		activation_hash=hashlib.sha512(salt+data['email']).hexdigest()[10:30]
+		
+		exist_user=db.users.find({'email':data['email']})
+		try:
+			exist_user.next()
+			return render_template('signup_tutor.html',active='signup',signup_error='Email already exists',username=username,email=data['email'],app_id=app_id)
+		except StopIteration:
+			pass
+
+		_id=db.users.save({'name':username,
+					   'email':data['email'],
+					   'password':hashlib.sha512(SALT+data['password']).hexdigest(),
+					   'activation_hash':activation_hash,
+					   'user_type':'tutor',
+					   'phone':data['phone'],
+					   'active':False})
+		#user=User(name=username,email=data['email'],password=data['password'],active=False,id=str(_id))
+		
+		app.logger.debug('Sending activation email to:registrations@tutorack.com')
+		html_content=render_template("activate_email_tutor.html",name=username, email=data['email'],phone=data['phone'],
+									url=app.config['HOST']+'/activate?hash='+activation_hash)
+
+		data={"from": "Tutorack <admin@tutorack.com>",
+              "to": 'registrations@tutorack.com',
+              "subject": 'New Tutor Registration',
+              "text": 'Click this link to activate new tutor account '+app.config['HOST']+'/activate?hash='+activation_hash,
+              "html":html_content}
+		#app.logger.debug(activation_hash)
+		#app.logger.debug(str(app.extensions['mail'].server))
+		try:
+			p=multiprocessing.Process(target=send_mail,args=(data,None,))
+			p.start()
+		except Exception:
+			db.users.remove({'_id':_id})
+			return render_template('signup_tutor.html',signup_error='Problem processing request. Account not created. Pls try again later.',
+									username=username,email=data['email'],app_id=app_id)
+		return render_template('checkmail_tutor.html',app_id=app_id)
+
 @app.route('/change-password',methods=['GET','POST'])
 def change_password():
 	def send_mail(data,files):
@@ -606,7 +702,7 @@ def login2():
 	data={}
 	for name,value in dict(request.form).iteritems():
 		data[name]=value[0]
-	print data
+	
 	username=None
 	if 'username' in data and 'password' in data:
 		username=data['username']
@@ -625,8 +721,14 @@ def login2():
 	user=db.users.find({'email':username,'password':password})
 	try:
 		user=user.next()
-		ret_user=User(name=user['name'],email=user['email'],password=user['password'],active=user['active'],_id=str(user['_id']))
+		if 'user_type' in user and user['user_type']=='tutor':
+			print 'user_type:tutor'
+			ret_user=User(name=user['name'],email=user['email'],
+			password=user['password'],active=user['active'],_id=str(user['_id']),user_type=user['user_type'])
+		else:		
+			ret_user=User(name=user['name'],email=user['email'],password=user['password'],active=user['active'],_id=str(user['_id']))
 		if login_user(ret_user,remember=remember_me):
+			app.logger.error('checking  '+current_user.user_type)
 			flash('Logged in!')
 			if 'redirect_url' in data:
 				return redirect(data['redirect_url'])
@@ -647,6 +749,14 @@ def logout():
 	if redirect_url is not None:
 		return redirect(redirect_url)
 	return redirect('/')
+
+@app.route('/tutor_registration',methods=['GET','POST'])
+def tutor_registration():
+	client=MongoClient()
+	db=client.local_tutor
+	tutors=db.users.find({'user_type':'tutor'})
+	return render_template('tutor_registration.html',tutors=tutors)
+
 
 def rewrite_query(query):
 	client=MongoClient()
@@ -1272,6 +1382,76 @@ def tutor_edit_save():
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp
 
+@login_required
+@app.route('/tutor_profile_edit_save',methods=['POST'])
+def tutor_profile_edit_save():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip().lower()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	if '_id' not in data:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp	
+
+	if data['user_id']!=current_user.id:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp					
+
+	tutor=db.teachers.find({'_id':ObjectId(data['_id'])})
+	try:
+		tutor=tutor.next()
+		if data['name']!='' or len(data['name'])>1:
+			tutor['name']=data['name']
+			tutor['subject']=[subject.strip().lower() for subject in data['subject'].split(',')]
+			tutor['contact_number']=[contact_number.strip().lower() for contact_number in data['contact_number'].split(',')]
+			tutor['geographical_location']=data['geographical_location']
+			tutor['area']=data['area']
+			tutor['email']=data['email']
+			tutor['age_group']=data['age_group']
+			tutor['venue']=data['venue']
+			tutor['classroom_type']=data['classroom_type']
+			tutor['teacher_type']=data['teacher_type']
+
+			for subject in tutor['subject']:
+				actual_subject=db.subjects.find({'name':subject})
+				try:
+					actual_subject=actual_subject.next()
+				except StopIteration:
+					actual_subject={}
+					actual_subject['name']=subject
+					actual_subject['category']=''
+					db.subjects.save(actual_subject)
+
+			db.teachers.save(tutor)
+
+		else:
+			response={}
+			response={'result':'failed'}
+			js=json.dumps(response)
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp			
+
+	except StopIteration:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp		
+
+	response={}
+	response={'result':'success'}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
+
 def tagger(text):
 	tagger=pycrfsuite.Tagger()
 	tagger.open('static/classifier/crf_classifier_main.crfsuite')
@@ -1833,6 +2013,7 @@ def search():
 				
 			is_pre_filter='y'
 		else:
+			print 'check 0'
 			tagged_subjects, tagged_areas = tagger(query)
 			print 'tagged_subjects:'+str(tagged_subjects)
 			print tagged_areas
@@ -1875,6 +2056,7 @@ def search():
 				response=prepare_query(query,500,0,None,None,None,False)
 			is_pre_filter='n'
 
+		print 'check 2'
 		total=response['hits']['total']
 		max_score=response['hits']['max_score']
 		results=response['hits']['hits']
@@ -1968,6 +2150,7 @@ def search():
 				response=prepare_query(query,10,(page-1)*10,None,None,None,False)
 			is_pre_filter='n'
 		
+
 		total=response['hits']['total']
 		max_score=response['hits']['max_score']
 		results=response['hits']['hits']
@@ -1989,6 +2172,7 @@ def search():
 				student_teacher=db.student_tutor.find({'tutor_id':str(teacher['_id']),'student_id':current_user.fb_id}).count()
 				if student_teacher>0:
 					student_tutor_assoc[teacher['_id']]=True
+
 		print student_tutor_assoc
 		total_pages=math.ceil(total/10.0)
 		if total_pages>10:
@@ -2004,7 +2188,9 @@ def search():
 				student_teacher=db.student_tutor_like.find({'tutor_id':str(teacher['_id']),'student_id':current_user.id}).count()
 				if student_teacher>0:
 					student_tutor_like[teacher['_id']]=True
-							
+
+		print 'checking'
+
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,

@@ -1,0 +1,397 @@
+{% extends "base2.html" %}
+{% block css %}
+<link rel="stylesheet" href="/static/stylesheets/pages/page_search.css">
+<link rel="stylesheet" href="/static/stylesheets/pages/page_faq1.css">
+{% endblock %}
+
+{% block content %}
+
+      <!-- Jumbotron -->
+
+    <div class="container">
+        <div class="search-block-v2">
+        <div class="container" style="margin-top:30px;">
+            <div class="col-md-6 ">
+              
+                <div class="input-group">
+
+                    <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing etc." value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="{{query}}">
+                    <span class="input-group-btn">
+                        <button class="btn-u" type="button" style="margin-top:-0.4em;" onclick="search()"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+                 
+            </div>
+        </div>
+    </div>
+    <hr>
+  </div>
+
+
+  <div class="container">
+  	<div class="row">
+  		<div class="col-md-9">
+    <div class="alert alert-success fade in margin-bottom-40">Thank you. New tutor account activated successfully. Welcome to our amazing tutor community which is helping people learn over 800 subjects. We do not charge any commission or registration fees.
+        
+    </div>
+</div>
+</div>
+</div>
+<div class="container">
+    <div class="service-block-v4">
+        <div class="container content-sm">
+            <div class="row">
+                <div class="col-md-4 service-desc md-margin-bottom-50">
+                    <i class="fa fa-search service-icon"></i>
+                    <h3>Find</h3>
+                    <p class="no-margin-bottom">Find tutors, institutes and courses in your city for anything you want to learn like dancing, swimming or even unqiue areas like taekwondo and magic</p>
+                </div>
+                <div class="col-md-4 service-desc md-margin-bottom-50">
+                    <i class="fa fa-cogs service-icon"></i>
+                    <h3>Connect</h3>
+                    <p class="no-margin-bottom">Connect with tutors qucikly and directly. Network with friends who personally know the tutor to decide if they are a good fit</p>
+                </div>
+                <div class="col-md-4 service-desc">
+                    <i class="fa fa-rocket service-icon"></i>
+                    <h3>Learn</h3>
+                    <p class="no-margin-bottom">Develop new interests or harness old ones. Enhance your knowledge through any learning medium that suits you</p>
+                </div>
+            </div><!--/end row-->
+        </div><!--/end container-->
+    </div>
+    <hr>
+  </div>
+
+  <div class="container faq-page">
+
+      <div class="row">
+            <!-- Begin Tab v1 -->
+            <div class="col-md-6">
+                <div class="tab-v1">
+                    <ul class="nav nav-tabs margin-bottom-20">
+                        <li class="active"><a data-toggle="tab" href="#">For Tutors</a></li>
+                        <li><a data-toggle="tab" href="#profile">For Students</a></li>
+                        
+                    </ul>
+                    <div class="tab-content">
+                        <!-- Tab Content 1 -->
+                        <div id="home" class="tab-pane fade in active">
+                            <div id="accordion-v1" class="panel-group acc-v1">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-One" data-parent="#accordion-v1" data-toggle="collapse" class="accordion-toggle">
+                                                Why should I be on tutorack ?
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse in" id="collapse-One">
+                                        <div class="panel-body">
+                                            Tutorack is a free tutoring search engine. We have over 5000 experienced tutors for any area of interest like mathematics or swimming and sometimes even unique ones like taekwondo and magic! So no matter what you teach, join us now to grow your tutoring career! As a registered tutor you get:
+                                            <ul>
+<li>A free tutoring profile on Tutorack showcasing your qualifications, experiences and excellent reviews from students.</li>
+<li>Thousands of tutoring jobs to choose from daily</li>
+<li>Opportunity to increase your student popularity through our special facebook features</li>
+<li>Build your credentials and earn more!</li>
+</ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-Two" data-parent="#accordion-v1" data-toggle="collapse" class="accordion-toggle">
+                                                How will students contact me?
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse" id="collapse-Two">
+                                        <div class="panel-body">
+                                            Students contact you directly and you deal directly with students. Students can contact on your mobile number directly. It is important to keep your contact details up to date to connect with students.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-Three" data-parent="#accordion-v1" data-toggle="collapse" class="accordion-toggle">
+                                                How will I get paid?
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse" id="collapse-Three">
+                                        <div class="panel-body">
+                                            The students will pay you as per your agreed arrangement with them. Tutorack doesn’t pay you. 
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-Four" data-parent="#accordion-v1" data-toggle="collapse" class="accordion-toggle">
+                                                Does tutorack charge any money for listing ?
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse" id="collapse-Four">
+                                        <div class="panel-body">
+                                            Tutorack doesn’t charge any money for listing your name as a tutor or course provider.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-Five" data-parent="#accordion-v1" data-toggle="collapse" class="accordion-toggle">
+                                                How do I make my profile more searchable?
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse" id="collapse-Five">
+                                        <div class="panel-body">
+                                            The best way to make an effective and searchable profile is to keep us up to date with your contact details and course offerings. At present we are only accepting updates through email. Feel free to email us on connect@tutorack.com
+                                        </div>
+                                    </div>
+                                </div>
+
+                                
+
+                                
+                            </div>
+                        </div>
+                        <!-- End Tab Content 1 -->
+
+                        <!-- Tab Content 2 -->
+                        <div id="profile" class="tab-pane fade">
+                            <div id="accordion-v2" class="panel-group acc-v1">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-v2-One" data-parent="#accordion-v2" data-toggle="collapse" class="accordion-toggle">
+                                                Why should I log in through facebook?
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse in" id="collapse-v2-One">
+                                        <div class="panel-body">
+                                            Because it’s simple! Just click on the ‘Login using Facebook’ tab and fill out your facebook username and password. <br>
+                                            That’s all! The search results present you with an option to acknowldge that you have studied under a tutor. You will also know which teachers your friends have studied under.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-v2-Two" data-parent="#accordion-v2" data-toggle="collapse" class="accordion-toggle">
+                                                Contribute to a tutor's profile
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse" id="collapse-v2-Two">
+                                        <div class="panel-body">
+                                            You can find your tutors, and click on ‘ I studied under this teacher’! Support their profile and make them popular!
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-v2-Three" data-parent="#accordion-v2" data-toggle="collapse" class="accordion-toggle">
+                                                Learn a new skill
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse" id="collapse-v2-Three">
+                                        <div class="panel-body">
+                                            Once logged in, you can choose from over 10000 experienced tutors and courses for any area of interest like physics, chemistry, contemporary dance and computer programming.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-v2-Four" data-parent="#accordion-v2" data-toggle="collapse" class="accordion-toggle">
+                                                Ask your own friends for reviews
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse" id="collapse-v2-Four">
+                                        <div class="panel-body">
+                                            We aren’t just another tutoring website that just gives you a list of tutors! By logging in through facebook you can see which friends in your circle have studied under a tutor! You can connect with them to get personal reviews and then choose what best fits your requirements!
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-v2-Five" data-parent="#accordion-v2" data-toggle="collapse" class="accordion-toggle">
+                                                Does tutorack help me in connecting with a tutor?
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse" id="collapse-v2-Five">
+                                        <div class="panel-body">
+                                            We have made finding a tutor simple for you. Just search for your interest area or the subject you want to learn. Vola! You will get an extensive list of experienced teachers with only the information you need to connect with them and make a choice.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a href="#collapse-v2-Six" data-parent="#accordion-v2" data-toggle="collapse" class="accordion-toggle">
+                                                Do I have to pay tutorack after I connect with a tutor?
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse" id="collapse-v2-Six">
+                                        <div class="panel-body">
+                                            Tutorack is a completely free service for students.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tab Content 2 -->
+
+                        <!-- Tab Content 3 -->
+                        
+                        <!-- Tab Content 4 -->
+                    </div>
+                </div>
+            </div><!--/col-md-6-->
+
+              <!-- Popular Topics -->
+            <div class="col-md-6">
+                <div class="headline"><h2>Get In Touch</h2></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="faq-add">
+                            <div class="top-part">
+                                <i class="fa fa-phone service-icon"></i>
+                                <h3 class="new-title">
+                                    <a href="#">Contact Us</a>
+
+                                </h3>
+                                <p>2, Hare Street, <br>
+                                  Nicco House, 3rd Floor<br>
+                                  Kolkata - 700001
+                                </p>
+                            </div>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="faq-add">
+                            <div class="top-part">
+                                <i class="fa fa-envelope service-icon"></i>
+                                <h3 class="new-title">
+                                    <a href="#">Email</a>
+                                </h3>
+                            </div>
+                            <p>connect@tutorack.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div><!--/col-md-6-->
+            <!--End Tab v1-->
+
+     
+
+   
+
+            </div>
+    
+   
+
+    
+      
+
+      <!-- Example row of columns -->
+<script>
+$('.result').hover(function(){
+  $(this).css('background-color','#eee');
+},function(){
+  $(this).css('background-color','white');
+});
+</script>   
+
+<script>     
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  },
+   prefetch : {
+    url: '/options?subject='
+   
+  }
+});
+
+var suggestion="";
+var classify="y";
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+}).on('typeahead:select', function (obj, suggestion) {
+  suggestion=suggestion['value'];
+  classify="n";
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion); 
+  
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+        window.location='search?subject='+encodeURIComponent(name.value.trim());
+    }
+
+</script>  
+{% endblock %}
+
+
+

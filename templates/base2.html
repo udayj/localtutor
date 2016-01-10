@@ -261,7 +261,11 @@ function custom_logic(login_status)
                     </li>
                     <li>
                          <a href="/user_profile?id={{current_user.id}}">
+                          {% if current_user.user_type=="tutor" %}
+                            Update Profile
+                          {% else %}
                             Hi, {{current_user.name}}
+                          {% endif %}
                         </a>
                         
                     </li>
@@ -457,7 +461,7 @@ var userid=null;
                     <div class="col-md-6">
                         <p>
                             2015 &copy; All Rights Reserved.
-                           <a href="/disclaimer">Disclaimer</a> | <a href="/disclaimer">Terms of Service</a>
+                           <a href="/disclaimer">Disclaimer</a> | <a href="/disclaimer">Terms of Service</a>|<a href="/signup_tutor">Register as a Tutor</a>
                         </p>
                     </div>
 

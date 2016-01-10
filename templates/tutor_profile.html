@@ -1,0 +1,404 @@
+{% extends "base2.html" %}
+{% block content %}
+
+      <!-- Jumbotron -->
+     
+        <div class="search-block-v2">
+        <div class="container" style="margin-top:30px;">
+            <div class="col-md-6 ">
+              
+                <div class="input-group">
+
+                    <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing etc." value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="{{query}}">
+                    <span class="input-group-btn">
+                        <button class="btn-u" type="button" style="margin-top:-0.4em;" onclick="search()"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+                 
+            </div>
+            <br>
+            <hr>
+        </div>
+        
+    </div>
+
+     
+    
+    <div id="tutor_id" style="display:none;">
+      {{tutor['_id']}}
+    </div>
+
+    <div class="container">
+     <div class="row">
+      <div class="col-lg-10 col-md-10">
+          <div class="panel panel-u margin-bottom-40">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-user">Tutor/Institute Information</i></h3>
+                    </div>
+                    <div class="panel-body">
+          <table class="table table-striped sky-form">
+            
+            <tbody>
+              <tr>
+                <td>
+                  Name
+                </td>
+                <td>
+                   <input id="name_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['name']}}">
+                
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Subjects Taught
+                </td>
+                <td>
+                  <input id="subject_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12"
+
+                  value="{{tutor['subject']|join(',')}}" placeholder="eg. physics, chemistry,maths">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Contact Number
+                </td>
+                <td>
+                 <input id="contact_number_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12"
+
+                  value="{{tutor['contact_number']|join(',')}}">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Address
+                </td>
+                <td>
+                  <input id="geographical_location_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['geographical_location'].title()}}">
+                  
+                </td>
+              </tr>
+               <tr>
+                <td>
+                  Area
+                </td>
+                <td>
+                  <input id="area_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['area']}}" placeholder="eg. alipore">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Email Id
+                </td>
+                <td>
+                  <input id="email_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['email']}}">  
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Teaches Age Group
+                </td>
+                <td>
+                  <input id="age_group_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['age_group']}}" placeholder="eg. 10-15, 15-20">
+                </td>
+              </tr>
+              
+              <tr>
+                <td>
+                  Venue of Class
+                </td>
+                <td>
+                  <label class="select" >
+                    <select id="venue">
+                      <option value="0">Choose Option - Student's Home/Center</option>
+                      <option value="1">Student's Home</option>
+                      <option value="2">Center</option>
+                    </select>
+                    <i></i>
+                  </label>
+                  <!--input id="venue_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['venue']}}"-->
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Do you teach groups or individual
+                </td>
+                <td>
+                 <label class="select" >
+                    <select id="classroom_type">
+                      <option value="0">Choose Option - Group/Individual</option>
+                      <option value="1">Group</option>
+                      <option value="2">Individual</option>
+                    </select>
+                    <i></i>
+                  </label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                 Are you an institution or a tutor ?
+                </td>
+                <td>
+                  <label class="select" >
+                    <select id="teacher_type">
+                      <option value="0">Choose Option - Institution/Individual</option>
+                      <option value="1">Institution</option>
+                      <option value="2">Individual</option>
+                    </select>
+                    <i></i>
+                  </label>
+                </td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+          <div class="row">
+            <div class="col-lg-12 col-md-12">
+              <div>
+          <button id="save_{{tutor['_id']}}" type="submit" class="btn-u" id="submit" onclick="save_tutor_data(this.id)">Save</button>
+          <br>
+
+            </div>
+              <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
+      <br>
+          <div id="status_{{tutor['_id']}}" class="alert alert-success fade in" style="display:none;"></div>
+        </div>
+          
+          <br>
+          <br>
+      </div>
+    </div>
+      
+
+              </div>  
+            </div>
+          </div>
+
+    
+      
+
+      <!-- Example row of columns -->
+<script>
+
+$(document).ready(
+  function(){
+
+    if("{{tutor['venue']}}"=="students home"){
+      $('#venue').val("1");   
+    }
+    else if ("{{tutor['venue']}}"=="center"){
+      $('#venue').val("2"); 
+    }
+    else{
+      $('#venue').val("0");
+    }
+    if("{{tutor['classroom_type']}}"=="group"){
+      $('#classroom_type').val("1");   
+    }
+    else if ("{{tutor['classroom_type']}}"=="individual"){
+      $('#classroom_type').val("2"); 
+    }
+    else{
+      $('#classroom_type').val("0");
+    }
+    if("{{tutor['teacher_type']}}"=="institution"){
+      $('#teacher_type').val("1");   
+    }
+    else if ("{{tutor['teacher_type']}}"=="individual"){
+      $('#teacher_type').val("2"); 
+    }
+    else{
+      $('#teacher_type').val("0");
+    }
+}
+
+   
+  );
+
+function save_tutor_data(id)
+{
+  new_id=id.substr(5);
+  name=$('#'+'name_'+new_id).val();
+  subject=$('#'+'subject_'+new_id).val();
+  contact_number=$('#'+'contact_number_'+new_id).val();
+  geographical_location=$('#'+'geographical_location_'+new_id).val();
+  area=$('#'+'area_'+new_id).val();
+  email=$('#'+'email_'+new_id).val();
+  age_group=$('#'+'age_group_'+new_id).val();
+  venue=$('#venue').val();
+  classroom_type=$('#classroom_type').val();
+  teacher_type=$('#teacher_type').val();
+
+  
+  var data={}
+  data['user_id']='{{current_user.id}}';
+  data['_id']=new_id;
+  data['name']=name;
+  data['subject']=subject;
+  data['contact_number']=contact_number;
+  data['geographical_location']=geographical_location;
+  data['area']=area;
+  data['email']=email;
+  data['age_group']=age_group;
+  if(venue=="0"){
+    data['venue']='';
+  }
+  else if(venue=="1"){
+    data['venue']='students home';
+  }
+  else{
+    data['venue']='center';  
+  }
+  if(classroom_type=="0"){
+    data['classroom_type']='';  
+  }
+  else{
+    data['classroom_type']=$('#classroom_type :selected').text().toLowerCase();
+  }
+  if(teacher_type=="0"){
+    data['teacher_type']='';
+  }
+  else{
+    data['teacher_type']=$('#teacher_type :selected').text().toLowerCase();
+  }
+  
+  console.log(data);
+
+  jQuery.ajax({
+    url: '/tutor_profile_edit_save',
+    data: data,
+    type: 'POST',
+    success: function(data){
+
+        if(data['result']=='success')
+        {
+          $('#status_'+new_id).css('display','');
+          $('#status_'+new_id).html('Successfully updated data');
+          
+
+        }
+       
+        else
+        {
+          $('#status_'+new_id).css('display','');
+          $('#status_'+new_id).html('Could not update data');
+        }
+    }
+});
+
+}
+
+
+$('.result').hover(function(){
+  $(this).css('background-color','#eee');
+},function(){
+  $(this).css('background-color','white');
+});
+</script>   
+
+<script>     
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  },
+  prefetch : {
+    url: '/options?subject='
+   
+  }
+});
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+});
+
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+        window.location='search?subject='+encodeURIComponent(name.value.trim());
+    }
+
+function custom_logic(login_status){
+  friend_tutor();
+}
+
+function friend_tutor(){
+  var tutor_id=$('#tutor_id').text().trim();
+  var friends=[];
+  var friend_names={};
+   FB.api('/me/friends', function(response) {
+    console.log(response);
+    var ind=0;
+    for(ind=0;ind<response['data'].length;ind++)
+    {
+      friends.push(response['data'][ind]['id']);
+      friend_names[response['data'][ind]['id']]=response['data'][ind]['name'];
+    }
+
+    data={}
+   data['tutor']=tutor_id;
+   data['friends']=friends;
+   console.log(data);
+   jQuery.ajax({
+    url: '/friend_tutor_name',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      var result="";
+      var ind=0;
+      console.log(friend_names);
+      console.log(data);
+      for(ind=0;ind<data['friend_tutor'].length;ind++)
+      {
+        result=result+friend_names[data['friend_tutor'][ind]]+"<br>"
+      }
+      $('#friend_names').html(result);
+      $('#friends').css('display','');
+    }
+  });
+ });
+}
+
+</script>  
+{% endblock %}
+
+
+
