@@ -1387,7 +1387,10 @@ def tutor_edit_save():
 def tutor_profile_edit_save():
 	data={}
 	for name,value in dict(request.form).iteritems():
-		data[name]=value[0].strip().lower()
+		if name=='usp':
+			data[name]=value[0]
+		else:
+			data[name]=value[0].strip().lower()
 	app.logger.debug(str(data))
 	client=MongoClient()
 	db=client.local_tutor
@@ -1419,6 +1422,7 @@ def tutor_profile_edit_save():
 			tutor['venue']=data['venue']
 			tutor['classroom_type']=data['classroom_type']
 			tutor['teacher_type']=data['teacher_type']
+			tutor['usp']=data['usp']
 
 			for subject in tutor['subject']:
 				actual_subject=db.subjects.find({'name':subject})

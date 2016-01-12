@@ -33,7 +33,7 @@
       <div class="col-lg-10 col-md-10">
           <div class="panel panel-u margin-bottom-40">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-user">Tutor/Institute Information</i></h3>
+                        <h3 class="panel-title"><i class="fa fa-user"></i>Tutor/Institute Information</h3>
                     </div>
                     <div class="panel-body">
           <table class="table table-striped sky-form">
@@ -56,6 +56,7 @@
                   <input id="subject_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12"
 
                   value="{{tutor['subject']|join(',')}}" placeholder="eg. physics, chemistry,maths">
+                  <div class="note">Enter a comma separated list of subjects you teach eg. physics, chemistry</div>
                 </td>
               </tr>
               <tr>
@@ -83,6 +84,7 @@
                 </td>
                 <td>
                   <input id="area_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['area']}}" placeholder="eg. alipore">
+                  <div class="note">Enter the area/locality which you serve</div>
                 </td>
               </tr>
               <tr>
@@ -143,9 +145,21 @@
                       <option value="0">Choose Option - Institution/Individual</option>
                       <option value="1">Institution</option>
                       <option value="2">Individual</option>
+
                     </select>
                     <i></i>
                   </label>
+                </td>
+              </tr>
+               <tr>
+                <td>
+                 Additional Info
+                </td>
+                <td>
+                  <textarea id="additional_{{tutor['_id']}}" class="form-control col-lg-12 col-md-12 textarea textarea-resizeable" rows="3"
+
+                  >{{tutor['usp']}}</textarea>
+                  <div class="note">Enter any additional information like your educational qualification, accomplishment etc</div>
                 </td>
               </tr>
               
@@ -229,6 +243,7 @@ function save_tutor_data(id)
   venue=$('#venue').val();
   classroom_type=$('#classroom_type').val();
   teacher_type=$('#teacher_type').val();
+  usp=$('#additional_'+new_id).val();
 
   
   var data={}
@@ -241,6 +256,7 @@ function save_tutor_data(id)
   data['area']=area;
   data['email']=email;
   data['age_group']=age_group;
+  data['usp']=usp;
   if(venue=="0"){
     data['venue']='';
   }
