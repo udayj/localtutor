@@ -197,17 +197,18 @@ def activate():
 
 		
 		if 'user_type' in user and user['user_type']=='tutor':
-			fields=['subject','name','contact_number','email','age_group','venue',
-			'classroom_type','geographical_location','area','usp','teacher_type','price']
-			teacher_structured={}
-			for field in fields:
-				teacher_structured[field]=''
-			teacher_structured['name']=user['name']
-			teacher_structured['email']=user['email']
-			teacher_structured['contact_number']=[user['phone']]
-			_id=db.teachers.save(teacher_structured)
-			user['tutor_id']=str(_id)
-			db.users.save(user)
+			if 'tutor_id' not in user:
+				fields=['subject','name','contact_number','email','age_group','venue',
+				'classroom_type','geographical_location','area','usp','teacher_type','price']
+				teacher_structured={}
+				for field in fields:
+					teacher_structured[field]=''
+				teacher_structured['name']=user['name']
+				teacher_structured['email']=user['email']
+				teacher_structured['contact_number']=[user['phone']]
+				_id=db.teachers.save(teacher_structured)
+				user['tutor_id']=str(_id)
+				db.users.save(user)
 			return render_template('activate_tutor.html')	
 
 		login_user(ret_user)
