@@ -145,6 +145,16 @@
                 </td>
               </tr>
               {% endif %}
+              {% if 'announcement' in tutor and tutor['announcement']|length > 0 %}
+              <tr>
+                <td>
+                  Announcement
+                </td>
+                <td>
+                  {{tutor['date_announcement']}} - {{tutor['announcement']}}
+                </td>
+              </tr>
+              {% endif %}
               <tr style="display:none;" id="friends">
                 <td>
                   Friends who have studied under this tutor

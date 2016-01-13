@@ -17,6 +17,8 @@ import math
 import requests
 import hashlib
 import multiprocessing
+from pytz import timezone
+from datetime import datetime
 
 
 
@@ -1387,7 +1389,7 @@ def tutor_edit_save():
 def tutor_profile_edit_save():
 	data={}
 	for name,value in dict(request.form).iteritems():
-		if name=='usp':
+		if name=='usp' or name=='announcement':
 			data[name]=value[0]
 		else:
 			data[name]=value[0].strip().lower()
@@ -1423,6 +1425,12 @@ def tutor_profile_edit_save():
 			tutor['classroom_type']=data['classroom_type']
 			tutor['teacher_type']=data['teacher_type']
 			tutor['usp']=data['usp']
+			
+			ist=timezone('Asia/Kolkata')
+			ist_now=datetime.now(ist)
+			date=ist_now.strftime('%d/%m/%Y')
+			tutor['announcement']=data['announcement']
+			tutor['date_announcement']=date
 
 			for subject in tutor['subject']:
 				actual_subject=db.subjects.find({'name':subject})

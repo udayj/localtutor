@@ -162,6 +162,19 @@
                   <div class="note">Enter any additional information like your educational qualification, accomplishment etc</div>
                 </td>
               </tr>
+              <tr>
+                <td>
+                  Announcement
+                </td>
+                <td>
+                  <input id="announcement_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" 
+                  {% if 'announcement' in tutor %}
+                  value="{{tutor['announcement']}}"
+                  {% endif %}
+                  >
+                  <div class="note">Make any announcement for your students - you can change or delete any time</div>
+                </td>
+              </tr>
               
             </tbody>
           </table>
@@ -244,6 +257,7 @@ function save_tutor_data(id)
   classroom_type=$('#classroom_type').val();
   teacher_type=$('#teacher_type').val();
   usp=$('#additional_'+new_id).val();
+  announcement=$('#announcement_'+new_id).val();
 
   
   var data={}
@@ -257,6 +271,7 @@ function save_tutor_data(id)
   data['email']=email;
   data['age_group']=age_group;
   data['usp']=usp;
+  data['announcement']=announcement;
   if(venue=="0"){
     data['venue']='';
   }
