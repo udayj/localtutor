@@ -308,7 +308,9 @@ def content_entry(file_name,db_name):
 
 @app.route('/')
 def main_page():
-	return render_template('main_page.html',app_id=app_id,active='main')
+	title='- Find tutors and courses for anything you want to learn from over 800 subjects and 10000 teachers'
+	meta_description='Find tutors/teachers and courses for anything you want to learn from over 800 subjects and 10000 teachers'
+	return render_template('main_page.html',app_id=app_id,active='main',title=title,meta_description=meta_description)
 
 @app.route('/user_profile')
 def user_profile():
@@ -1973,12 +1975,12 @@ def search():
 				student_teacher=db.student_tutor_like.find({'tutor_id':str(teacher['_id']),'student_id':current_user.id}).count()
 				if student_teacher>0:
 					student_tutor_like[teacher['_id']]=True
-
+		title='- Search results for '+query
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),
-								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like)
+								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title)
 
 	try:
 		query=request.args.get('subject')
@@ -2202,13 +2204,14 @@ def search():
 				if student_teacher>0:
 					student_tutor_like[teacher['_id']]=True
 
-		print 'checking'
+		
+		title='- Search results for '+query
 
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),
-								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like)
+								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title)
 	except Exception as e:
 		app.logger.error(str(e))
 
