@@ -1501,6 +1501,8 @@ def tagger(text):
 
 def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,
 									actual_tagged_subjects,actual_tagged_areas):
+
+	print 'prepare_machine_filtered query function'
 	payload={}
 	payload['query']={}
 	payload['query']['filtered']={}
@@ -1515,8 +1517,8 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 	payload_machine['query']['bool']={}
 	payload_machine['query']['bool']['should']=[]
 	for sub in actual_tagged_subjects:
-		payload_machine['query']['bool']['should'].append(
-			{'constant_score':{'query':{'match':{'subject' : {'query':sub, 'type': 'phrase'}}}}})
+		#payload_machine['query']['bool']['should'].append(
+		#	{'constant_score':{'query':{'match':{'subject' : {'query':sub, 'type': 'phrase'}}}}})
 		payload_machine['query']['bool']['should'].append(
 			{'term' : {'subject.not_analyzed':sub}})
 
@@ -1643,6 +1645,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 
 def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter):
 	
+	'prepare_filter query function'
 	payload={}
 	payload['query']={}
 	payload['query']['filtered']={}
@@ -1687,6 +1690,8 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 
 
 def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter):
+
+	print 'prepare query function'
 	payload={}
 	payload['query']={}
 	payload['query']['filtered']={}
@@ -2031,7 +2036,7 @@ def search():
 			print 'check 0'
 			tagged_subjects, tagged_areas = tagger(query)
 			print 'tagged_subjects:'+str(tagged_subjects)
-			print tagged_areas
+			print 'tagged_areas:'+str(tagged_areas)
 			print len(tagged_subjects)
 
 			for a in tagged_areas:
@@ -2259,7 +2264,7 @@ def options():
 	except StopIteration:
 		pass
 
-	app.logger.debug(output)
+	#app.logger.debug(output)
 	js=json.dumps(output)
 	
 	resp=Response(js,status=200,mimetype='application/json')
