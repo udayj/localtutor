@@ -24,13 +24,19 @@
                     </span>
                 </div>
                 {% if current_user.id %}
-                <h5 id="question_satisfy" class="note" style="display:inline;"> Found the search results satisfactory ? 
+                <h5 id="question_satisfy" class="note" style="display:inline;"> Found the search results satisfactory? 
 
                 </h5> 
                 <button id="yes_satisfy" class="btn btn-u btn-xs" type="button" onclick="result_satisfaction('yes')">Yes</button>
                   <button id="no_satisfy" class="btn btn-u btn-xs" type="button"  onclick="result_satisfaction('no')">No</button>
-                  <div id="message_satisfy" style="display:none;color:#999;">Great, thanks for the feedback ! </div>
-                  <div id="message_satisfy_no" style="display:none;color:#999;">Thanks for the feedback - we'll definitely improve the results and appreciate your help.</div>
+                  <div id="message_satisfy" style="display:none;color:#999;">Great, thanks for the feedback! </div>
+                  <div id="message_satisfy_no" style="display:none;color:#999;">Thanks for the feedback - we'll definitely improve the results and appreciate your help. <br>You can also comment on what exactly went wrong.</div>
+                  <input id="satisfy_comment" type="text" class="form-control col-md-2" placeholder="eg. irrelevant results" style="display:none;">
+                  <span class="input-group-btn" >
+                  <button id="satisfy_comment_button" type="button" class="btn btn-u btn-xs" onclick="satisfaction_comment()" style="display:none;margin-top:0.5em;">Submit</button>
+                </span>
+                  <input type="text" id="satisfy_id" style="display:none;">
+                  <div id="satisfy_comment_status" style="display:none;color:#999;">Comment submitted successfully, thank you</div>
 
                 {% endif %}
                  
@@ -514,11 +520,33 @@ function result_satisfaction(satisfy){
     type: 'POST',
     success: function(data)
     {
-
+       $('#satisfy_comment').css('display','');
+       $('#satisfy_comment_button').css('display','');
+       $('#satisfy_id').val(data['satisfy_id']);
     }
   });
   }
 
+
+}
+
+function satisfaction_comment(){
+
+  var data={}
+  data['satisfy_id']=$('#satisfy_id').val();
+  data['comment']=$('#satisfy_comment').val();
+  jQuery.ajax({
+    url: '/result_satisfaction_comment',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+       $('#satisfy_comment').css('display','none');
+       $('#satisfy_comment_button').css('display','none');
+       $('#satisfy_comment_status').css('display','');
+       
+    }
+  });
 
 }
 

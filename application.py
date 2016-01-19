@@ -2278,6 +2278,40 @@ def result_feedback():
 	feedback=db.satisfaction.find()
 	return render_template('result_feedback.html',feedback=feedback)
 
+@app.route('/result_satisfaction_comment',methods=['POST'])
+def result_satisfaction_comment():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	if 'satisfy_id' not in data or 'comment' not in data:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp	
+
+	satisfy=db.satisfaction.find({'_id':ObjectId(data['satisfy_id'])})
+	try:
+		satisfy=satisfy.next()
+		satisfy['comment']=data['comment']
+		db.satisfaction.save(satisfy)
+		response={}
+		response={'result':'success'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+
+	except:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp			
+
+
 
 @app.route('/result_satisfaction',methods=['POST'])
 def result_satisfaction():

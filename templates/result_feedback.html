@@ -41,6 +41,7 @@
       <td>NAME</td>
       <td>QUERY</td>
       <td>STATUS</td>
+      <td>COMMENT</td>
       
       
       </tr>
@@ -60,6 +61,11 @@
         </td>
         <td>
           {{result['satisfy']}}
+        </td>
+        <td>
+          {% if 'comment' in result %}
+          {{result['comment']}}
+          {% endif %}
         </td>
 
         
