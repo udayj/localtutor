@@ -595,7 +595,7 @@ def signup_tutor():
 			db.users.remove({'_id':_id})
 			return render_template('signup_tutor.html',signup_error='Problem processing request. Account not created. Pls try again later.',
 									username=username,email=data['email'],app_id=app_id)
-		return render_template('checkmail_tutor.html',app_id=app_id)
+		return redirect('/activate?hash='+activation_hash)
 
 @app.route('/change-password',methods=['GET','POST'])
 def change_password():
