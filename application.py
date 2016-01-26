@@ -859,8 +859,10 @@ def subjects():
 				category_wise[subject['category']].append(subject['display_name'])
 	print category_wise.items()
 	sorted_category_wise=sorted(category_wise.items(),key=sorter)
-
-	return render_template('subjects.html',output=output,category_wise=sorted_category_wise,active='subjects',app_id=app_id)
+	title=' - Get over 10000 tutors, online courses and centers covering more than 800 subjects in Kolkata'
+	
+	return render_template('subjects.html',output=output,category_wise=sorted_category_wise,active='subjects',
+							app_id=app_id,title=title)
 
 @app.route('/delete_subject',methods=['POST'])
 def delete_subject():
@@ -2063,13 +2065,14 @@ def search():
 					actual_tagged_subjects.append(sub)
 			
 
-			print 'actual subjects:'+str(actual_tagged_subjects)
-			print 'actual areas:'+str(actual_tagged_areas)
+			
 
 			if len(actual_tagged_subjects)>0 or len(actual_tagged_areas)>0:
 				is_machine_filtered=True
 
 			if is_machine_filtered==True:
+				if len(actual_tagged_areas)==1 and actual_tagged_areas[0]=='kolkata':
+					actual_tagged_areas=[]
 				print 'machine_filtered results'
 				print actual_tagged_subjects
 				print actual_tagged_areas
@@ -2213,12 +2216,27 @@ def search():
 
 		
 		title='- Search results for '+query
+		meta_description=''
+		if is_pre_filter and is_pre_filter=='y':
+			areas_covered=','.join([x for (x,y) in areas if len(x.strip())>0])
+
+			meta_description='Choose from '+str(total)+' tutors, courses and centers covering '+query+'. Locations covered in Kolkata: '\
+							+areas_covered
+		else:
+			if is_machine_filtered==True:
+				areas_covered=','.join([x for (x,y) in areas if len(x.strip())>0])
+				subjects_covered=','.join([x for (x,y) in subjects if len(x.strip())>0])
+				meta_description='Choose from '+str(total)+' tutors, courses and centers covering '+subjects_covered+\
+								' in areas like '+areas_covered+' in Kolkata'
+			else:
+				meta_description='Choose from '+str(total)+' tutors, online courses and centers covering '+query
 
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),
-								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title)
+								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title,
+								meta_description=meta_description)
 	except Exception as e:
 		app.logger.error(str(e))
 
