@@ -764,6 +764,27 @@ def tutor_registration():
 	tutors=db.users.find({'user_type':'tutor'})
 	return render_template('tutor_registration.html',tutors=tutors)
 
+@app.route('/prepare_sortbyvenue')
+def prepare_sortbyvenue():
+	client=MongoClient()
+	db=client.local_tutor
+	teachers=db.teachers.find()
+	for teacher in teachers:
+		if 'venue_sort' in teacher:
+			continue
+		if teacher['area']=='online':
+			teacher['venue_sort']=3
+		else:
+			if teacher['venue']=='center' or teacher['venue']=='centre':
+				teacher['venue_sort']=2
+			elif len(teacher['venue'])>1:
+				teacher['venue_sort']=1
+			else:
+				teacher['venue_sort']=8
+		db.teachers.save(teacher)
+	js=json.dumps({'result':'success','message':'updated data'})
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
 
 def rewrite_query(query):
 	client=MongoClient()
@@ -1638,7 +1659,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 		payload['query']['filtered']['filter']=bool_query
 
 	
-
+	payload['sort']=[{'venue_sort':{'order':'asc'}},{'_score':{'order':'desc'}}]
 	print payload
 
 	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
@@ -1684,6 +1705,7 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 		bool_query['bool']['should'].append({'term':{'subject.not_analyzed':query}})
 		payload['query']['filtered']['filter']=bool_query
 
+	payload['sort']=[{'venue_sort':{'order':'asc'}},{'_score':{'order':'desc'}}]
 	print payload
 
 	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
@@ -1800,8 +1822,10 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 		payload['query']['filtered']['filter']=bool_query
 
 	
+	payload['sort']=[{'venue_sort':{'order':'asc'}},{'_score':{'order':'desc'}}]
 
 	print payload
+
 
 	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
 	r=requests.post('http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from),json=payload)
