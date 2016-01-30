@@ -170,7 +170,7 @@
                   </script>
 
                 <div class=" col-lg-6 col-md-6 col-sm-12" style="margin-bottom:20px;">
-                  <h3><a class="tutors" href="/tutor?id={{item['_id']}}" id="{{item['_id']}}">{{item['name'].title()}}</a></h3>
+                  <h3><a class="tutors" href="/tutor?id={{item['_id']}}" id="{{item['_id']}}">{{item['name'].upper()}}</a></h3>
                     
                     <ul class="list-inline up-ul">
                         <li>
@@ -194,7 +194,7 @@
                             <ul role="menu" class="dropdown-menu">
                               {% for subject in item['subject'] %}
 
-                                <li><a href="#">{{subject.title()}}</a></li>
+                                <li><a href="/search?subject={{subject.title()}}&is_pre_filter=y">{{subject.title()}}</a></li>
                                 {% endfor %}
                             </ul>
                         </li>
