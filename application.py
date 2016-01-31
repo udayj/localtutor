@@ -2009,6 +2009,29 @@ def search():
 				if student_teacher>0:
 					student_tutor_like[teacher['_id']]=True
 		title='- Search results for '+query
+
+		ist=timezone('Asia/Kolkata')
+		ist_now=datetime.now(ist)
+		date=ist_now.strftime('%d/%m/%Y')
+
+		if hasattr(current_user,'id'):
+			search={}
+			search['user_id']=current_user.id
+			search['user_name']=current_user.name
+			search['query']=query
+			search['filtered']='y'
+			search['date']=date
+			search['results']=total
+			db.searches.save(search)
+		else:
+			search={}
+			search['user_id']='nil'
+			search['user_name']='anonymous'
+			search['query']=query
+			search['filtered']='y'
+			search['date']=date
+			search['results']=total
+			db.searches.save(search)
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total,
@@ -2255,6 +2278,30 @@ def search():
 			else:
 				meta_description='Choose from '+str(total)+' tutors, online courses and centers covering '+query
 
+		ist=timezone('Asia/Kolkata')
+		ist_now=datetime.now(ist)
+		date=ist_now.strftime('%d/%m/%Y')
+
+		if hasattr(current_user,'id'):
+			search={}
+			search['user_id']=current_user.id
+			search['user_name']=current_user.name
+			search['query']=query
+			search['filtered']='n'
+			search['date']=date
+			search['results']=total
+			db.searches.save(search)
+		else:
+			search={}
+			search['user_id']='nil'
+			search['user_name']='anonymous'
+			search['query']=query
+			search['filtered']='n'
+			search['date']=date
+			search['results']=total
+			db.searches.save(search)
+
+
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
@@ -2321,6 +2368,18 @@ def result_feedback():
 	db=client.local_tutor
 	feedback=db.satisfaction.find()
 	return render_template('result_feedback.html',feedback=feedback)
+
+@login_required
+@app.route('/user_queries')
+def user_queries():
+	client=MongoClient()
+	db=client.local_tutor
+	searches_db=db.searches.find()
+	searches=[]
+	for search in searches_db:
+		searches.append(search)
+	searches=reversed(searches)
+	return render_template('user_queries.html',searches=searches)	
 
 @app.route('/result_satisfaction_comment',methods=['POST'])
 def result_satisfaction_comment():
