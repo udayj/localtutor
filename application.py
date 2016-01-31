@@ -895,11 +895,29 @@ def delete_subject():
 	db=client.local_tutor
 	print data['id']
 	try:
-		db.subjects.remove({'_id':ObjectId(data['id'])},True)
-		response={'result':'success'}
-		js=json.dumps(response)
-		resp=Response(js,status=200,mimetype='application/json')
-		return resp
+		subject=db.subjects.find({'_id':ObjectId(data['id'])})
+		try:
+			subject=subject.next()
+			teachers=db.teachers.find({'subject':{'$in':[subject['name']]}})
+
+			for teacher in teachers:
+				if subject['name'] in teacher['subject']:
+					teacher['subject'].remove(subject['name'])
+					db.teachers.save(teacher)		
+
+			db.subjects.remove({'_id':ObjectId(data['id'])},True)
+
+			
+			response={'result':'success'}
+			js=json.dumps(response)
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp
+		except:
+			response={'result':'success'}
+			js=json.dumps(response)
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp
+			
 	except Exception as e:
 		logger.debug(e)
 		response={'result':'failed'}
