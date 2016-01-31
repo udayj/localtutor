@@ -917,7 +917,7 @@ def delete_subject():
 			js=json.dumps(response)
 			resp=Response(js,status=200,mimetype='application/json')
 			return resp
-			
+
 	except Exception as e:
 		logger.debug(e)
 		response={'result':'failed'}
@@ -1373,7 +1373,10 @@ def tutor_delete():
 def tutor_edit_save():
 	data={}
 	for name,value in dict(request.form).iteritems():
-		data[name]=value[0].strip().lower()
+		if name=='usp' or name=='announcement':
+			data[name]=value[0]
+		else:
+			data[name]=value[0].strip().lower()
 	app.logger.debug(str(data))
 	client=MongoClient()
 	db=client.local_tutor
@@ -1397,6 +1400,7 @@ def tutor_edit_save():
 			tutor['venue']=data['venue']
 			tutor['classroom_type']=data['classroom_type']
 			tutor['teacher_type']=data['teacher_type']
+			tutor['usp']=data['usp']
 
 			for subject in tutor['subject']:
 				actual_subject=db.subjects.find({'name':subject})

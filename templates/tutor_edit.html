@@ -124,6 +124,17 @@
                   <input id="teacher_type_{{tutor['_id']}}" type="text" class="form-control col-lg-12 col-md-12" value="{{tutor['teacher_type']}}">
                 </td>
               </tr>
+              <tr>
+                <td>
+                 Additional Info
+                </td>
+                <td>
+                  <textarea id="additional_{{tutor['_id']}}" class="form-control col-lg-12 col-md-12 textarea textarea-resizeable" rows="3"
+
+                  >{{tutor['usp']}}</textarea>
+                  <div class="note">Enter any additional information like your educational qualification, accomplishment etc</div>
+                </td>
+              </tr>
               
             </tbody>
           </table>
@@ -164,6 +175,7 @@ function save_tutor_data(id)
   venue=$('#'+'venue_'+new_id).val();
   classroom_type=$('#'+'classroom_type_'+new_id).val();
   teacher_type=$('#'+'teacher_type_'+new_id).val();
+  usp=$('#additional_'+new_id).val();
 
   var data={}
   data['_id']=new_id;
@@ -177,6 +189,7 @@ function save_tutor_data(id)
   data['venue']=venue
   data['classroom_type']=classroom_type;
   data['teacher_type']=teacher_type;
+  data['usp']=usp;
 
   jQuery.ajax({
     url: '/tutor_edit_save',
