@@ -309,8 +309,14 @@ def content_entry(file_name,db_name):
 @app.route('/')
 def main_page():
 	title='- Find tutors and courses for anything you want to learn from over 800 subjects and 10000 teachers'
-	meta_description='Find tutors/teachers and courses for anything you want to learn from over 800 subjects and 10000 teachers'
+	meta_description='Find teachers and courses for anything you want to learn from over 800 subjects and 10000 teachers'
 	return render_template('main_page.html',app_id=app_id,active='main',title=title,meta_description=meta_description)
+
+@app.route('/classes_in_kolkata')
+def classes_in_kolkata():
+	title='- Find tutors and courses for anything you want to learn in Kolkata from over 800 subjects and 10000 teachers'
+	meta_description='Find teachers and courses for anything you want to learn in Kolkata from over 800 subjects and 10000 teachers'
+	return render_template('general_classes.html',app_id=app_id,title=title,meta_description=meta_description)
 
 @app.route('/user_profile')
 def user_profile():
