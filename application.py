@@ -2200,7 +2200,7 @@ def search():
 
 		subjects.sort()
 
-
+		subjects_meta=subjects
 		if is_pre_filter=='y' and len(categories)<1:
 			subjects=[]
 		new_subjects=[]
@@ -2211,6 +2211,7 @@ def search():
 						new_subjects.append((s[0],False))
 						break
 			subjects=new_subjects
+			subjects_meta=subjects
 		if is_pre_filter and len(categories)>0:
 			for s in subjects:
 				for a in filter_subjects:
@@ -2218,7 +2219,9 @@ def search():
 						new_subjects.append((s[0],False))
 						break
 			subjects=new_subjects
+			subjects_meta=subjects
 
+		
 		if len(subjects)==1:
 			subjects=[]
 		if is_machine_filtered and len(actual_tagged_areas)==1:
@@ -2301,9 +2304,9 @@ def search():
 							+areas_covered
 		else:
 			if is_machine_filtered==True:
-				areas_covered=','.join([x for (x,y) in areas if len(x.strip())>0])
-				subjects_covered=','.join([x for (x,y) in subjects if len(x.strip())>0])
-				meta_description='Choose from '+str(total)+' tutors, courses and centers covering '+subjects_covered+\
+				areas_covered=','.join([x for x in actual_tagged_areas if len(x.strip())>0])
+				subjects_covered=','.join([x for (x,y) in subjects_meta if len(x.strip())>0])
+				meta_description='Choose from '+str(total)+' tutors, courses and centers for '+subjects_covered+\
 								' in areas like '+areas_covered+' in Kolkata'
 			else:
 				meta_description='Choose from '+str(total)+' tutors, online courses and centers covering '+query
