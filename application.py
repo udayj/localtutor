@@ -464,7 +464,7 @@ def login():
 
 		
 		if login_user(ret_user,force=True):
-			if 'redirect_url' in data and data['redirect_url'][-6:]!='login2':
+			if 'redirect_url' in data and data['redirect_url'][-6:]!='signup':
 				return redirect(data['redirect_url'])
 			else:
 				return redirect('/user_profile?id='+ret_user.id)
