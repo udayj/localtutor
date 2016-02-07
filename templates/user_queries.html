@@ -38,11 +38,14 @@
       <thead>
       <tr>
       <td>DATE</td>
-      <td>USER ID</td>
+      
       <td>NAME</td>
       <td>QUERY</td>
       <td>FILTERED</td>
       <td>NO. OF RESULTS</td>
+      <td>PAGE NO.</td>
+      <td>SUBJECT FILTER</td>
+      <td>AREA FILTER</td>
       
       
       
@@ -55,9 +58,7 @@
         <td>
           {{search['date']}}
         </td>
-        <td>
-          {{search['user_id']}}
-        </td>
+       
         <td>
           {{search['user_name']}}
         </td>
@@ -69,6 +70,21 @@
         </td>
         <td>
           {{search['results']}}
+        </td>
+        <td>
+          {% if 'page' in search %}
+          {{search['page']}}
+          {% endif %}
+        </td>
+        <td>
+          {% if 'filter_subject' in search %}
+          {{search['filter_subject']}}
+          {% endif %}
+        </td>
+        <td>
+          {% if 'filter_area' in search %}
+          {{search['filter_area']}}
+          {% endif %}
         </td>
         
       </tr>

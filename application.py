@@ -2042,7 +2042,7 @@ def search():
 		ist_now=datetime.now(ist)
 		date=ist_now.strftime('%d/%m/%Y')
 		user_agent=request.headers.get('User-Agent')
-		if 'googlebot' not in user_agent.lower():
+		if 'bot' not in user_agent.lower():
 			if hasattr(current_user,'id'):
 				search={}
 				search['user_id']=current_user.id
@@ -2051,6 +2051,10 @@ def search():
 				search['filtered']='y'
 				search['date']=date
 				search['results']=total
+				search['page']=page
+				search['filter_subject']=data['subject_selected'][0]
+				search['filter_area']=data['areas_selected'][0]
+				search['filter_venue']=data['venue_selected'][0]
 				db.searches.save(search)
 			else:
 				search={}
@@ -2060,6 +2064,10 @@ def search():
 				search['filtered']='y'
 				search['date']=date
 				search['results']=total
+				search['page']=page
+				search['filter_subject']=data['subject_selected'][0]
+				search['filter_area']=data['areas_selected'][0]
+				search['filter_venue']=data['venue_selected'][0]
 				db.searches.save(search)
 
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
@@ -2316,7 +2324,7 @@ def search():
 		date=ist_now.strftime('%d/%m/%Y')
 		user_agent=request.headers.get('User-Agent')
 		print user_agent
-		if 'googlebot' not in user_agent.lower():
+		if 'bot' not in user_agent.lower():
 			if hasattr(current_user,'id'):
 				search={}
 				search['user_id']=current_user.id
@@ -2325,6 +2333,7 @@ def search():
 				search['filtered']='n'
 				search['date']=date
 				search['results']=total
+				search['page']=page
 				db.searches.save(search)
 			else:
 				search={}
@@ -2334,6 +2343,7 @@ def search():
 				search['filtered']='n'
 				search['date']=date
 				search['results']=total
+				search['page']=page
 				db.searches.save(search)
 
 
