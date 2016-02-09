@@ -175,7 +175,7 @@
                     <ul class="list-inline up-ul">
                         <li>
                            {% if item['area'] is equalto 'online' %}
-                      This is an online course available at {{item['venue']}}
+                      Available online at <a href="{{item['venue']}}" style="color:#72c02c" >{{item['venue']}}</a>
                       {% else %}
 
                       {% if item['venue'] is equalto 'both' %}
