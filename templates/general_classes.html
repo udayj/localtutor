@@ -9,6 +9,20 @@
 
 <style>
 
+.videoWrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  padding-top: 25px;
+  height: 0;
+}
+.videoWrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .twitter-typeahead { width: 100%; } 
 .tt-hint { width: 100%; } 
 .tt-input{ width: 100%; } 
@@ -61,7 +75,7 @@
         <div class="container">
             <div class="col-md-6 col-md-offset-3">
                 <h1>Find <span class="color-green">Connect</span> Learn</h1>
-                <h3 style="color:white;">Find the best tutors and online classes from over 800 subjects</h3>
+                <h3 style="color:white;">Find the best teachers for everything you want to learn</h3>
                 <div class="input-group">
                     <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing" onkeydown="if (event.keyCode==13) { search();}">
                     <span class="input-group-btn">
@@ -74,39 +88,11 @@
         </div>
     </div>
     <div class="container content-sm">
-    <div class="row margin-bottom-30">
-          <div class="col-md-4">
-            <div class="service">
-                    <i class="fa fa-search service-icon"></i>
-              <div class="desc">
-                <h4>Find</h4>
-                        <p>Find tutors, institutes and courses in your city for anything you want to learn like dancing, swimming or even unqiue areas like taekwondo and magic</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="service">
-                    <i class="fa fa-cogs service-icon"></i>
-              <div class="desc">
-                <h4>Connect</h4>
-                        <p>Connect with tutors quickly and directly. Network with friends who personally know the tutor to decide if they are a good fit</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="service">
-                    <i class="fa fa-rocket service-icon"></i>
-              <div class="desc">
-                <h4>Learn</h4>
-                        <p>Develop new interests or harness old ones. Enhance your knowledge through any learning medium that suits you</p>
-              </div>
-            </div>
-          </div>
-      </div>
-       <div class="headline"><h2>Top Subjects and Categories</h2></div>
+   
+       <div class="headline"><h2>Trending Now</h2></div>
         <div class="row category margin-bottom-20">
             <!-- Info Blocks -->
-            <div class="col-md-4 col-sm-6">
+            <div class="col-md-4 col-sm-4 col-xs-12">
                 <div class="content-boxes-v3 margin-bottom-10 md-margin-bottom-20">
                     <i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i>
                     <div class="content-boxes-in-v3">
@@ -134,7 +120,7 @@
             <!-- End Info Blocks -->
 
             <!-- Info Blocks -->
-            <div class="col-md-4 col-sm-6 md-margin-bottom-40">
+            <div class="col-md-4 col-sm-4 col-xs-12 md-margin-bottom-40">
                 <div class="content-boxes-v3 margin-bottom-10 md-margin-bottom-20">
                     <i class="icon-custom icon-sm rounded-x icon-bg-green icon-line icon-playlist"></i>
                     <div class="content-boxes-in-v3">
@@ -160,7 +146,7 @@
                 
             </div>
 
-             <div class="col-md-4 col-sm-6 md-margin-bottom-40">
+             <div class="col-md-4 col-sm-4 col-xs-12 md-margin-bottom-40">
                 <div class="content-boxes-v3 margin-bottom-10 md-margin-bottom-20">
                     <i class="icon-custom icon-sm rounded-x icon-bg-grey fa fa-music"></i>
                     <div class="content-boxes-in-v3">
@@ -186,9 +172,20 @@
                 
             </div>
           </div>
+
+
+
             <!-- End Info Blocks -->
 
     </div>
+
+    <div class="container content-sm">
+      <div class="videoWrapper">
+        
+          <iframe src="https://www.youtube.com/embed/pGMBDs_YWSg" frameborder="0" allowfullscreen></iframe>
+        
+      </div>
+        </div>
 
 <script>     
 function options(subject)
