@@ -132,6 +132,11 @@ fbq('track', "PageView");
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=1046056598771217&ev=PageView&noscript=1"
 /></noscript>
+
+<!-- start Mixpanel --><script type="text/javascript">(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.union people.track_charge people.clear_charges people.delete_user".split(" ");
+for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f)}})(document,window.mixpanel||[]);
+mixpanel.init("ced7c07bb968ddc5a442715c385de1cd");</script><!-- end Mixpanel -->
+
 <!-- End Facebook Pixel Code -->
     
   </head>
@@ -222,7 +227,7 @@ function custom_logic(login_status)
 
                     <!-- Pages -->
                    <li id="subjects">
-                        <a href="/subjects" >
+                        <a href="/subjects" id="subjects_link">
                             Subjects
                         </a>
                    </li>
@@ -230,14 +235,14 @@ function custom_logic(login_status)
 
                     <!-- Blog -->
                     <li id="about">
-                        <a href="/about" >
+                        <a href="/about" id="about_link">
                             About
                         </a>
                     </li>
                     {% if not current_user.id %}
                      <li id="signup">
                          
-                        <a href="/signup">
+                        <a href="/signup" id="signup_link">
                             Login
                         </a>
                     </li>
@@ -250,7 +255,7 @@ function custom_logic(login_status)
                     
                     <li>
                          
-                        <a href="/signup_tutor">
+                        <a href="/signup_tutor" id="tutor_signup">
                             Tutor Login
                         </a>
                     </li>
@@ -264,7 +269,7 @@ function custom_logic(login_status)
                             Logout
                         </a>
                         {% else %}
-                         <a href="/logout">
+                         <a href="/logout" id="logout">
                             Logout
                         </a>
                         {% endif %}
@@ -394,11 +399,13 @@ function fblogout(){
 
   });
   var redirect_url=window.location.href;
+  mixpanel.track('Facebook Logout Clicked');
   window.location.href='/logout?redirect_url='+encodeURIComponent(redirect_url);
 }
 
   function fblogin(){
 
+    mixpanel.track('Facebook Login');
     FB.login(function(response){
     statusChangeCallback(response);
 },{scope: 'public_profile,email,user_friends'});
@@ -504,6 +511,12 @@ var userid=null;
         App.initParallaxBg();
         //OwlCarousel.initOwlCarousel();
     });
+
+  mixpanel.track_links('#signup_link','Login Clicked');
+  mixpanel.track_links('#tutor_signup','Tutor Login Clicked');
+  mixpanel.track_links('#logout','Logout Clicked');
+  mixpanel.track_links('#subjects_link','Subjects Clicked');
+  mixpanel.track_links('#about_link','About Clicked');
 </script>
 <!--[if lt IE 9]>
     <script src="assets/plugins/respond.js"></script>

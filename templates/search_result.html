@@ -92,14 +92,14 @@
                   
               {% for v in venue %}
 
-              <li><label class="checkbox"><input class="venue_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{v[0]}}"
+              <li><label class="checkbox"><input class="venue_checkbox" type="checkbox" onclick="get_filtered_results_pre('venue')" name="{{v[0]}}"
               {% if v[1] %}
               checked
               {% endif %}
               ><i></i>{{v[0]}}</label></li>
               {% endfor %}
               {% if areas|length>0 and areas[0][0]=='online' %}
-              <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="online"
+              <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results_pre('venue')" name="online"
               {% if areas[0][1] %}
               checked
               {% endif %}
@@ -119,7 +119,7 @@
                   
               {% for area in areas %}
               {% if area[0]!='online' %}
-              <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{area[0]}}"
+              <li><label class="checkbox"><input class="area_checkbox" type="checkbox" onclick="get_filtered_results_pre('area')" name="{{area[0]}}"
               {% if area[1] %}
               checked
               {% endif %}
@@ -139,7 +139,7 @@
               <h3>Filter by Subject</h3>
               <ul class="list-unstyled">
               {% for subject in subjects %}
-              <li><label class="checkbox"><input class="subject_checkbox" type="checkbox" onclick="get_filtered_results_pre()" name="{{subject[0]}}"
+              <li><label class="checkbox"><input class="subject_checkbox" type="checkbox" onclick="get_filtered_results_pre('subject')" name="{{subject[0]}}"
               {% if subject[1] %}
               checked
               {% endif %}
@@ -194,7 +194,7 @@
                             <ul role="menu" class="dropdown-menu">
                               {% for subject in item['subject'] %}
 
-                                <li><a href="/search?subject={{subject.title()}}&is_pre_filter=y">{{subject.title()}}</a></li>
+                                <li><a href="/search?subject={{subject.title()}}&is_pre_filter=y" class="subjects_covered">{{subject.title()}}</a></li>
                                 {% endfor %}
                             </ul>
                         </li>
@@ -339,7 +339,7 @@
                          <ul class="list-inline down-ul">
                         <li>
 
-                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#responsive"><i class="fa fa-thumbs-up"></i> Like</button>
+                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#responsive" ><i class="fa fa-thumbs-up" onclick="track_activity()"></i> Like</button>
                         <div class="modal fade" id="responsive" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -480,6 +480,9 @@
 {% block javascript %}
 
 <script>
+function track_activity(){
+  mixpanel.track('Logged-out Like');
+}
 function result_satisfaction(satisfy){
 
   if(satisfy=='yes'){
@@ -560,7 +563,8 @@ $('#form_login').submit(function(){
     alert("Email/Password cannot be empty");
     return false;
   }
-  
+  mixpanel.track('Login from Like');
+
   $('#redirect_url_login').val(window.location);  
     });
 
@@ -627,6 +631,7 @@ $('.input-group #search').typeahead({
 }).on('typeahead:select', function (obj, suggestion) {
   suggestion=suggestion['value'];
   classify="n";
+  mixpanel.track('Search Performed',{'Query':suggestion,'From':'Suggestion'});
   window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion); 
   
 });
@@ -639,7 +644,9 @@ function like_tutor(tutor_id,student_id,likes){
   data={};
   data['tutor_id']=tutor_id;
   data['student_id']=student_id;
-  
+
+  mixpanel.track('Logged-in Like');
+
   likes=parseInt(likes);
   jQuery.ajax({
     url: '/like_student_tutor',
@@ -680,6 +687,9 @@ function dislike_tutor(tutor_id,student_id,likes){
   data['tutor_id']=tutor_id;
   data['student_id']=student_id;
   likes=parseInt(likes);
+
+  mixpanel.track('Logged-in Dislike');
+
   jQuery.ajax({
     url: '/dislike_student_tutor',
     data: data,
@@ -723,6 +733,7 @@ function dislike_tutor(tutor_id,student_id,likes){
 
 function associate_tutor(tutor_id,student_id){
 
+  mixpanel.track('I Studied Under');
   data={};
   data['tutor_id']=tutor_id;
   data['student_id']=student_id;
@@ -744,6 +755,7 @@ function associate_tutor(tutor_id,student_id){
 
 function disassociate_tutor(tutor_id,student_id){
 
+  mixpanel.track('I did not Study Under');
   data={};
   data['tutor_id']=tutor_id;
   data['student_id']=student_id;
@@ -773,7 +785,7 @@ function search()
         if(name==null || name.value.trim()=="")
           return;
         
-          
+          mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
           window.location='search?subject='+encodeURIComponent(name.value.trim());
         
     }
@@ -866,6 +878,7 @@ $('#page_selection').bootpag({
   url=url.substring(0,n)+"&page="+num;
  }
    $('#filter_form').attr('action',url);
+   mixpanel.track('Next Page',{'Page':num});
    get_filtered_results();
    //window.location='/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page="+num;
 });
@@ -959,7 +972,7 @@ $('#filter_form').submit();
 
 }
 
-function get_filtered_results_pre()
+function get_filtered_results_pre(type)
 {
 
   var url=window.location.href;
@@ -971,6 +984,7 @@ function get_filtered_results_pre()
   url=url.substring(0,n);
  }
   $('#filter_form').attr('action',url);
+  mixpanel.track('Filter',{'Type':type});
   get_filtered_results();
 }
 
@@ -1032,6 +1046,9 @@ function toggler(){
     $('#filter-options').addClass('hidden-sm'); 
   }
 }
+
+mixpanel.track_links('.subjects_covered','Subjects Covered Link');
+mixpanel.track_links('.tutors','Tutors Link');
 </script>  
 {% endblock %}
 
