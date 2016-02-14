@@ -228,7 +228,7 @@ var subjects = new Bloodhound({
 
 var suggestion="";
 var classify="y";
-var track="";
+
 $('.input-group #search').typeahead({
   hint: true,
   highlight: true,
@@ -241,7 +241,7 @@ $('.input-group #search').typeahead({
   suggestion=suggestion['value'];
   classify="n";
   mixpanel.track('Search Performed',{'Query':suggestion,'From':'Suggestion'});
-  track="y";
+  
   window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion)+"&classify=n"; 
   
 })
@@ -253,10 +253,8 @@ function search()
         var name=document.getElementById("search");
         if(name==null || name.value.trim()=="")
           return;
-          if(track!="y")
-          {
-            mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
-          }
+          mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
+          
           window.location='search?subject='+encodeURIComponent(name.value.trim());
         
 
