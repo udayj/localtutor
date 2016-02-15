@@ -38,11 +38,11 @@
      
         <div class="col-lg-4 col-md-4 col-sm-12">
           {% set actual_category, subjects = category %}
-      <h3><a href="/search?subject={{actual_category|urlencode}}">{{actual_category.title()}}</a></h3>
+      <h3><a class="categories" href="/search?subject={{actual_category|urlencode}}">{{actual_category.title()}}</a></h3>
         <ul>
         {% for subject in subjects %}
           <li>
-          <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y">{{subject}}</a>
+          <a class="subjects" href="/search?subject={{subject|urlencode}}&is_pre_filter=y">{{subject}}</a>
         </li>
         {% endfor %}
       </ul>
@@ -178,6 +178,8 @@ function custom_logic(login_status){
   return;
 }
 
+mixpanel.track_links('.categories','Category Link Clicked');
+mixpanel.track_links('.subjects','Subject Link Clicked');
 </script>  
 {% endblock %}
 
