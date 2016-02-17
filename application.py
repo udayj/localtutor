@@ -1687,7 +1687,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 		payload['query']['filtered']['filter']=bool_query
 
 	
-	payload['sort']=[{'venue_sort':{'order':'asc'}},{'_score':{'order':'desc'}}]
+	payload['sort']=[{'_score':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 	print payload
 
 	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
@@ -1733,7 +1733,7 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 		bool_query['bool']['should'].append({'term':{'subject.not_analyzed':query}})
 		payload['query']['filtered']['filter']=bool_query
 
-	payload['sort']=[{'venue_sort':{'order':'asc'}},{'_score':{'order':'desc'}}]
+	payload['sort']=[{'_score':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 	print payload
 
 	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
@@ -1850,7 +1850,7 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 		payload['query']['filtered']['filter']=bool_query
 
 	
-	payload['sort']=[{'venue_sort':{'order':'asc'}},{'_score':{'order':'desc'}}]
+	payload['sort']=[{'_score':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 
 	print payload
 
