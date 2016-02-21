@@ -1,6 +1,14 @@
 {% extends "base2.html" %}
 {% block css %}
 <link rel="stylesheet" href="/static/stylesheets/pages/page_search_inner.css">
+
+<meta property="og:url"  content="{{fb_url}}" />
+<meta property="og:type"  content="article" />
+<meta property="og:title"  content="{{fb_title.upper()}}" />
+<meta property="og:description"  content="{{fb_description}}" />
+<meta property="og:image" content="http://www.tutorack.com/static/images/7.jpg" />
+<meta property="fb:app_id" content="{{fb_app_id}}" />
+
 {% endblock %}
 
 {% block content %}
@@ -1050,6 +1058,7 @@ function toggler(){
 mixpanel.track_links('.subjects_covered','Subjects Covered Link');
 mixpanel.track_links('.tutors','Tutors Link');
 mixpanel.track('Search Results Pageview');
+
 </script>  
 {% endblock %}
 

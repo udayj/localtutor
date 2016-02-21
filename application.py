@@ -2070,10 +2070,12 @@ def search():
 				search['filter_venue']=data['venue_selected'][0]
 				db.searches.save(search)
 
+		fb_title=title
+		fb_app_id=app_id
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total,
-								actual_tagged_subjects='|'.join(actual_tagged_subjects),
+								actual_tagged_subjects='|'.join(actual_tagged_subjects),fb_title=fb_title,fb_app_id=fb_app_id,
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title)
 
 	try:
@@ -2304,20 +2306,28 @@ def search():
 
 		
 		title='- Search results for '+query
+		fb_title=query
+		fb_url="http://www.tutorack.com/search?subject="+query
+		fb_app_id=app_id
+
 		meta_description=''
+		fb_description=''
 		if is_pre_filter and is_pre_filter=='y':
 			areas_covered=','.join([x for (x,y) in areas if len(x.strip())>0])
 
-			meta_description='Choose from '+str(total)+' tutors, courses and centers covering '+query+'. Locations covered in Kolkata: '\
-							+areas_covered
+			meta_description='Choose from '+str(total)+' teachers, online courses and centers covering '+query
+			fb_description='Choose from over 10000 teachers, online courses and centers covering '+query
+
 		else:
 			if is_machine_filtered==True:
 				areas_covered=','.join([x for x in actual_tagged_areas if len(x.strip())>0])
 				subjects_covered=','.join([x for (x,y) in subjects_meta if len(x.strip())>0])
-				meta_description='Choose from '+str(total)+' tutors, courses and centers for '+subjects_covered+\
-								' in areas like '+areas_covered+' in Kolkata'
+				meta_description='Choose from '+str(total)+' teachers, online courses and centers for '+subjects_covered
+				fb_description='Choose from over 10000 teachers, online courses and centers for '+subjects_covered
+								
 			else:
-				meta_description='Choose from '+str(total)+' tutors, online courses and centers covering '+query
+				meta_description='Choose from '+str(total)+' teachers, online courses and centers covering '+query
+				fb_description='Choose from 10000 teachers, online courses and centers covering '+query
 
 		ist=timezone('Asia/Kolkata')
 		ist_now=datetime.now(ist)
@@ -2352,7 +2362,8 @@ def search():
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title,
-								meta_description=meta_description)
+								meta_description=meta_description,fb_title=fb_title, fb_url=fb_url, fb_description=fb_description,
+								fb_app_id=fb_app_id)
 	except Exception as e:
 		app.logger.error(str(e))
 
