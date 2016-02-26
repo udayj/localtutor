@@ -2082,6 +2082,10 @@ def search():
 		query=request.args.get('subject')
 		is_classify=request.args.get('classify')
 		page=request.args.get('page')
+		online=request.args.get('medium')
+		
+
+
 		print page
 		
 		try:
@@ -2105,13 +2109,18 @@ def search():
 		is_machine_filtered=False
 		actual_tagged_subjects=[]
 		actual_tagged_areas=[]
+		if online=='online':
+			actual_tagged_areas.append('online')
 		categories=[]
 		filter_subjects=[]
 
 		if is_pre_filter and is_pre_filter=='y':
 			categories=get_category([query])
 			if len(categories)<1:
-				response=prepare_query_filtered(query,500,0,None,None,None,False)
+				if online=='online':
+					response=prepare_query_filtered(query,500,0,['online'],None,None,True)
+				else:
+					response=prepare_query_filtered(query,500,0,None,None,None,False)
 			else:
 				for tagged_category in categories:
 					print 'category:'+tagged_category
@@ -2165,7 +2174,10 @@ def search():
 				print actual_tagged_areas
 				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,actual_tagged_subjects,actual_tagged_areas)
 			else:
-				response=prepare_query(query,500,0,None,None,None,False)
+				if online=='online':
+					response=prepare_query(query,500,0,['online'],None,None,False)
+				else:		
+					response=prepare_query(query,500,0,None,None,None,False)
 			is_pre_filter='n'
 
 		print 'check 2'
@@ -2204,7 +2216,10 @@ def search():
 		areas.sort()
 		if ('online',False) in areas:
 			areas.remove(('online',False))
-			areas=[('online',False)]+areas
+			if online=='online':
+				areas=[('online',True)]+areas	
+			else:
+				areas=[('online',False)]+areas
 
 		app.logger.debug(areas)
 
@@ -2248,7 +2263,10 @@ def search():
 		if is_pre_filter and is_pre_filter=='y':
 
 			if len(categories)<1:
-				response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False)
+				if online=='online':
+					response=prepare_query_filtered(query,10,(page-1)*10,['online'],None,None,True)
+				else:
+					response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False)
 			else:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,
 														filter_subjects,actual_tagged_areas)
@@ -2262,7 +2280,10 @@ def search():
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,
 														actual_tagged_subjects,actual_tagged_areas)
 			else:
-				response=prepare_query(query,10,(page-1)*10,None,None,None,False)
+				if online=='online':
+					response=prepare_query(query,10,(page-1)*10,['online'],None,None,False)
+				else:
+					response=prepare_query(query,10,(page-1)*10,None,None,None,False)
 			is_pre_filter='n'
 		
 
