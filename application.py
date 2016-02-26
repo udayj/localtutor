@@ -1698,7 +1698,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 
 def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter):
 	
-	'prepare_filter query function'
+	print 'prepare_filter query function'
 	payload={}
 	payload['query']={}
 	payload['query']['filtered']={}
@@ -2118,9 +2118,11 @@ def search():
 			categories=get_category([query])
 			if len(categories)<1:
 				if online=='online':
-					response=prepare_query_filtered(query,500,0,['online'],None,None,True)
+					response=prepare_query_filtered(query,500,0,['online'],[query],[],True)
+					print 'working'
 				else:
 					response=prepare_query_filtered(query,500,0,None,None,None,False)
+
 			else:
 				for tagged_category in categories:
 					print 'category:'+tagged_category
@@ -2130,6 +2132,7 @@ def search():
 					filter_subjects.append(tagged_category)
 				
 				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,filter_subjects,actual_tagged_areas)
+				print 'working category'
 				
 			is_pre_filter='y'
 		else:
@@ -2175,7 +2178,7 @@ def search():
 				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,actual_tagged_subjects,actual_tagged_areas)
 			else:
 				if online=='online':
-					response=prepare_query(query,500,0,['online'],None,None,False)
+					response=prepare_query(query,500,0,['online'],[],[],True)
 				else:		
 					response=prepare_query(query,500,0,None,None,None,False)
 			is_pre_filter='n'
@@ -2264,7 +2267,7 @@ def search():
 
 			if len(categories)<1:
 				if online=='online':
-					response=prepare_query_filtered(query,10,(page-1)*10,['online'],None,None,True)
+					response=prepare_query_filtered(query,10,(page-1)*10,['online'],[query],[],True)
 				else:
 					response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False)
 			else:
@@ -2281,7 +2284,7 @@ def search():
 														actual_tagged_subjects,actual_tagged_areas)
 			else:
 				if online=='online':
-					response=prepare_query(query,10,(page-1)*10,['online'],None,None,False)
+					response=prepare_query(query,10,(page-1)*10,['online'],[],[],True)
 				else:
 					response=prepare_query(query,10,(page-1)*10,None,None,None,False)
 			is_pre_filter='n'
