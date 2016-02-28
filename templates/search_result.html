@@ -346,8 +346,40 @@
                       {% else %}
                          <ul class="list-inline down-ul">
                         <li>
-
+                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#fb-modal-login">
+                          {% if item['area']=='online' %}
+                          I took this course
+                          {% else %}
+                          I studied under this teacher
+                          {% endif %}
+                        </button>
                         <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#responsive" ><i class="fa fa-thumbs-up" onclick="track_activity()"></i> Like</button>
+                        <div class="modal fade" id="fb-modal-login" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                        <h4 class="modal-title" id="myModalLabel4">You need to login through Facebook for this</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                            
+                    <h4> Login through your existing Facebook account</h4>
+                    <p> Logging in through Facebook enables you to see what courses your friends are taking.</p>
+                    <button class="btn-u pull-left" onclick="fblogin()" data-dismiss="modal" aria-hidden="true" style="background:#3b5998;color:white;">Facebook Login</button><br>
+                    <hr>
+                    <h4>Want an account here? Its free</h4>
+                    <p> <a class="color-green" href="/signup">Click here</a> to create a new account here.</p>
+               
+                                            </div>
+                                          
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
                         <div class="modal fade" id="responsive" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
