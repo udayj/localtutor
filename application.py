@@ -19,6 +19,7 @@ import hashlib
 import multiprocessing
 from pytz import timezone
 from datetime import datetime
+import random
 
 
 
@@ -2113,8 +2114,9 @@ def search():
 			actual_tagged_areas.append('online')
 		categories=[]
 		filter_subjects=[]
-
+		related_subject=''
 		if is_pre_filter and is_pre_filter=='y':
+			related_subject=[query]
 			categories=get_category([query])
 			if len(categories)<1:
 				if online=='online':
@@ -2130,7 +2132,7 @@ def search():
 					for s in subjects_in_categories:
 						filter_subjects.append(s['name'])
 					filter_subjects.append(tagged_category)
-				
+				related_subject=filter_subjects
 				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,filter_subjects,actual_tagged_areas)
 				print 'working category'
 				
@@ -2353,6 +2355,16 @@ def search():
 				meta_description='Choose from '+str(total)+' teachers, online courses and centers covering '+query
 				fb_description='Choose from 10000 teachers, online courses and centers covering '+query
 
+		related_subjects=[]
+		
+		if len(related_subject)>0:
+			related_subjects=get_related_subjects(related_subject,1)
+		elif len(actual_tagged_subjects)>0:
+
+			related_subjects=get_related_subjects(actual_tagged_subjects,2)
+		else:
+			related_subjects=get_related_subjects([x for (x,y) in subjects],3)
+
 		ist=timezone('Asia/Kolkata')
 		ist_now=datetime.now(ist)
 		date=ist_now.strftime('%d/%m/%Y')
@@ -2381,15 +2393,49 @@ def search():
 				db.searches.save(search)
 
 
+		
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title,
 								meta_description=meta_description,fb_title=fb_title, fb_url=fb_url, fb_description=fb_description,
-								fb_app_id=fb_app_id)
+								fb_app_id=fb_app_id,related_searches=related_subjects)
 	except Exception as e:
 		app.logger.error(str(e))
+
+
+def get_related_subjects(base,scenario):
+	
+	client=MongoClient()
+	db=client.local_tutor
+	length=len(base)
+	if length>1 and length<4:
+		return base
+	related_subjects=[]
+	if length==1:
+		subject=db.subjects.find({'name':base[0]})
+		try:
+			subject=subject.next()
+			category=subject['category']
+			category_subjects=db.subjects.find({'category':category})
+			for individual_subject in category_subjects:
+				related_subjects.append(individual_subject['name'])
+
+			
+			if len(related_subjects)>4:
+				return random.sample(related_subjects,5)
+			else:
+				return related_subjects
+		except Exception as e:
+			
+			return []
+	if len(base)==4:
+		return base
+	elif len(base)==0:
+		return []
+	else:
+		return random.sample(base,5)
 
 
 

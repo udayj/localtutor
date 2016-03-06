@@ -167,22 +167,23 @@
                 {% endif %}
                 </div>
             </div><!--/col-md-2-->
-            <div class="col-md-10">
-                <span class="results-number" style="margin-bottom:30px;">{{total}} results</span>
+            <div class="col-md-8">
+                <span class="results-number" style="margin-bottom:20px;">{{total}} results</span>
                 <!-- Begin Inner Results -->
-                {% for result in results | batch(2) %}
+                {% for result in results | batch(1) %}
                 <div class="inner-results row clearfix">
                   {% for item in result %}
                   <script>
                   buffer["{{item['_id']}}"]=0;
                   </script>
 
-                <div class=" col-lg-6 col-md-6 col-sm-12" style="margin-bottom:20px;">
+                <div class=" col-lg-12 col-md-12 col-sm-12" style="margin-bottom:0px;">
                   <h3><a class="tutors" href="/tutor?id={{item['_id']}}" id="{{item['_id']}}">{{item['name'].upper()}}</a></h3>
                     
                     <ul class="list-inline up-ul">
+                        
                         <li>
-                           {% if item['area'] is equalto 'online' %}
+                      {% if item['area'] is equalto 'online' %}
                       Available online at <a href="{{item['venue']}}" style="color:#72c02c" >{{item['venue']}}</a>
                       {% else %}
 
@@ -206,10 +207,8 @@
                                 {% endfor %}
                             </ul>
                         </li>
-                        
-                    </ul>
-                    <p>
-                      {% if item['area'] is equalto 'online' %}
+                         <li>
+                           {% if item['area'] is equalto 'online' %}
                      
                       
                       {% else %}
@@ -217,12 +216,23 @@
                        {{item['contact_number']|join(',')}}
                        <br>
                        {% endif %}
-
-                        {% if item['area'] is equalto 'online' %}
+                     </li>
+                        
+                        <li>
+                           {% if item['area'] is equalto 'online' %}
                        <a href="{{item['geographical_location']}}">Online course link</a>
                        {% else %}
+                       <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
                        {{item['geographical_location'].title()}}
                        {% endif %}
+                     </li>
+
+                        
+                    </ul>
+                    <p>
+                     
+
+                       
                     </p>
                     
                     <ul id="like_section_{{item['_id']}}" class="list-inline down-ul"
@@ -481,6 +491,40 @@
                 </div>
 
             </div><!--/col-md-10-->
+            {% if related_searches and related_searches|length>1 %}
+            <div class="col-md-2 s-results related-search">
+              <h3>RELATED SEARCHES</h3>
+              <ul class="list-unstyled">
+                {% for related_search in related_searches %}
+                <li>
+                  <a href="/search?subject={{related_search}}">{{related_search.title()}}</a>
+                </li>
+                {% endfor %}
+              </ul>
+               
+            </div>
+            {% endif %}
+
+            <div class="col-md-2 s-results related-search">
+              <h3>TOP CATEGORIES</h3>
+              <ul class="list-unstyled">
+                <li>
+                  <a href="/search?subject=guitar">Guitar Classes</a>
+                </li>
+                <li>
+                  <a href="/search?subject=programming">Programming</a>
+                </li>
+                <li>
+                  <a href="/search?subject=acting and theatre">Acting and Theatre</a>
+                </li>
+                <li>
+                  <a href="/search?subject=machine learning">Machine Learning</a>
+                </li>
+                <li>
+                  <a href="/search?subject=kathak">Kathak</a>
+                </li>
+              </ul>
+            </div>
  
           </div>
         </div>
