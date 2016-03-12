@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, Response, redirect, url_for,flash, jsonify
+from flask import Flask, request, render_template, Response, redirect, url_for,flash, jsonify, make_response
 from pymongo import MongoClient
 from flask.ext.login import (LoginManager, current_user, login_required,
                             login_user, logout_user, UserMixin, confirm_login,
@@ -311,7 +311,10 @@ def content_entry(file_name,db_name):
 def main_page():
 	title='- Find tutors and courses for everything you want to learn from over 800 subjects and 10000 teachers'
 	meta_description='Find teachers and courses for everything you want to learn from over 800 subjects and 10000 teachers'
-	return render_template('general_classes.html',app_id=app_id,active='main',title=title,meta_description=meta_description)
+	cities=['kolkata','online']
+	actual_location=request.cookies.get('location')
+	return render_template('general_classes.html',app_id=app_id,active='main',title=title,meta_description=meta_description,
+							cities=cities,actual_location=actual_location)
 
 @app.route('/classes_in_kolkata')
 def classes_in_kolkata():
@@ -331,6 +334,8 @@ def user_profile():
 	client=MongoClient()
 	db=client.local_tutor
 	user=db.users.find({'_id':ObjectId(user_id)})
+	cities=['kolkata','online']
+	actual_location=request.cookies.get('location')
 	try:
 		user=user.next()
 		if 'user_type' in user and user['user_type']=='tutor' and hasattr(current_user,'id') and current_user.id==user_id:
@@ -339,7 +344,7 @@ def user_profile():
 			tutor_id=user['tutor_id']
 			tutor=db.teachers.find({'_id':ObjectId(tutor_id)})
 			tutor=tutor.next()
-			return render_template('tutor_profile.html',tutor=tutor)
+			return render_template('tutor_profile.html',tutor=tutor,cities=cities,actual_location=actual_location)
 
 		if 'user_type' in user and user['user_type']=='tutor':
 
@@ -363,11 +368,12 @@ def user_profile():
 		
 		if hasattr(current_user,'id') and current_user.id==user_id:
 			return render_template('user_profile.html',name=name,age=age,
-				school=school, wish_list=','.join(wish_list),favorite=favorite,app_id=app_id)
+				school=school, wish_list=','.join(wish_list),favorite=favorite,app_id=app_id,cities=cities,
+				actual_location=actual_location)
 		else:
 
-			return render_template('user_profile_readonly.html',name=name,
-				school=school, wish_list=wish_list,favorite=favorite,app_id=app_id)
+			return render_template('user_profile_readonly.html',name=name,cities=cities,
+				school=school, wish_list=wish_list,favorite=favorite,app_id=app_id,actual_location=actual_location)
 
 	except Exception as e:
 		app.logger.error(str(e))
@@ -888,9 +894,11 @@ def subjects():
 	print category_wise.items()
 	sorted_category_wise=sorted(category_wise.items(),key=sorter)
 	title=' - Get over 10000 tutors, online courses and centers covering more than 800 subjects in Kolkata'
-	
+	cities=['kolkata','online']
+	actual_location=request.cookies.get('location')
+
 	return render_template('subjects.html',output=output,category_wise=sorted_category_wise,active='subjects',
-							app_id=app_id,title=title)
+							app_id=app_id,title=title,cities=cities,actual_location=actual_location)
 
 @app.route('/delete_subject',methods=['POST'])
 def delete_subject():
@@ -1336,12 +1344,39 @@ def tutor():
 					display_subjects.append(actual_subject['display_name'])
 			except StopIteration:
 				pass
+		cities=['kolkata','online']
+		actual_location=request.cookies.get('location')
+
 		if tutor['area'] != 'online':
-			return render_template('tutor.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id)
+			return render_template('tutor.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id,cities=cities,
+									actual_location=actual_location)
 		else:
-			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id)
+			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id,cities=cities,
+									actual_location=actual_location)
 	except StopIteration:
 		return render_template('error.html')
+
+@app.route('/new_cities')
+def new_cities():
+	client=MongoClient()
+	db=client.local_tutor
+	tutors=db.teachers.find()
+	count=0
+	counter=0
+	for tutor in tutors:
+		counter=counter+1
+		if 'area' in tutor and tutor['area']=='online':
+			tutor['city']='online'
+			count=count+1
+			
+		elif 'area' in tutor and tutor['area']!='online':
+			tutor['city']='kolkata'
+			count=count+1
+		db.teachers.save(tutor)
+	js=json.dumps({'result':'success','message':'Added new column for '+str(count)+' rows for tot '+str(counter)})
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
+
 
 @app.route('/tutor_edit')
 def tutor_edit():
@@ -1554,7 +1589,7 @@ def tagger(text):
 	return(tagged_subjects,tagged_areas)
 
 def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,
-									actual_tagged_subjects,actual_tagged_areas):
+									actual_tagged_subjects,actual_tagged_areas,actual_location='online'):
 
 	print 'prepare_machine_filtered query function'
 	payload={}
@@ -1675,17 +1710,54 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 
 	payload['query']['filtered']['query']['bool']['should'].append(bool_query)	
 
+	payload['query']['filtered']['filter']=[]
+
+	bool_query={}
+	bool_query['bool']={}
+	bool_query['bool']['must']=[]
+
 	if is_filter:
-		bool_query={}
-		bool_query['bool']={}
-		bool_query['bool']['should']=[]
+		bool_query1={}
+		bool_query1['bool']={}
+		bool_query1['bool']['should']=[]
+
 		for subject in filter_subjects:
-			bool_query['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
+			bool_query1['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
+
+		bool_query['bool']['must'].append(bool_query1)
+		bool_query2={}
+		bool_query2['bool']={}
+		bool_query2['bool']['should']=[]
+
 		for area in filter_areas:
-			bool_query['bool']['should'].append({'term': {'area.not_analyzed':area}})
+			bool_query2['bool']['should'].append({'term': {'area.not_analyzed':area}})
+
+		bool_query['bool']['must'].append(bool_query2)
+
+		bool_query3={}
+		bool_query3['bool']={}
+		bool_query3['bool']['should']=[]
+
 		for venue in filter_venues:
-			bool_query['bool']['should'].append({'term': {'venue':venue}})
-		payload['query']['filtered']['filter']=bool_query
+			bool_query3['bool']['should'].append({'term': {'venue':venue}})
+
+		bool_query['bool']['must'].append(bool_query3)
+
+		
+
+	if actual_location:
+		
+		if actual_location=='online':
+			bool_query['bool']['must'].append({'term': {'city':actual_location}})
+		if actual_location!='online':
+			bool_query_inner={}
+			bool_query_inner['bool']={}
+			bool_query_inner['bool']['should']=[]
+			bool_query_inner['bool']['should'].append({'term': {'city':actual_location}})
+			bool_query_inner['bool']['should'].append({'term': {'area.not_analyzed':'online'}})
+			bool_query['bool']['must'].append(bool_query_inner)
+			
+	payload['query']['filtered']['filter'].append(bool_query)
 
 	
 	payload['sort']=[{'_score':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
@@ -1697,42 +1769,77 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 	json_response=json.loads(r.text)
 	return json_response
 
-def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter):
+def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,actual_location):
 	
 	print 'prepare_filter query function'
 	payload={}
 	payload['query']={}
 	payload['query']['filtered']={}
-	payload['query']['filtered']['filter']={}
+	payload['query']['filtered']['filter']=[]
 	
 
 	if is_filter:
+		bool_query1={}
+		bool_query1['bool']={}
+		bool_query1['bool']['should']=[]
+
+		bool_query2={}
+		bool_query2['bool']={}
+		bool_query2['bool']['should']=[]
+
 		bool_query={}
 		bool_query['bool']={}
-		bool_query['bool']['should']=[]
+		bool_query['bool']['must']=[]
 		#for subject in filter_subjects:
 
 		#	bool_query['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
 		for area in filter_areas:
-			bool_query['bool']['should'].append({'term': {'area.not_analyzed':area}})
+			bool_query1['bool']['should'].append({'term': {'area.not_analyzed':area}})
+
+		bool_query['bool']['must'].append(bool_query1)
+
 		for venue in filter_venues:
-			bool_query['bool']['should'].append({'term': {'venue':venue}})
+			bool_query2['bool']['should'].append({'term': {'venue':venue}})
+
+		bool_query['bool']['must'].append(bool_query2)
 		
-		bool_query['bool']['must']=[]
 		bool_query_inner={}
 		bool_query_inner['bool']={}
 		bool_query_inner['bool']['must']=[]
 		for subject in filter_subjects:
 			bool_query['bool']['must'].append({'term': {'subject.not_analyzed':subject}})
+		if actual_location and actual_location=='online':
+			bool_query['bool']['must'].append({'term': {'city':actual_location}})
+		if actual_location and actual_location!='online':
+			bool_query_inner={}
+			bool_query_inner['bool']={}
+			bool_query_inner['bool']['should']=[]
+			bool_query_inner['bool']['should'].append({'term': {'city':actual_location}})
+			bool_query_inner['bool']['should'].append({'term': {'area.not_analyzed':'online'}})
+			bool_query['bool']['must'].append(bool_query_inner)
+
 		
 		
-		payload['query']['filtered']['filter']=bool_query
+		payload['query']['filtered']['filter'].append(bool_query)
 	else:
 		bool_query={}
 		bool_query['bool']={}
-		bool_query['bool']['should']=[]
-		bool_query['bool']['should'].append({'term':{'subject.not_analyzed':query}})
-		payload['query']['filtered']['filter']=bool_query
+		bool_query['bool']['must']=[]
+		bool_query['bool']['must'].append({'term':{'subject.not_analyzed':query}})
+		if actual_location and actual_location=='online':
+			bool_query['bool']['must'].append({'term': {'city':actual_location}})
+		if actual_location and actual_location!='online':
+			bool_query_inner={}
+			bool_query_inner['bool']={}
+			bool_query_inner['bool']['should']=[]
+			bool_query_inner['bool']['should'].append({'term': {'city':actual_location}})
+			bool_query_inner['bool']['should'].append({'term': {'area.not_analyzed':'online'}})
+			bool_query['bool']['must'].append(bool_query_inner)
+			
+		
+		payload['query']['filtered']['filter'].append(bool_query)
+
+	
 
 	payload['sort']=[{'_score':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 	print payload
@@ -1744,7 +1851,7 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 	return json_response
 
 
-def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter):
+def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,actual_location):
 
 	print 'prepare query function'
 	payload={}
@@ -1753,6 +1860,7 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 	payload['query']['filtered']['query']={}
 	payload['query']['filtered']['query']['bool']={}
 	payload['query']['filtered']['query']['bool']['should']=[]
+	payload['query']['filtered']['filter']=[]
 
 	constant_score_query={}
 	constant_score_query['constant_score']={}
@@ -1823,33 +1931,65 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 	bool_query={}
 	bool_query['bool']={}
 	bool_query['bool']['should']=[]
-	bool_query['bool']['should'].append(constant_score_query1)
+	bool_query['bool']['should'].append(constant_score_query6)
 
 	bool_query2={}
 	bool_query2['bool']={}
 	bool_query2['bool']['should']=[]
-	bool_query2['bool']['should'].append(constant_score_query2)
+	bool_query2['bool']['should'].append(constant_score_query1)
 	#bool_query2['bool']['should'].append(constant_score_query3)
 	bool_query2['bool']['should'].append(constant_score_query5)
-	bool_query2['bool']['should'].append(constant_score_query6)
+	bool_query2['bool']['should'].append(constant_score_query2)
 
 	bool_query['bool']['should'].append(bool_query2)
 	
 
 	payload['query']['filtered']['query']['bool']['should'].append(bool_query)	
 
-	if is_filter:
-		bool_query={}
-		bool_query['bool']={}
-		bool_query['bool']['should']=[]
-		for subject in filter_subjects:
-			bool_query['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
-		for area in filter_areas:
-			bool_query['bool']['should'].append({'term': {'area.not_analyzed':area}})
-		for venue in filter_venues:
-			bool_query['bool']['should'].append({'term': {'venue':venue}})
-		payload['query']['filtered']['filter']=bool_query
+	bool_query={}
+	bool_query['bool']={}
+	bool_query['bool']['must']=[]
 
+	if is_filter:
+		
+		bool_query1={}
+		bool_query1['bool']={}
+		bool_query1['bool']['should']=[]
+		for subject in filter_subjects:
+			bool_query1['bool']['should'].append({'term': {'subject.not_analyzed':subject}})
+
+		bool_query['bool']['must'].append(bool_query1)
+		bool_query2={}
+		bool_query2['bool']={}
+		bool_query2['bool']['should']=[]
+
+		for area in filter_areas:
+			bool_query2['bool']['should'].append({'term': {'area.not_analyzed':area}})
+
+		bool_query['bool']['must'].append(bool_query2)
+		bool_query3={}
+		bool_query3['bool']={}
+		bool_query3['bool']['should']=[]
+
+		for venue in filter_venues:
+			bool_query3['bool']['should'].append({'term': {'venue':venue}})
+
+		bool_query['bool']['must'].append(bool_query3)
+		
+
+	if actual_location:
+		
+		if actual_location=='online':
+			bool_query['bool']['must'].append({'term': {'city':actual_location}})
+		if actual_location!='online':
+			bool_query_inner={}
+			bool_query_inner['bool']={}
+			bool_query_inner['bool']['should']=[]
+			bool_query_inner['bool']['should'].append({'term': {'city':actual_location}})
+			bool_query_inner['bool']['should'].append({'term': {'area.not_analyzed':'online'}})
+			bool_query['bool']['must'].append(bool_query_inner)
+			
+	payload['query']['filtered']['filter'].append(bool_query)
 	
 	payload['sort']=[{'_score':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 
@@ -1896,7 +2036,8 @@ def search():
 
 		filter_venue_string=data['venue_selected'][0].split('|')
 
-
+		cities=['kolkata','online']
+		actual_location=request.cookies.get('location')
 		
 		areas_checkboxes=data['areas_checkboxes'][0].split('|')
 		subject_checkboxes=data['subject_checkboxes'][0].split('|')
@@ -1945,17 +2086,18 @@ def search():
 		if is_pre_filter and is_pre_filter=='y':
 			categories=get_category([query])
 			if len(categories)<1:
-				response=prepare_query_filtered(query,10,(page-1)*10,filter_areas,[query],filter_venues,is_filter)
+				response=prepare_query_filtered(query,10,(page-1)*10,filter_areas,[query],filter_venues,is_filter,actual_location)
 			else:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,
-													filter_venues,is_filter,actual_tagged_subjects,actual_tagged_areas)
+													filter_venues,is_filter,actual_tagged_subjects,actual_tagged_areas,actual_location)
 				
 		else:
 			if is_machine_filtered:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,
-													filter_venues,is_filter,actual_tagged_subjects,actual_tagged_areas)
+													filter_venues,is_filter,actual_tagged_subjects,actual_tagged_areas,
+													actual_location)
 			else:
-				response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,filter_venues,is_filter)
+				response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,filter_venues,is_filter,actual_location)
 		
 		
 
@@ -2077,16 +2219,31 @@ def search():
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),fb_title=fb_title,fb_app_id=fb_app_id,
-								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title)
+								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,
+								title=title,cities=cities,actual_location=actual_location)
 
 	try:
 		query=request.args.get('subject')
 		is_classify=request.args.get('classify')
 		page=request.args.get('page')
 		online=request.args.get('medium')
-		
+		location=request.args.get('location')
 
+		print 'location='+str(location)
+		set_cookie=False
+		cookie_location=request.cookies.get('location')
+		actual_location=''
+		if location:
+			actual_location=location
+			set_cookie=True
+		elif cookie_location:
+			actual_location=cookie_location
+			
+		else:
+			actual_location='kolkata'
+			set_cookie=True
 
+		print 'actual_location='+actual_location
 		print page
 		
 		try:
@@ -2123,7 +2280,7 @@ def search():
 					response=prepare_query_filtered(query,500,0,['online'],[query],[],True)
 					print 'working'
 				else:
-					response=prepare_query_filtered(query,500,0,None,None,None,False)
+					response=prepare_query_filtered(query,500,0,None,None,None,False,actual_location)
 
 			else:
 				for tagged_category in categories:
@@ -2133,7 +2290,8 @@ def search():
 						filter_subjects.append(s['name'])
 					filter_subjects.append(tagged_category)
 				related_subject=filter_subjects
-				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,filter_subjects,actual_tagged_areas)
+				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,filter_subjects,actual_tagged_areas,
+														actual_location)
 				print 'working category'
 				
 			is_pre_filter='y'
@@ -2172,17 +2330,17 @@ def search():
 				is_machine_filtered=True
 
 			if is_machine_filtered==True:
-				if len(actual_tagged_areas)==1 and actual_tagged_areas[0]=='kolkata':
-					actual_tagged_areas=[]
+				
 				print 'machine_filtered results'
 				print actual_tagged_subjects
 				print actual_tagged_areas
-				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,actual_tagged_subjects,actual_tagged_areas)
+				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,actual_tagged_subjects,actual_tagged_areas,
+														actual_location)
 			else:
 				if online=='online':
 					response=prepare_query(query,500,0,['online'],[],[],True)
 				else:		
-					response=prepare_query(query,500,0,None,None,None,False)
+					response=prepare_query(query,500,0,None,None,None,False,actual_location)
 			is_pre_filter='n'
 
 		print 'check 2'
@@ -2271,10 +2429,10 @@ def search():
 				if online=='online':
 					response=prepare_query_filtered(query,10,(page-1)*10,['online'],[query],[],True)
 				else:
-					response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False)
+					response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False,actual_location)
 			else:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,
-														filter_subjects,actual_tagged_areas)
+														filter_subjects,actual_tagged_areas,actual_location)
 				
 			is_pre_filter='y'
 			actual_tagged_subjects=filter_subjects
@@ -2283,12 +2441,12 @@ def search():
 
 			if is_machine_filtered==True:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,
-														actual_tagged_subjects,actual_tagged_areas)
+														actual_tagged_subjects,actual_tagged_areas,actual_location)
 			else:
 				if online=='online':
 					response=prepare_query(query,10,(page-1)*10,['online'],[],[],True)
 				else:
-					response=prepare_query(query,10,(page-1)*10,None,None,None,False)
+					response=prepare_query(query,10,(page-1)*10,None,None,None,False,actual_location)
 			is_pre_filter='n'
 		
 
@@ -2392,15 +2550,20 @@ def search():
 				search['page']=page
 				db.searches.save(search)
 
+		cities=['kolkata','online']
 
 		
-		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
+		response=make_response(render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title,
 								meta_description=meta_description,fb_title=fb_title, fb_url=fb_url, fb_description=fb_description,
-								fb_app_id=fb_app_id,related_searches=related_subjects)
+								fb_app_id=fb_app_id,related_searches=related_subjects,actual_location=actual_location,cities=cities))
+		if set_cookie:
+			response.set_cookie('location',actual_location)
+		return response
+
 	except Exception as e:
 		app.logger.error(str(e))
 
