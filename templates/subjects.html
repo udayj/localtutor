@@ -2,9 +2,9 @@
 {% block content %}
 
       <!-- Jumbotron -->
-      <div class="container">
-        <div class="search-block-v2">
-        <div class="container" style="margin-top:30px;">
+      <!--div class="container"-->
+        <div class="search-block" style="background-color:#a9cddd;">
+        <div class="container" style="padding-top:50px;margin-bottom:0px;" style="background-color:#a9cddd;">
             <div class="col-md-6 ">
                <div class="form-group">
        
@@ -13,7 +13,7 @@
                    <div class="input-group-btn select" style="border-right:1px; border-color:#ccc;background:#ccc">
            
                 <select id="location" class="form-control" style="width:auto;" style="float:none;background:#ccc">
-        <option value="" >Choose Location</option>
+        <option value="" >Location ?</option>
         {% for city in cities %}
         <option value="{{city}}" {% if city == actual_location %} selected {% endif %}
         >{{ city | capitalize }}</option>
@@ -32,11 +32,12 @@
                  
             </div>
         </div>
+        <hr>
     </div>
-  </div>
+  <!--/div-->
 
      
-    <hr>
+    
 
     <div class="container">
      <div class="row">

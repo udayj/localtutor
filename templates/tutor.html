@@ -13,7 +13,7 @@
                    <div class="input-group-btn select" style="border-right:1px; border-color:#ccc;background:#ccc">
            
                 <select id="location" class="form-control" style="width:auto;" style="float:none;background:#ccc">
-        <option value="" >Choose Location</option>
+        <option value="" >Location ?</option>
         {% for city in cities %}
         <option value="{{city}}" {% if city == actual_location %} selected {% endif %}
         >{{ city | capitalize }}</option>
