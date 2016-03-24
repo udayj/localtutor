@@ -517,7 +517,7 @@
               <ul class="list-unstyled">
                 {% for related_search in related_searches %}
                 <li>
-                  <a href="/search?subject={{related_search}}">{{related_search.title()}}</a>
+                  <a class="related_search" href="/search?subject={{related_search}}">{{related_search.title()}}</a>
                 </li>
                 {% endfor %}
               </ul>
@@ -529,19 +529,19 @@
               <h3>TOP CATEGORIES</h3>
               <ul class="list-unstyled">
                 <li>
-                  <a href="/search?subject=guitar">Guitar Classes</a>
+                  <a class="top_categories" href="/search?subject=guitar">Guitar Classes</a>
                 </li>
                 <li>
-                  <a href="/search?subject=programming">Programming</a>
+                  <a class="top_categories" href="/search?subject=programming">Programming</a>
                 </li>
                 <li>
-                  <a href="/search?subject=acting and theatre">Acting and Theatre</a>
+                  <a class="top_categories" href="/search?subject=acting and theatre">Acting and Theatre</a>
                 </li>
                 <li>
-                  <a href="/search?subject=machine learning">Machine Learning</a>
+                  <a class="top_categories" href="/search?subject=machine learning">Machine Learning</a>
                 </li>
                 <li>
-                  <a href="/search?subject=kathak">Kathak</a>
+                  <a class="top_categories" href="/search?subject=kathak">Kathak</a>
                 </li>
               </ul>
             </div>
@@ -1155,6 +1155,8 @@ function toggler(){
 
 mixpanel.track_links('.subjects_covered','Subjects Covered Link');
 mixpanel.track_links('.tutors','Tutors Link');
+mixpanel.track_links('.related_search','Related Search');
+mixpanel.track_links('.top_categories','Top Categories');
 mixpanel.track('Search Results Pageview');
 
 </script>  
