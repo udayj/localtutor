@@ -10,7 +10,7 @@
 
 .search-block {
 	padding: 120px 0;
-	padding-top:300px;
+	padding-top:310px;
 	padding-bottom:30px;
 	text-align: center;
 	position: relative;
@@ -107,15 +107,15 @@
 
 	.search-block {
 	padding: 20px 0;
-	padding-top: 20px;
+	padding-top: 160px;
 	padding-bottom:30px;
 	text-align: center;
 	position: relative;
 	margin-bottom: 20px;
-	background-image: none;
+	background: url(../../images/banner_mobile_rev.jpg) 100% 0 no-repeat;
 	background-color:#a9cddd;
-	/*background-size:380px 150px;
-	background-position:top left;*/
+	background-size:380px 150px;
+	background-position:top left;
 }
 
 }
@@ -124,7 +124,7 @@
 
 	.search-block {
 	padding: 20px 0;
-	padding-top: 120px;
+	padding-top: 150px;
 	padding-bottom:30px;
 	text-align: center;
 	position: relative;
