@@ -10,8 +10,8 @@
 
 .search-block {
 	padding: 120px 0;
-	padding-top:326px;
-	padding-bottom:30px;
+	padding-top:26em;
+	padding-bottom:20px;
 	text-align: center;
 	position: relative;
 	margin-bottom: 20px;
@@ -112,7 +112,7 @@
 	text-align: center;
 	position: relative;
 	margin-bottom: 20px;
-	background: url(../../images/banner_mobile_rev.jpg) 100% 0 no-repeat;
+	background: url(../../images/banner.jpg) 100% 0 no-repeat;
 	background-color:#a9cddd;
 	background-size:380px 150px;
 	background-position:top left;
