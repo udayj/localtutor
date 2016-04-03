@@ -27,6 +27,7 @@
     <!--link rel="stylesheet" href="/static/stylesheets/owl-carousel/owl-carousel/owl.carousel.css"-->
     <link rel="stylesheet" href="/static/stylesheets/sky-forms-pro/skyforms/css/sky-forms.css">
     <link rel="stylesheet" href="/static/stylesheets/sky-forms-pro/skyforms/custom/custom-sky-forms.css">
+    <link rel="shortcut icon" href="/static/images/favicon.png" />
     <!--[if lt IE 9]><link rel="stylesheet" href="assets/plugins/sky-forms-pro/skyforms/css/sky-forms-ie8.css"><![endif]-->
 
     <!-- CSS Page Style -->
@@ -107,7 +108,7 @@
 
 .tt-suggestion.tt-cursor {
   color: #fff;
-  background-color: #72c02c;
+  background-color: #ff9966;
 
 }
 
@@ -186,11 +187,11 @@ function custom_logic(login_status)
 </script>
 <div class="wrapper">
     <!--=== Header ===-->
-    <div class="header">
+    <div class="header" style="background-color:#a9cddd;border-bottom:0px;opacity:0.9;">
         <div class="container">
             <!-- Logo -->
             <a class="logo" href="/">
-                <img id="logo" src="/static/images/tutorack.logo.svg" alt="Tutorack Logo" style="margin:7px;" height="53px" width="233px">
+                <img id="logo" src="/static/images/tutorack-logo.svg" alt="Tutorack Logo" style="margin:7px;opacity:1.0" height="53px" width="233px">
             </a>
             <!-- End Logo -->
 
@@ -209,7 +210,7 @@ function custom_logic(login_status)
             <!-- End Topbar -->
 
             <!-- Toggle get grouped for better mobile display -->
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse" style="margin-top:1.5em;">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="fa fa-bars"></span>
             </button>
@@ -234,11 +235,11 @@ function custom_logic(login_status)
                     <!-- End Pages -->
 
                     <!-- Blog -->
-                    <li id="about">
+                    <!--li id="about">
                         <a href="/about" id="about_link">
                             About
                         </a>
-                    </li>
+                    </li-->
                     {% if not current_user.id %}
                      <li id="signup">
                          
@@ -478,8 +479,11 @@ var userid=null;
                 <div class="row">
                     <div class="col-md-6">
                         <p>
-                            2015 &copy; All Rights Reserved.
-                           <a href="/disclaimer">Disclaimer</a> | <a href="/disclaimer">Terms of Service</a>|<a href="/signup_tutor">Register as a Tutor</a>
+                            2015 &copy; All Rights Reserved.<br>
+                           <a href="/disclaimer">Disclaimer</a> <br>
+                           <a href="/disclaimer">Terms of Service</a><br>
+                           <a href="/signup_tutor">Register as a Tutor</a><br>
+                           <a href="/about">About</a>
                         </p>
                     </div>
 

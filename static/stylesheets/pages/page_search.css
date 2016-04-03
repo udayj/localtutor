@@ -1,14 +1,50 @@
 /*Page Search
 ------------------------------------*/
 /*Search Block*/
+
+@font-face {
+    font-family: american_typewriter;
+    src: url(../../fonts/american_typewriter.woff);
+    font-weight: bold;
+}
+
+.content-boxes-v3 .content-boxes-in-v3 h4 a {
+    color: #555;
+}
+
+.content-boxes-v3 .content-boxes-in-v3 h5 a {
+    color: #555;
+}
+
+.content-boxes-v3 .content-boxes-in-v3 .heading a {
+    color: #555;
+}
+
+
+.truncated { 
+	display:inline-block; max-width:95%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; 
+}
+
+.icon-custom {
+	max-width:25%;
+}
+
 .search-block {
-	padding: 80px 0;
+	padding: 120px 0;
+	padding-top:27em;
+	padding-bottom:10px;
 	text-align: center;
 	position: relative;
 	margin-bottom: 20px;
-	background: url(../../images/7.jpg) 50% 0 repeat fixed;		
+	background: url(../../images/banner.jpg) 0 no-repeat;		
+	background-size:100%;
+	background-position:top left;
+	
 }
 
+.heading {
+	font-size:1.5em;
+}
 .search-block:before {
 	top: 0;
 	left: 0;
@@ -16,7 +52,7 @@
 	height: 100%; 
 	content: " ";
 	position: absolute;
-	background: rgba(0,0,0,0.3);
+	background: rgba(0,0,0,0.0);
 }
 
 .search-block h1 {
@@ -91,3 +127,52 @@
 .section-block .section-block-info ul {
 	margin-bottom: 0;
 }
+
+@media (max-width:450px) {
+
+	.search-block {
+	padding: 20px 0;
+	padding-top: 160px;
+	padding-bottom:30px;
+	text-align: center;
+	position: relative;
+	margin-bottom: 20px;
+	background: url(../../images/banner.jpg) 100% 0 no-repeat;
+	background-color:#a9cddd;
+	background-size:380px 150px;
+	background-position:top left;
+	
+}
+.heading {
+	font-size:1.3em;
+}
+
+.icon-custom {
+	max-width:50%;
+}
+
+}
+
+@media (min-width:450px) and (max-width:768px) {
+
+	.search-block {
+	padding: 20px 0;
+	padding-top: 150px;
+	padding-bottom:30px;
+	text-align: center;
+	position: relative;
+	margin-bottom: 20px;
+	background: url(../../images/banner_mobile_rev.jpg) 100% 0 no-repeat;		
+	/*background-size:800px;*/
+	background-position:top center;
+	
+}
+.heading {
+	font-size:1.3em;
+}
+
+.icon-custom {
+	max-width:40%;
+}
+}
+
