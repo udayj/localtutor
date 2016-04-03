@@ -25,6 +25,9 @@
 	display:inline-block; max-width:95%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; 
 }
 
+.icon-custom {
+	max-width:33%;
+}
 
 .search-block {
 	padding: 120px 0;
@@ -144,6 +147,10 @@
 	font-size:1.3em;
 }
 
+.icon-custom {
+	max-width:50%;
+}
+
 }
 
 @media (min-width:450px) and (max-width:768px) {
@@ -162,6 +169,10 @@
 }
 .heading {
 	font-size:1.3em;
+}
+
+.icon-custom {
+	max-width:40%;
 }
 }
 
