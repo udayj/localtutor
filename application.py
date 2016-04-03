@@ -1702,7 +1702,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 	bool_query2={}
 	bool_query2['bool']={}
 	bool_query2['bool']['should']=[]
-	bool_query2['bool']['should'].append(constant_score_query2)
+	#bool_query2['bool']['should'].append(constant_score_query2)
 	#bool_query2['bool']['should'].append(constant_score_query3)
 	bool_query2['bool']['should'].append(constant_score_query5)
 	bool_query2['bool']['should'].append(constant_score_query6)
