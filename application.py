@@ -44,6 +44,8 @@ login_manager.login_message = u"Please log in to access this page."
 
 login_serializer = URLSafeTimedSerializer(SECRET_KEY)
 
+available_cities=['kolkata','mumbai','pune','hyderabad','bangalore','ahmedabad','raipur','online']
+
 def set_subject_area():
 	client=MongoClient()
 	db=client.local_tutor
@@ -269,7 +271,7 @@ def content_entry(file_name,db_name):
 			teacher_structured={}
 
 			fields=['subject','name','contact_number','email','age_group','venue',
-			'classroom_type','geographical_location','area','usp','teacher_type','price']
+			'classroom_type','geographical_location','area','usp','teacher_type','price','city']
 			counter=0
 			
 			good_value=True
@@ -311,7 +313,7 @@ def content_entry(file_name,db_name):
 def main_page():
 	title='- Find tutors and courses for everything you want to learn from over 800 subjects and 10000 teachers'
 	meta_description='Find teachers and courses for everything you want to learn from over 800 subjects and 10000 teachers'
-	cities=['kolkata','online']
+	cities=available_cities
 	actual_location=request.cookies.get('location')
 	return render_template('general_classes.html',app_id=app_id,active='main',title=title,meta_description=meta_description,
 							cities=cities,actual_location=actual_location)
@@ -334,7 +336,7 @@ def user_profile():
 	client=MongoClient()
 	db=client.local_tutor
 	user=db.users.find({'_id':ObjectId(user_id)})
-	cities=['kolkata','online']
+	cities=available_cities
 	actual_location=request.cookies.get('location')
 	try:
 		user=user.next()
@@ -894,7 +896,7 @@ def subjects():
 	print category_wise.items()
 	sorted_category_wise=sorted(category_wise.items(),key=sorter)
 	title=' - Get over 10000 tutors, online courses and centers covering more than 800 subjects in Kolkata'
-	cities=['kolkata','online']
+	cities=available_cities
 	actual_location=request.cookies.get('location')
 
 	return render_template('subjects.html',output=output,category_wise=sorted_category_wise,active='subjects',
@@ -1344,7 +1346,7 @@ def tutor():
 					display_subjects.append(actual_subject['display_name'])
 			except StopIteration:
 				pass
-		cities=['kolkata','online']
+		cities=available_cities
 		actual_location=request.cookies.get('location')
 
 		if tutor['area'] != 'online':
@@ -2036,7 +2038,7 @@ def search():
 
 		filter_venue_string=data['venue_selected'][0].split('|')
 
-		cities=['kolkata','online']
+		cities=available_cities
 		actual_location=request.cookies.get('location')
 		
 		areas_checkboxes=data['areas_checkboxes'][0].split('|')
@@ -2550,7 +2552,7 @@ def search():
 				search['page']=page
 				db.searches.save(search)
 
-		cities=['kolkata','online']
+		cities=available_cities
 
 		
 		response=make_response(render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
