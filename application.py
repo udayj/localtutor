@@ -46,6 +46,22 @@ login_serializer = URLSafeTimedSerializer(SECRET_KEY)
 
 available_cities=['kolkata','mumbai','pune','hyderabad','bangalore','ahmedabad','raipur','online']
 
+@app.route('/get_duplicates')
+def get_duplicates():
+	client=MongoClient()
+	db=client.local_tutor
+	duplicates=db.teachers.aggregate([{'$group':{'_id':'$name','count':{'$sum':1}}},
+		{'$match': {'_id':{'$ne':None}, 'count': {'$gt':1}}},{'$project': {'name': '$_id','_id':0}}])
+	result=[]
+	counter=0
+	for dup in duplicates['result']:
+		result.append(dup['name'])
+		counter=counter+1
+	return render_template('duplicates.html',results=result,counter=counter)
+	#js=json.dumps({'result':'success','duplicates':result})
+	#resp=Response(js,status=200,mimetype='application/json')
+	#return resp
+
 def set_subject_area():
 	client=MongoClient()
 	db=client.local_tutor
