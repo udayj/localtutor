@@ -604,7 +604,7 @@ def signup():
 		
 		app.logger.debug('Sending activation email to:'+data['email'])
 		html_content=render_template("activate_email.html",name=username, url=app.config['HOST']+'/activate?hash='+activation_hash)
-		data={"from": "Tutorack <admin@tutorack.com>",
+		data={"from": "Tutorack <connect@tutorack.com>",
               "to": [data['email']],
               "subject": 'Welcome to Tutorack',
               "text": 'Click this link to activate your account '+app.config['HOST']+'/activate?hash='+activation_hash,
@@ -662,12 +662,12 @@ def signup_tutor():
 					   'active':False})
 		#user=User(name=username,email=data['email'],password=data['password'],active=False,id=str(_id))
 		
-		app.logger.debug('Sending activation email to:registrations@tutorack.com')
+		app.logger.debug('Sending activation email to:connect@tutorack.com')
 		html_content=render_template("activate_email_tutor.html",name=username, email=data['email'],phone=data['phone'],
 									url=app.config['HOST']+'/activate?hash='+activation_hash)
 
-		data={"from": "Tutorack <admin@tutorack.com>",
-              "to": 'registrations@tutorack.com',
+		data={"from": "Tutorack <connect@tutorack.com>",
+              "to": 'connect@tutorack.com',
               "subject": 'New Tutor Registration',
               "text": 'Click this link to activate new tutor account '+app.config['HOST']+'/activate?hash='+activation_hash,
               "html":html_content}
@@ -768,7 +768,7 @@ def forgot_password():
 			user['forgot_password']=True
 			db.users.save(user)
 			html_content=render_template("forgot_password_email.html",url=app.config['HOST']+'/change-password?hash='+forgot_password_hash)
-			data={"from": "Tutorack <support@tutorack.com>",
+			data={"from": "Tutorack <connect@tutorack.com>",
 	              "to": email,
 	              "subject": 'Reset your password',
 	              "text": 'Click this link to change your password '+app.config['HOST']+'/change-password?hash='+forgot_password_hash,
