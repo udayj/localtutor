@@ -58,9 +58,63 @@ def get_duplicates():
 		result.append(dup['name'])
 		counter=counter+1
 	return render_template('duplicates.html',results=result,counter=counter)
-	#js=json.dumps({'result':'success','duplicates':result})
-	#resp=Response(js,status=200,mimetype='application/json')
-	#return resp
+
+@app.route('/remove_duplicates')
+def remove_duplicates():
+	client=MongoClient()
+	db=client.local_tutor
+	duplicates=db.teachers.aggregate([{'$group':{'_id':'$name','count':{'$sum':1}}},
+		{'$match': {'_id':{'$ne':None}, 'count': {'$gt':1}}},{'$project': {'name': '$_id','_id':0}}])
+	result=[]
+	counter=0
+	duplicates_removed=0
+	duplicates_found=0
+	for dup in duplicates['result']:
+		result.append(dup['name'])
+		tutors=db.teachers.find({'name':dup['name']})
+		count=db.teachers.find({'name':dup['name']}).count()
+		counter=0
+		actual_tutors=[]
+
+		for tutor in tutors:
+			#if tutor['area']!='online':
+			#	break
+			counter=counter+1
+			actual_tutors.append(tutor)
+		if counter!=count:
+			continue
+
+		counter=0
+		main_tutor=None
+		duplicates_found=duplicates_found+1
+		for tutor in actual_tutors:
+			counter=counter+1
+			if counter==1:
+				main_tutor=tutor
+				continue
+			
+			for subject in tutor['subject']:
+				if subject not in main_tutor['subject'] and isinstance(main_tutor['subject'],list):
+					main_tutor['subject'].append(subject)
+
+			if db.student_tutor.find({'tutor_id':str(tutor['_id'])}).count()!=0:
+				continue
+
+			if db.student_tutor_like.find({'tutor_id':str(tutor['_id'])}).count()!=0:
+				continue
+
+			if tutor['geographical_location']!=main_tutor['geographical_location']:
+				continue
+			db.teachers.remove({'_id':tutor['_id']})
+
+			duplicates_removed=duplicates_removed+1
+		if main_tutor:
+			db.teachers.save(main_tutor)
+	
+
+	js=json.dumps({'result':'success','duplicates_removed':duplicates_removed,'duplicates_found':duplicates_found})
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
 
 def set_subject_area():
 	client=MongoClient()
