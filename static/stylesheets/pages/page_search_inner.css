@@ -1,5 +1,20 @@
 /*Search Block Version 2
 ------------------------------------*/
+
+.search-block {
+	padding: 0px 0;
+	padding-top:0em;
+	padding-bottom:10px;
+	text-align: left;
+	position: relative;
+	margin-bottom: 20px;
+	background: linear-gradient(rgba(255,255,255,0.3),rgba(255,255,255,0.3)), url(../../images/bannersearch2.jpg)  0 repeat;		
+	background-size:80%;
+	background-position:top left;
+
+	
+}
+
 .search-block-v2 {
 	margin-bottom: 50px;
 	padding: 50px 0 58px;
