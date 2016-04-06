@@ -137,7 +137,7 @@
 	text-align: left;
 	position: relative;
 	margin-bottom: 20px;
-	background: linear-gradient(rgba(255,255,255,0.3),rgba(255,255,255,0.3)), url(../../images/bannersearch2.jpg)  0 repeat;		
+	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/bannersearch2.jpg)  0 repeat;		
 	background-size:80%;
 	background-position:top left;
 
@@ -176,7 +176,7 @@
 	text-align: left;
 	position: relative;
 	margin-bottom: 20px;
-	background: linear-gradient(rgba(255,255,255,0.3),rgba(255,255,255,0.3)), url(../../images/bannersearch2.jpg)  0 repeat;		
+	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/bannersearch2.jpg)  0 repeat;		
 	background-size:70%;
 	background-position:top left;
 

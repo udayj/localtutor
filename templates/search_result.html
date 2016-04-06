@@ -50,13 +50,13 @@
                 </div>
               </div>
                 {% if current_user.id %}
-                <h5 id="question_satisfy" class="note" style="display:inline;color:white;"> Found the search results satisfactory? 
-
+                <h5 id="question_satisfy" class="note" style="display:inline;color:white;"><b> Found the search results satisfactory? 
+                </b>
                 </h5> 
                 <button id="yes_satisfy" class="btn btn-u btn-xs" type="button" onclick="result_satisfaction('yes')">Yes</button>
                   <button id="no_satisfy" class="btn btn-u btn-xs" type="button"  onclick="result_satisfaction('no')">No</button>
-                  <div id="message_satisfy" style="display:none;color:#999;">Great, thanks for the feedback! </div>
-                  <div id="message_satisfy_no" style="display:none;color:white;">Thanks for the feedback - we'll definitely improve the results and appreciate your help. <br>You can also comment on what exactly went wrong.</div>
+                  <div id="message_satisfy" style="display:none;color:#999;"><b>Great, thanks for the feedback! </b></div>
+                  <div id="message_satisfy_no" style="display:none;color:white;"><b>Thanks for the feedback - we'll definitely improve the results and appreciate your help. <br>You can also comment on what exactly went wrong.</b></div>
                   <input id="satisfy_comment" type="text" class="form-control col-md-2" placeholder="eg. irrelevant results" style="display:none;">
                   <span class="input-group-btn" >
                   <button id="satisfy_comment_button" type="button" class="btn btn-u btn-xs" onclick="satisfaction_comment()" style="display:none;margin-top:0.5em;">Submit</button>
