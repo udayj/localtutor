@@ -23,7 +23,7 @@
   <div class="search-block" style="background-color:#a9cddd;">
         <div class="container" style="padding-top:30px;margin-bottom:20px;padding-bottom:20px;">
             <div class="col-md-6 ">
-               <h3 style="color:white;font-weight:bold;">Search results for {{query}}</h3>
+               <h3 style="color:white;font-weight:bold;"><span style="background-color:#006c83;padding-left:1em;padding-right:1em;">Search results for {{query}}  </span></h3>
 
                
 
@@ -50,19 +50,18 @@
                 </div>
               </div>
                 {% if current_user.id %}
-                <h5 id="question_satisfy" class="note" style="display:inline;color:white;"><b> Found the search results satisfactory? 
-                </b>
-                </h5> 
+                <h5 id="question_satisfy" class="note" style="display:inline;color:white;background-color:#006c83">Found the search results satisfactory? 
+                </h5> <br>
                 <button id="yes_satisfy" class="btn btn-u btn-xs" type="button" onclick="result_satisfaction('yes')">Yes</button>
                   <button id="no_satisfy" class="btn btn-u btn-xs" type="button"  onclick="result_satisfaction('no')">No</button>
-                  <div id="message_satisfy" style="display:none;color:#999;"><b>Great, thanks for the feedback! </b></div>
-                  <div id="message_satisfy_no" style="display:none;color:white;"><b>Thanks for the feedback - we'll definitely improve the results and appreciate your help. <br>You can also comment on what exactly went wrong.</b></div>
+                  <div id="message_satisfy" style="display:none;color:#white;"><span style="background-color:#006c83;color:white;">Great, thanks for the feedback! </span></div>
+                  <div id="message_satisfy_no" style="display:none;color:white;background-color:#006c83">Thanks for the feedback - we'll definitely improve the results and appreciate your help. <br>You can also comment on what exactly went wrong </div>
                   <input id="satisfy_comment" type="text" class="form-control col-md-2" placeholder="eg. irrelevant results" style="display:none;">
                   <span class="input-group-btn" >
                   <button id="satisfy_comment_button" type="button" class="btn btn-u btn-xs" onclick="satisfaction_comment()" style="display:none;margin-top:0.5em;">Submit</button>
                 </span>
                   <input type="text" id="satisfy_id" style="display:none;">
-                  <div id="satisfy_comment_status" style="display:none;color:#999;">Comment submitted successfully, thank you</div>
+                  <div id="satisfy_comment_status" style="display:none;color:white;background-color:#006c83">Comment submitted successfully, thank you</div>
 
                 {% endif %}
                  
@@ -139,7 +138,7 @@
 
             {% if areas|length > 1 %}
            
-              <div id="area_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
+              <div id="area_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:200px;overflow-y:scroll;margin-bottom:30px;">
                  <h3 >Filter by Area</h3>
                 <ul class="list-unstyled" >
                   
@@ -185,7 +184,7 @@
                 {% endif %}
                 </div>
             </div><!--/col-md-2-->
-            <div class="col-md-8">
+            <div class="col-md-7">
                 <span class="results-number" style="margin-bottom:20px;">{{total}} results</span>
                 <!-- Begin Inner Results -->
                 {% for result in results | batch(1) %}
@@ -521,7 +520,7 @@
               <ul class="list-unstyled">
                 {% for related_search in related_searches %}
                 <li>
-                  <a class="related_search" href="/search?subject={{related_search}}">{{related_search.title()}}</a>
+                  <a class="related_search" href="/search?subject={{related_search}}" style="color:#006c83">{{related_search.title()}}</a>
                 </li>
                 {% endfor %}
               </ul>
@@ -533,19 +532,19 @@
               <h3>TOP CATEGORIES</h3>
               <ul class="list-unstyled">
                 <li>
-                  <a class="top_categories" href="/search?subject=guitar">Guitar Classes</a>
+                  <a class="top_categories" href="/search?subject=guitar" style="color:#006c83">Guitar Classes</a>
                 </li>
                 <li>
-                  <a class="top_categories" href="/search?subject=programming">Programming</a>
+                  <a class="top_categories" href="/search?subject=programming" style="color:#006c83">Programming</a>
                 </li>
                 <li>
-                  <a class="top_categories" href="/search?subject=acting and theatre">Acting and Theatre</a>
+                  <a class="top_categories" href="/search?subject=acting and theatre" style="color:#006c83">Acting and Theatre</a>
                 </li>
                 <li>
-                  <a class="top_categories" href="/search?subject=machine learning">Machine Learning</a>
+                  <a class="top_categories" href="/search?subject=machine learning" style="color:#006c83">Machine Learning</a>
                 </li>
                 <li>
-                  <a class="top_categories" href="/search?subject=kathak">Kathak</a>
+                  <a class="top_categories" href="/search?subject=kathak" style="color:#006c83">Kathak</a>
                 </li>
               </ul>
             </div>
