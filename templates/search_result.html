@@ -227,19 +227,19 @@
                         </li>
                         
                         <br>
-                         <li>
-                           {% if item['area'] is equalto 'online' %}
-                     
-                      
-                      {% else %}
+                        {% if item['area'] is equalto 'online' %}
+                        
+                           {% else %}
+                            <li>
+                           
                        <span class="glyphicon glyphicon-phone" aria-hidden="true"></span>
                        {{item['contact_number']|join(',')}}
                        <br>
+                        </li>
                        {% endif %}
-                     </li>
-                        
+                    
                         <li>
-                           {% if item['area'] is equalto 'online' %}
+                       {% if item['area'] is equalto 'online' %}
                        <a href="{{item['geographical_location']}}">Online course link</a>
                        {% else %}
                        {% if item['geographical_location']|length >0 %}
