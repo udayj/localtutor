@@ -8,11 +8,15 @@
 	text-align: left;
 	position: relative;
 	margin-bottom: 20px;
-	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/bannersearch2.jpg)  0 repeat;		
+	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/croppedsearchbanner.jpg)  0 repeat;		
 	background-size:70%;
 	background-position:top left;
 
 	
+}
+
+.truncated { 
+	display:inline-block; max-width:95%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; 
 }
 
 .search-block-v2 {
@@ -228,7 +232,7 @@
 	text-align: left;
 	position: relative;
 	margin-bottom: 20px;
-	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/bannersearch2.jpg)  0 repeat;		
+	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/croppedsearchbanner.jpg)  0 repeat;		
 	background-size:80%;
 	background-position:top left;
 
