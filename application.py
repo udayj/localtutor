@@ -126,6 +126,8 @@ def set_subject_area():
 	for subject in subjects_db:
 		if len(subject['name'].strip())>1 and subject['name'] not in subjects:
 			subjects.append(subject['name'])
+		if len(subject['category'].strip())>1 and subject['category'] not in subjects:
+			subjects.append(subject['category'])
 	for teacher in teachers:
 		if teacher['area'] not in areas and len(teacher['area'].strip())>1:
 			areas.append(teacher['area'])
