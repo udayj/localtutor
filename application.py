@@ -2496,7 +2496,7 @@ def search():
 
 		tagged_subjects=[]
 		tagged_areas=[]
-
+		print 'actual_tagged_subjects' + str(actual_tagged_subjects)
 		if is_pre_filter and is_pre_filter=='y':
 
 			if len(categories)<1:
@@ -2596,7 +2596,7 @@ def search():
 			related_subjects=get_related_subjects(actual_tagged_subjects,2)
 		else:
 			related_subjects=get_related_subjects([x for (x,y) in subjects],3)
-		related_subjects.remove(query)
+		#related_subjects.remove(query)
 
 		ist=timezone('Asia/Kolkata')
 		ist_now=datetime.now(ist)
@@ -2627,7 +2627,7 @@ def search():
 
 		cities=available_cities
 
-		
+		print actual_tagged_subjects
 		response=make_response(render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
