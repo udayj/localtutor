@@ -2596,6 +2596,7 @@ def search():
 			related_subjects=get_related_subjects(actual_tagged_subjects,2)
 		else:
 			related_subjects=get_related_subjects([x for (x,y) in subjects],3)
+		related_subjects.remove(query)
 
 		ist=timezone('Asia/Kolkata')
 		ist_now=datetime.now(ist)
@@ -2657,7 +2658,8 @@ def get_related_subjects(base,scenario):
 			category=subject['category']
 			category_subjects=db.subjects.find({'category':category})
 			for individual_subject in category_subjects:
-				related_subjects.append(individual_subject['name'])
+				if individual_subject['name'] not in related_subjects:
+					related_subjects.append(individual_subject['name'])
 
 			
 			if len(related_subjects)>4:
