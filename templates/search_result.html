@@ -195,13 +195,13 @@
                   </script>
 
                 <div class=" col-lg-12 col-md-12 col-sm-12" style="margin-bottom:0px;">
-                  <h3><a class="tutors" href="/tutor?id={{item['_id']}}" id="{{item['_id']}}">{{item['name'].upper()}}</a></h3>
+                  <h3><a class="tutors" href="/tutor?id={{item['_id']}}" id="{{item['_id']}}" style="text-decoration:underline;">{{item['name'].upper()}}</a></h3>
                     
                     <ul class="list-inline up-ul">
                         
                         <li>
                       {% if item['area'] is equalto 'online' %}
-                      Available online at <a href="http://{{item['venue']}}" style="color:#ff9966" class="venue-link">{{item['venue']}}</a>
+                      Available online at <a href="{{item['geographical_location']}}" style="color:#ff9966" class="venue-link">{{item['venue']}}</a>
                       {% else %}
 
                       {% if item['venue'] is equalto 'both' %}
@@ -239,7 +239,7 @@
                     
                         <li>
                        {% if item['area'] is equalto 'online' %}
-                       <a href="{{item['geographical_location']}}" class="course-link">Online course link</a>
+                       <a href="{{item['geographical_location']}}" class="course-link">Go to course</a>
                        {% else %}
                        {% if item['geographical_location']|length >0 %}
                        <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
@@ -247,7 +247,9 @@
                        {{item['geographical_location'].title()}}
                        {% endif %}
                      </li>
-
+                     <!--li>
+                      <a href="/tutor?id={{item['_id']}}">More Details</a>
+                     </li-->
                         
                     </ul>
                     <p>
