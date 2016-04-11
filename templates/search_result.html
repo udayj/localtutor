@@ -201,7 +201,7 @@
                         
                         <li>
                       {% if item['area'] is equalto 'online' %}
-                      Available online at <a href="http://{{item['venue']}}" style="color:#ff9966" >{{item['venue']}}</a>
+                      Available online at <a href="http://{{item['venue']}}" style="color:#ff9966" class="venue-link">{{item['venue']}}</a>
                       {% else %}
 
                       {% if item['venue'] is equalto 'both' %}
@@ -239,7 +239,7 @@
                     
                         <li>
                        {% if item['area'] is equalto 'online' %}
-                       <a href="{{item['geographical_location']}}">Online course link</a>
+                       <a href="{{item['geographical_location']}}" class="course-link">Online course link</a>
                        {% else %}
                        {% if item['geographical_location']|length >0 %}
                        <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
@@ -1157,6 +1157,8 @@ function toggler(){
 }
 
 mixpanel.track_links('.subjects_covered','Subjects Covered Link');
+mixpanel.track_links('.venue-link','Venue Link');
+mixpanel.track_links('.course-link','Course Link');
 mixpanel.track_links('.tutors','Tutors Link');
 mixpanel.track_links('.related_search','Related Search');
 mixpanel.track_links('.top_categories','Top Categories');
