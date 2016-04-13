@@ -136,6 +136,22 @@
             </div>
             {% endif %}
 
+             {% if subjects|length > 0 %}
+            
+            <div id="subject_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:200px;overflow-y:scroll;margin-bottom:30px;">
+              <h3>Filter by Subject</h3>
+              <ul class="list-unstyled">
+              {% for subject in subjects %}
+              <li><label class="checkbox"><input class="subject_checkbox" type="checkbox" onclick="get_filtered_results_pre('subject')" name="{{subject[0]}}"
+              {% if subject[1] %}
+              checked
+              {% endif %}
+              ><i></i>{{subject[0].title()}}</label></li>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+
             {% if areas|length > 1 %}
            
               <div id="area_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:200px;overflow-y:scroll;margin-bottom:30px;">
@@ -158,20 +174,7 @@
             
             {% endif %}
             
-            {% if subjects|length > 0 %}
-            
-            <div id="subject_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
-              <h3>Filter by Subject</h3>
-              <ul class="list-unstyled">
-              {% for subject in subjects %}
-              <li><label class="checkbox"><input class="subject_checkbox" type="checkbox" onclick="get_filtered_results_pre('subject')" name="{{subject[0]}}"
-              {% if subject[1] %}
-              checked
-              {% endif %}
-              ><i></i>{{subject[0].title()}}</label></li>
-              {% endfor %}
-            </div>
-            {% endif %}
+           
 
            
 
@@ -896,6 +899,7 @@ function search()
           return;
         
           mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
+          fbq('track', "Search");
           var location='&location='+$('#location').find(':selected').val();
           window.location='search?subject='+encodeURIComponent(name.value.trim())+location;
         
@@ -990,6 +994,7 @@ $('#page_selection').bootpag({
  }
    $('#filter_form').attr('action',url);
    mixpanel.track('Next Page',{'Page':num});
+   fbq('track', "Search");
    get_filtered_results();
    //window.location='/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page="+num;
 });
@@ -1096,6 +1101,7 @@ function get_filtered_results_pre(type)
  }
   $('#filter_form').attr('action',url);
   mixpanel.track('Filter',{'Type':type});
+  fbq('track', "Search");
   get_filtered_results();
 }
 
