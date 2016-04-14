@@ -216,7 +216,7 @@
                       {% endif %}
                         </li>
                         <li class="btn-group">
-                            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+                            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" style="color:#555;">
                                 Subjects Covered<i class="fa fa-caret-down margin-left-5"></i>
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
@@ -314,9 +314,9 @@
                           {% if current_user.fb_id %}
                    <button id="associate_{{item['_id']}}" type="button" class="btn-u btn-u-sm" onclick="associate_tutor('{{item['_id']}}','{{current_user.fb_id}}')"  
                       {% if item['_id'] not in student_tutor_assoc %}
-                      style="display:;background:#017F9A"
+                      style="display:;background:#006c83"
                       {% else %}
-                      style="display:none;background:#017F9A"
+                      style="display:none;background:#006c83"
                       {% endif %}
                       style=""
                       >I studied under this teacher</button>
@@ -327,7 +327,7 @@
                       {% else %}
                       style="display:none;"
                       {% endif %}
-                      style="background:#017F9A"
+                      style="background:#006c83"
                      >
                       
 
@@ -346,15 +346,15 @@
                   <!-- <ul class="list-inline down-ul">
                     <li> -->
 
-                    <button id="like_{{item['_id']}}" type="button" class="btn-u btn-u-sm" onclick="like_tutor('{{item['_id']}}', '{{current_user.id}}',{{item['likes']}})" 
+                    <button id="like_{{item['_id']}}" type="button" class="btn-u btn-u-sm" onclick="like_tutor('{{item['_id']}}', '{{current_user.id}}',{{item['likes']}})"
                     {% if item['_id'] not in student_tutor_like %}
-                    style="display:;"
+                    style="display:;background:#006c83"
                     {% else %}
-                    style="display:none;"
+                    style="display:none;background:#006c83"
                     {% endif %}
                     ><i class="fa fa-thumbs-up"></i> Like</button>
 
-                    <button id="dislike_{{item['_id']}}" type="button" class="btn-u btn-u-sm btn-u-light-green" onclick="dislike_tutor('{{item['_id']}}', '{{current_user.id}}',{{item['likes']}})" 
+                    <button id="dislike_{{item['_id']}}" type="button" class="btn-u btn-u-sm btn-u-light-green" onclick="dislike_tutor('{{item['_id']}}', '{{current_user.id}}',{{item['likes']}})"
                     {% if item['_id'] in student_tutor_like %}
                     style="display:;"
                     {% else %}
@@ -363,7 +363,7 @@
                     ><i class="fa fa-thumbs-down"></i> Un-like</button>
             <!--      </li>
                 </ul> -->
-                  
+                  <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">More</button>
 
                     {% endif %}
                      
@@ -384,14 +384,14 @@
                       {% else %}
                          <ul class="list-inline down-ul">
                         <li>
-                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#fb-modal-login" style="background:#017F9A">
+                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#fb-modal-login" style="background:#006c83" onclick="track_fb()">
                           {% if item['area']=='online' %}
                           I took this course
                           {% else %}
                           I studied under this teacher
                           {% endif %}
                         </button>
-                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#responsive" ><i class="fa fa-thumbs-up" onclick="track_activity()"></i> Like</button>
+                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#responsive" style="background:#006c83" ><i class="fa fa-thumbs-up" onclick="track_activity()"></i> Like</button>
                         <div class="modal fade" id="fb-modal-login" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -427,7 +427,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <div class="row">
-                                            <div class="col-md-9">
+                                            <div class="col-md-9 col-sm-9 col-xs-10">
                                             <form class="reg-page" action="/login2" method="post" id="form_login">
                     <div class="reg-header">            
                         <h2>Login to your account</h2>
@@ -480,14 +480,17 @@
                                 </div>
                             </div>
                         </div>
-
+                            <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">More</button>
                           </li>
 
                         <li>
                     <span  class="label label-default" style="display:none;cursor:pointer;" id="friend_{{item['_id']}}">
                      </span>
                    </li>
-                       
+
+                   <li>
+                    
+                   </li>
                         
                     </ul>
                     {% endif %}
@@ -543,7 +546,7 @@
                   <a class="top_categories" href="/search?subject=programming" style="color:#006c83">Programming</a>
                 </li>
                 <li>
-                  <a class="top_categories" href="/search?subject=acting and theatre" style="color:#006c83">Acting and Theatre</a>
+                  <a class="top_categories" href="/search?subject=theatre" style="color:#006c83">Theatre</a>
                 </li>
                 <li>
                   <a class="top_categories" href="/search?subject=machine learning" style="color:#006c83">Machine Learning</a>
@@ -592,6 +595,13 @@
 {% block javascript %}
 
 <script>
+
+function show_tutor(id)
+{
+  mixpanel.track('More Clicked');
+  window.location="/tutor?id="+id;
+
+}
 function track_activity(){
   mixpanel.track('Logged-out Like');
 }
@@ -1010,6 +1020,11 @@ var actual_tagged_subjects="{{actual_tagged_subjects}}";
 var actual_tagged_areas="{{actual_tagged_areas}}";
 
 
+
+function track_fb(){
+
+  mixpanel.track('Facebook Studied Under');
+}
 
 
 

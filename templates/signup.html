@@ -1,21 +1,48 @@
 {% extends "base2.html" %}
 
 {% block css %}
-<link rel="stylesheet" href="/static/stylesheets/jquery-ui.min.css">
 <link rel="stylesheet" href="/static/stylesheets/page_log_reg_v1.css">
+<link rel="stylesheet" href="/static/stylesheets/pages/page_search_inner.css">
 {% endblock %}
-
 {% block content %}
 
+      <!-- Jumbotron -->
+  
 
 
-<div class="breadcrumbs" style="background-color:#a9cddd;padding-bottom:3em;">
-	<div class="container">
-		<h1 class="pull-left" style="color:white;margin-top:1em;">
-			User Registration & Login
-		</h1>
-	</div>
-</div>
+      <!-- Jumbotron -->
+        <div class="search-block">
+        <div class="container" style="padding-top:30px;margin-bottom:20px;padding-bottom:20px;">
+            <div class="col-md-6 ">
+              
+               <div class="form-group">
+       
+     
+                <div class="input-group">
+                   <div class="input-group-btn select" style="border-right:1px; border-color:#ccc;background:#ccc">
+           
+                <select id="location" class="form-control" style="width:auto;" style="float:none;background:#ccc">
+        <option value="" >Location ?</option>
+        {% for city in cities %}
+        <option value="{{city}}" {% if city == actual_location %} selected {% endif %}
+        >{{ city | capitalize }}</option>
+        {% endfor %}
+      </select>
+           
+        </div>  
+
+                    <input id="search" type="text" class="form-control" placeholder="eg. physics, chemistry, dance" value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="" style="float:none;">
+                    <span class="input-group-btn">
+                        <button class="btn-u" type="button" style="float:none;" onclick="search()"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+              </div>
+                 
+            </div>
+           
+        </div>
+        
+    </div>
 {% if signup_error|length >0 %}
 <div class="container">
 <div class="row">
@@ -127,6 +154,84 @@
     </div><!--/container-->		
 
 <script>
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  },
+  prefetch : {
+    url: '/options?subject='
+   
+  }
+});
+
+var suggestion="";
+var classify="y";
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+}).on('typeahead:select', function (obj, suggestion) {
+  suggestion=suggestion['value'];
+  classify="n";
+  mixpanel.track('Search Performed',{'Query':suggestion,'From':'Suggestion'});
+  var location='&location='+$('#location').find(':selected').val();
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion)+location; 
+  
+});
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+         if(classify!="n")
+        {  
+          
+          mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
+          var location='&location='+$('#location').find(':selected').val();
+          window.location='search?subject='+encodeURIComponent(name.value.trim())+location;
+        }
+        else
+        {
+          
+          
+        }
+    }
+
+
 $('#form_signup').submit(function(){
 
       mixpanel.track('Signup Submitted');
@@ -165,7 +270,7 @@ $('#form_login').submit(function(){
     alert("Email/Password cannot be empty");
     return false;
   }
-  mixpanel.track('Login from login-page);
+  mixpanel.track('Login from login-page');
     });
 
 </script>

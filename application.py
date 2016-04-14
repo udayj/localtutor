@@ -576,7 +576,9 @@ def signup():
         data=data)
 
 	if request.method=='GET':
-		return render_template('signup.html',active='signup',app_id=app_id)
+		cities=available_cities
+		actual_location=request.cookies.get('location')
+		return render_template('signup.html',active='signup',app_id=app_id,cities=cities,actual_location=actual_location)
 	else:
 		
 		data={}
@@ -632,7 +634,9 @@ def signup_tutor():
         data=data)
 
 	if request.method=='GET':
-		return render_template('signup_tutor.html',app_id=app_id)
+		cities=available_cities
+		actual_location=request.cookies.get('location')
+		return render_template('signup_tutor.html',app_id=app_id,cities=cities,actual_location=actual_location)
 	else:
 		
 		data={}
