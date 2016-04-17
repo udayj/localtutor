@@ -971,10 +971,11 @@ def subjects():
 				category_wise[subject['category']].append(subject['display_name'])
 	print category_wise.items()
 	sorted_category_wise=sorted(category_wise.items(),key=sorter)
-	title=' - Get over 10000 tutors, online courses and centers covering more than 800 subjects in Kolkata'
+	title=' - Get over 10000 tutors, online courses and centers covering more than 800 subjects'
 	cities=available_cities
 	actual_location=request.cookies.get('location')
-
+	for category in category_wise:
+		category_wise[category].sort()
 	return render_template('subjects.html',output=output,category_wise=sorted_category_wise,active='subjects',
 							app_id=app_id,title=title,cities=cities,actual_location=actual_location)
 
