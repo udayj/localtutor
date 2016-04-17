@@ -31,7 +31,7 @@
 
 .search-block {
 	padding: 120px 0;
-	padding-top:27em;
+	padding-top:24em;
 	padding-bottom:10px;
 	text-align: center;
 	position: relative;
@@ -41,6 +41,10 @@
 	background-position:top left;
 	
 }
+
+.main_heading {
+	font-weight:bold;font-size:3em;
+	}
 
 .heading {
 	font-size:1.3em;
@@ -155,6 +159,10 @@
 	max-width:50%;
 }
 
+.main_heading {
+	font-weight:bolder;font-size:2em;
+	}
+
 }
 
 @media (min-width:450px) and (max-width:768px) {
@@ -194,5 +202,9 @@
 .icon-custom {
 	max-width:30%;
 }
+
+.main_heading {
+	font-weight:bolder;font-size:2em;
+	}
 }
 
