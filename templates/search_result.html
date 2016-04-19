@@ -262,43 +262,43 @@
                     </p>
                     
                     <ul id="like_section_{{item['_id']}}" class="list-inline down-ul"
-                     {% if item['likes'] > 0 %}
+                     {% if item['likes']+item['likes_fake'] > 0 %}
                     style="display:;"
                     {% else %}
                     style="display:none;"
                     {% endif %}
                     >
                       <li>
-                         {% if item['likes'] == 0 %}
+                         {% if item['likes']+item['likes_fake'] == 0 %}
                     <span id="likes_{{item['_id']}}">
                      
                       </span>
                     {% endif %}
 
-                    {% if item['likes'] > 2 %}
+                    {% if item['likes']+item['likes_fake'] > 2 %}
                     <span id="likes_{{item['_id']}}">
                       {% if item['_id'] in student_tutor_like %}
-                      You and {{item['likes'] - 1}} people like this teacher 
+                      You and {{item['likes']+item['likes_fake'] - 1}} people like this 
                       {% else %}
-                      {{item['likes']}} people like this teacher 
+                      {{item['likes']+item['likes_fake']}} people like this 
                       {% endif %}
                       </span>
                     {% endif %}
-                    {% if item['likes'] == 2 %}
+                    {% if item['likes']+item['likes_fake'] == 2 %}
                     <span id="likes_{{item['_id']}}">
                       {% if item['_id'] in student_tutor_like %}
-                      You and {{item['likes'] -1}} person like this teacher 
+                      You and {{item['likes']+item['likes_fake'] -1}} person like this 
                       {% else %}
-                      {{item['likes']}} people like this teacher 
+                      {{item['likes']+item['likes_fake']}} people like this 
                       {% endif %}
                       </span>
                     {% endif %}
-                    {% if item['likes'] == 1 %}
+                    {% if item['likes']+item['likes_fake'] == 1 %}
                     <span id="likes_{{item['_id']}}">
                       {% if item['_id'] in student_tutor_like %}
-                      You like this teacher 
+                      You like this
                       {% else %}
-                      {{item['likes']}} person likes this teacher 
+                      {{item['likes']+item['likes_fake']}} person likes this
                       {% endif %}
                       </span>
                     {% endif %}
@@ -346,7 +346,7 @@
                   <!-- <ul class="list-inline down-ul">
                     <li> -->
 
-                    <button id="like_{{item['_id']}}" type="button" class="btn-u btn-u-sm" onclick="like_tutor('{{item['_id']}}', '{{current_user.id}}',{{item['likes']}})"
+                    <button id="like_{{item['_id']}}" type="button" class="btn-u btn-u-sm" onclick="like_tutor('{{item['_id']}}', '{{current_user.id}}',{{[item['likes'],item['likes_fake']]|sum}})"
                     {% if item['_id'] not in student_tutor_like %}
                     style="display:;background:#006c83"
                     {% else %}
@@ -354,7 +354,7 @@
                     {% endif %}
                     ><i class="fa fa-thumbs-up"></i> Like</button>
 
-                    <button id="dislike_{{item['_id']}}" type="button" class="btn-u btn-u-sm btn-u-light-green" onclick="dislike_tutor('{{item['_id']}}', '{{current_user.id}}',{{item['likes']}})"
+                    <button id="dislike_{{item['_id']}}" type="button" class="btn-u btn-u-sm btn-u-light-green" onclick="dislike_tutor('{{item['_id']}}', '{{current_user.id}}',{{[item['likes'],item['likes_fake']]|sum}})"
                     {% if item['_id'] in student_tutor_like %}
                     style="display:;"
                     {% else %}

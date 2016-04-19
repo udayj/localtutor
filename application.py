@@ -44,7 +44,7 @@ login_manager.login_message = u"Please log in to access this page."
 
 login_serializer = URLSafeTimedSerializer(SECRET_KEY)
 
-available_cities=['kolkata','mumbai','pune','hyderabad','bangalore','ahmedabad','raipur','online']
+available_cities=['online','ahmedabad','bangalore','hyderabad','kolkata','mumbai','pune','raipur']
 
 @app.route('/get_duplicates')
 def get_duplicates():
@@ -896,6 +896,17 @@ def count_clicks():
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp
 
+@app.route('/generate_fake_likes')
+def generate_fake_likes():
+	client=MongoClient()
+	db=client.local_tutor
+	teachers=db.teachers.find()
+	for teacher in teachers:
+		teacher['likes_fake']=random.randrange(0,70)
+		db.teachers.save(teacher)
+	js=json.dumps({'result':'success','message':'generated likes'})
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp	
 def rewrite_query(query):
 	client=MongoClient()
 	db=client.local_tutor
@@ -2270,6 +2281,8 @@ def search():
 		for teacher in paginated_results:
 			
 			teacher['likes']=db.student_tutor_like.find({'tutor_id':str(teacher['_id'])}).count()
+			if 'likes_fake' not in teacher:
+				teacher['likes_fake']=random.randrange(0,70)
 			
 		student_tutor_like={}
 		if hasattr(current_user,'id'):
@@ -2578,6 +2591,8 @@ def search():
 		for teacher in paginated_results:
 			
 			teacher['likes']=db.student_tutor_like.find({'tutor_id':str(teacher['_id'])}).count()
+			if 'likes_fake' not in teacher:
+				teacher['likes_fake']=random.randrange(0,70)
 
 		student_tutor_like={}
 		if hasattr(current_user,'id'):
