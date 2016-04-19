@@ -281,6 +281,20 @@ function friend_tutor(){
 }
 
 fbq('track', "ViewContent");
+
+click_data={}
+click_data['id']="{{tutor['_id']}}";
+jQuery.ajax({
+    url: '/count_clicks',
+    data: click_data,
+    type: 'POST',
+    success: function(data)
+    {
+      
+    }
+
+});
+
 </script>  
 {% endblock %}
 

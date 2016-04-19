@@ -877,6 +877,25 @@ def prepare_sortbyvenue():
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp
 
+@app.route('/count_clicks',methods=['POST'])
+def count_clicks():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	teacher=db.teachers.find({'_id':ObjectId(data['id'])})
+	teacher=teacher.next()
+	if 'click_metric' not in teacher:
+		teacher['click_metric']=1.0
+	else:
+		teacher['click_metric']=teacher['click_metric']+1.0
+	db.teachers.save(teacher)
+	js=json.dumps({'result':'success','message':'updated data'})
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
+
 def rewrite_query(query):
 	client=MongoClient()
 	db=client.local_tutor
@@ -1839,7 +1858,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 	payload['query']['filtered']['filter'].append(bool_query)
 
 	
-	payload['sort']=[{'_score':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
+	payload['sort']=[{'_score':{'order':'desc'}},{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 	print payload
 
 	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
@@ -1920,7 +1939,7 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 
 	
 
-	payload['sort']=[{'_score':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
+	payload['sort']=[{'_score':{'order':'desc'}},{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 	print payload
 
 	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
@@ -2070,7 +2089,7 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 			
 	payload['query']['filtered']['filter'].append(bool_query)
 	
-	payload['sort']=[{'_score':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
+	payload['sort']=[{'_score':{'order':'desc'}},{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 
 	print payload
 
