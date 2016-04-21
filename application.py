@@ -20,6 +20,7 @@ import multiprocessing
 from pytz import timezone
 from datetime import datetime
 import random
+from urlparse import urlparse
 
 
 
@@ -274,7 +275,7 @@ def activate():
 		if 'user_type' in user and user['user_type']=='tutor':
 			if 'tutor_id' not in user:
 				fields=['subject','name','contact_number','email','age_group','venue',
-				'classroom_type','geographical_location','area','usp','teacher_type','price']
+				'classroom_type','geographical_location','area','usp','teacher_type','price','city']
 				teacher_structured={}
 				for field in fields:
 					teacher_structured[field]=''
@@ -907,6 +908,61 @@ def generate_fake_likes():
 	js=json.dumps({'result':'success','message':'generated likes'})
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp	
+
+@app.route('/create_online_resource',methods=['GET','POST'])
+def create_online_resource():
+	if request.method=='POST':
+		data={}
+		
+		for name,value in dict(request.form).iteritems():
+			data[name]=value[0].strip().lower()
+		try:
+			name=data['name']
+			geographical_location=data['link']
+			subjects=data['subjects'].split(',')
+			parsed_url=urlparse(geographical_location)
+			venue=parsed_url.netloc
+			if parsed_url.scheme=='':
+				parsed_url=urlparse('http://'+geographical_location)
+				venue=parsed_url.netloc
+			verified_subjects=[]
+			ok=False
+			for subject in subjects:
+				if len(subject)>1:
+					ok=True
+					verified_subjects.append(subject)
+			if len(name)<1 or len(geographical_location)<1:
+				ok=False
+
+			if not ok:
+				return render_template('create_online_resource.html',text='Submit New Link',
+									error='Could Not Create Resource. Please try again later')	
+			fields=['subject','name','contact_number','email','age_group','venue',
+			'classroom_type','geographical_location','area','usp','teacher_type','price','city']
+			values=[verified_subjects,name,'','','all',venue,'individual',geographical_location,'online','','institution','free','online']
+			teacher={}
+			counter=0
+			while counter<13:
+				teacher[fields[counter]]=values[counter]
+				counter=counter+1
+			client=MongoClient()
+			db=client.local_tutor
+			db.teachers.save(teacher)
+			for subject in verified_subjects:
+				prior_subject_count=db.subjects.find({'name':subject}).count()
+				if prior_subject_count<=0:
+					db.subjects.save({'name':subject,'category':''})
+
+
+
+
+		
+		except:
+			return render_template('create_online_resource.html',text='Submit New Link',
+									error='Could Not Create Resource. Please try again later')	
+		return render_template('create_online_resource.html',text='Submit Another New Link',update_message='Thank you')	
+	return render_template('create_online_resource.html',text='Submit New Link')
+
 def rewrite_query(query):
 	client=MongoClient()
 	db=client.local_tutor

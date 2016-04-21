@@ -204,7 +204,7 @@
                         
                         <li>
                       {% if item['area'] is equalto 'online' %}
-                      Available online at <a href="{{item['geographical_location']}}" style="color:#ff9966" class="venue-link">{{item['venue']}}</a>
+                      Available online at <a href="//{{item['geographical_location']}}" style="color:#ff9966" class="venue-link">{{item['venue']}}</a>
                       {% else %}
 
                       {% if item['venue'] is equalto 'both' %}
@@ -242,7 +242,7 @@
                     
                         <li>
                        {% if item['area'] is equalto 'online' %}
-                       <a href="{{item['geographical_location']}}" class="course-link">Go to course</a>
+                       <a href="//{{item['geographical_location']}}" class="course-link">Go to course</a>
                        {% else %}
                        {% if item['geographical_location']|length >0 %}
                        <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>

@@ -1,0 +1,220 @@
+{% extends "base2.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/stylesheets/page_log_reg_v1.css">
+<link rel="stylesheet" href="/static/stylesheets/pages/page_search_inner.css">
+{% endblock %}
+{% block content %}
+
+      <!-- Jumbotron -->
+  
+
+
+      <!-- Jumbotron -->
+        <div class="search-block">
+        <div class="container" style="padding-top:30px;margin-bottom:20px;padding-bottom:20px;">
+            <div class="col-md-6 ">
+              
+               <div class="form-group">
+       
+     
+                <div class="input-group">
+                   <div class="input-group-btn select" style="border-right:1px; border-color:#ccc;background:#ccc">
+           
+                <select id="location" class="form-control" style="width:auto;" style="float:none;background:#ccc">
+        <option value="" >Location ?</option>
+        {% for city in cities %}
+        <option value="{{city}}" {% if city == actual_location %} selected {% endif %}
+        >{{ city | capitalize }}</option>
+        {% endfor %}
+      </select>
+           
+        </div>  
+
+                    <input id="search" type="text" class="form-control" placeholder="eg. physics, chemistry, dance" value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="" style="float:none;">
+                    <span class="input-group-btn">
+                        <button class="btn-u" type="button" style="float:none;" onclick="search()"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+              </div>
+                 
+            </div>
+           
+        </div>
+        
+    </div>
+{% if update_message|length >0 %}
+<div class="container">
+<div class="row">
+            <div class="col-md-4 col-md-offset-1 col-sm-6 col-sm-offset-3">
+            	<br>
+              <div class="alert alert-success fade in">{{update_message}}</div>
+              </div>
+          </div>
+      </div>
+{% endif %}
+
+{% if error|length >0 %}
+<div class="container">
+<div class="row">
+  <div class="col-md-4 col-md-offset-1 col-sm-6 col-sm-offset-3">
+      <br>
+          <div class="alert alert-danger fade in">{{error}}</div>
+        </div>
+      </div>
+</div>
+{% endif %}
+
+<div class="container content" style="padding-top:10px;">
+        <div class="row">
+           
+
+            <div class="col-md-6 col-md-offset-1 col-sm-12 col-sm-offset-1">
+                <form class="reg-page" action="/create_online_resource" method="post" id="create_resource">
+
+                    
+                   
+                    <div class="reg-header">            
+                        <h2>{{text}}</h2>
+                        <!--p>Don't have an account yet? Click <a href="/signup" class="color-green">Sign Up</a> to create a new account.</p-->
+                    </div>
+                    <div class="input-group margin-bottom-10">
+                       
+                        
+                        <input type="text" id="name" class="form-control" name="name" placeholder="Name eg. The Elements of Statistical Learning">
+                        <div class="note">Enter name of the resource</div>
+                        
+                    </div>   
+
+                    <div class="input-group margin-bottom-10">
+                       
+                        
+                        <input type="text" id="link" class="form-control" name="link" placeholder="Link">
+                        <div class="note">Enter the web address of the resource (video/course/article/book/podcast etc)</div>
+                          
+                    </div>      
+                                
+                    <div class="input-group margin-bottom-10">
+                        
+                        <input type="text" id="subjects" class="form-control" name="subjects" placeholder="Subjects eg. machine learning, statistics">
+                        <div class="note">Enter a comma separated list of subjects for this resource</div>
+                        
+                    </div>                    
+
+                    <div class="row">
+                        <!--div class="col-md-6" style="padding-left:30px;">
+                          <label class="checkbox">
+                          <input name="remember_me" id="remember_me" type="checkbox">
+                          Stay signed in
+                          </label>                                                 
+                        </div-->
+                        <div class="col-md-6">
+                            <button class="btn-u" type="submit">Submit</button>                        
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    
+                    
+                </form>            
+            </div>
+        </div>
+    </div><!--/container-->		
+
+<script>
+function options(subject)
+{
+  return ['check'];
+  $.ajax({
+  type: "GET",
+  url: "/options?subject="+subject,
+  
+  
+  success: function(data)
+  {
+    return data;
+    
+  },
+  fail: function()
+  {
+    
+    
+  }
+}).done(function( msg ) {
+ // document.getElementById("user_tips").value="";
+  //alert("Thanks for helping us improve!");
+});
+}
+
+var subjects = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  
+  remote: {
+    url: '/options?subject=%QUERY',
+    wildcard: '%QUERY'
+  },
+  prefetch : {
+    url: '/options?subject='
+   
+  }
+});
+
+var suggestion="";
+var classify="y";
+
+$('.input-group #search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+}, {
+  name: 'subjects',
+  display: 'value',
+  source: subjects
+}).on('typeahead:select', function (obj, suggestion) {
+  suggestion=suggestion['value'];
+  classify="n";
+  mixpanel.track('Search Performed',{'Query':suggestion,'From':'Suggestion'});
+  var location='&location='+$('#location').find(':selected').val();
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion)+location; 
+  
+});
+
+function search()
+    {
+        var name=document.getElementById("search");
+        if(name==null || name.value.trim()=="")
+          return;
+         if(classify!="n")
+        {  
+          
+          mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
+          var location='&location='+$('#location').find(':selected').val();
+          window.location='search?subject='+encodeURIComponent(name.value.trim())+location;
+        }
+        else
+        {
+          
+          
+        }
+    }
+
+
+
+
+$('#create_resource').submit(function(){
+
+  var name=$('#name').val();
+  var link=$('#link').val();
+  var subjects=$('#subjects').val();
+  if(link==null || link.trim()=="" || subjects==null || subjects.trim()=="" || name==null || name.trim()=="")
+  {
+    alert("Name/Link/Subjects cannot be empty");
+    return false;
+  }
+  mixpanel.track('Create Online Resource');
+    });
+
+</script>
+{% endblock %}
