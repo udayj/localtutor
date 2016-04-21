@@ -242,7 +242,7 @@
                     
                         <li>
                        {% if item['area'] is equalto 'online' %}
-                       <a href="//{{item['geographical_location']}}" class="course-link">Go to course</a>
+                       <a href="//{{item['geographical_location']}}" class="course-link" style="text-decoration:underline;">Check out resource</a>
                        {% else %}
                        {% if item['geographical_location']|length >0 %}
                        <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
