@@ -930,7 +930,7 @@ def create_online_resource():
 			for subject in subjects:
 				if len(subject)>1:
 					ok=True
-					verified_subjects.append(subject)
+					verified_subjects.append(subject.lower())
 			if len(name)<1 or len(geographical_location)<1:
 				ok=False
 
