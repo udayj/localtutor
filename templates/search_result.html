@@ -8,7 +8,12 @@
 <meta property="og:description"  content="{{fb_description}}" />
 <meta property="og:image" content="http://www.tutorack.com/static/images/7.jpg" />
 <meta property="fb:app_id" content="{{fb_app_id}}" />
-
+<style>
+.pagination {
+  margin-top:10px;
+  margin-bottom:10px;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -99,6 +104,7 @@
           <button type="button" class="btn-u visible-sm visible-xs" data-toggle="collapse" data-target="#filter-options" style="margin-left:1em;margin-bottom:0.5em;" onclick="toggler()">
             <i class="fa fa-sliders"> Filters </i>
           </button>
+
             <div id="filter-options" class="col-md-2 related-search hidden-xs hidden-sm">
                 <div class="row" style="margin-left:0.1em";>
                    <div style="display:none;">
@@ -188,7 +194,11 @@
                 </div>
             </div><!--/col-md-2-->
             <div class="col-md-7">
-                <span class="results-number" style="margin-bottom:20px;">{{total}} results</span>
+               
+                <span class="results-number" style="margin-bottom:10px;" >{{total}} results</span>
+                <div class="text-left hidden-xs hidden-sm" id="page_selection_top" style="display:inline;">
+                    
+                </div>
                 <!-- Begin Inner Results -->
                 {% for result in results | batch(1) %}
                 <div class="inner-results row clearfix">
@@ -985,6 +995,31 @@ function friend_tutor()
 if(parseInt($('#total_pages').html().trim())>1)
 {
 $('#page_selection').bootpag({
+  total: parseInt($('#total_pages').html().trim()),
+  page: parseInt($('#page').html().trim()),
+  leaps:false,
+  maxVisible:5,
+  next:'next',
+  prev:'prev'
+  //href:'/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page={% raw %}{{number}}{% endraw %}"
+}).on("page",function(event,num){
+
+   var url=window.location.href;
+   var n=url.indexOf("page");
+   if(n==-1){
+   url=url+"&page="+num;
+ }
+ else{
+  url=url.substring(0,n)+"&page="+num;
+ }
+   $('#filter_form').attr('action',url);
+   mixpanel.track('Next Page',{'Page':num});
+   fbq('track', "Search");
+   get_filtered_results();
+   //window.location='/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page="+num;
+});
+
+$('#page_selection_top').bootpag({
   total: parseInt($('#total_pages').html().trim()),
   page: parseInt($('#page').html().trim()),
   leaps:false,
