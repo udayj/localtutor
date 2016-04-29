@@ -54,21 +54,21 @@
                     </span>
                 </div>
               </div>
-                {% if current_user.id %}
+                
                 <h5 id="question_satisfy" class="note" style="display:inline;color:white;background-color:#006c83">Found the search results satisfactory? 
                 </h5> <br>
                 <button id="yes_satisfy" class="btn btn-u btn-xs" type="button" onclick="result_satisfaction('yes')">Yes</button>
                   <button id="no_satisfy" class="btn btn-u btn-xs" type="button"  onclick="result_satisfaction('no')">No</button>
                   <div id="message_satisfy" style="display:none;color:#white;"><span style="background-color:#006c83;color:white;">Great, thanks for the feedback! </span></div>
                   <div id="message_satisfy_no" style="display:none;color:white;background-color:#006c83">Thanks for the feedback - we'll definitely improve the results and appreciate your help. <br>You can also comment on what exactly went wrong </div>
-                  <input id="satisfy_comment" type="text" class="form-control col-md-2" placeholder="eg. irrelevant results" style="display:none;">
+                  <input id="satisfy_comment" type="text" class="form-control col-md-2" placeholder="eg. irrelevant results /confusing /not useful" style="display:none;">
                   <span class="input-group-btn" >
                   <button id="satisfy_comment_button" type="button" class="btn btn-u btn-xs" onclick="satisfaction_comment()" style="display:none;margin-top:0.5em;">Submit</button>
                 </span>
                   <input type="text" id="satisfy_id" style="display:none;">
                   <div id="satisfy_comment_status" style="display:none;color:white;background-color:#006c83">Comment submitted successfully, thank you</div>
 
-                {% endif %}
+               
                  
             </div>
         </div>
@@ -214,7 +214,7 @@
                         
                         <li>
                       {% if item['area'] is equalto 'online' %}
-                      Available online at <a href="{{item['geographical_location']}}" style="color:#ff9966" class="venue-link">{{item['venue']}}</a>
+                      Available online at <a href="{{item['geographical_location']}}" style="color:#ff9966" class="venue-link" onclick="increment_ranking('{{item['_id']}}')">{{item['venue']}}</a>
                       {% else %}
 
                       {% if item['venue'] is equalto 'both' %}
@@ -245,14 +245,16 @@
                             <li>
                            
                        <span class="glyphicon glyphicon-phone" aria-hidden="true"></span>
-                       {{item['contact_number']|join(',')}}
+                       {% for contact_number in item['contact_number'] %}
+                       <a href="tel:{{contact_number}}" style="color:#555">{{contact_number}} </a>
+                       {% endfor %}
                        <br>
                         </li>
                        {% endif %}
                     
                         <li>
                        {% if item['area'] is equalto 'online' %}
-                       <a href="{{item['geographical_location']}}" class="course-link" style="text-decoration:underline;">Check out resource</a>
+                       <a href="{{item['geographical_location']}}" class="course-link" style="text-decoration:underline;" onclick="increment_ranking('{{item['_id']}}')" >Check out resource</a>
                        {% else %}
                        {% if item['geographical_location']|length >0 %}
                        <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
@@ -566,6 +568,13 @@
                 </li>
               </ul>
             </div>
+            <br>
+            {% if not current_user.id %}
+            <div class="col-md-2" style="margin-top:15px;">
+            <button class="btn-u" onclick="fblogin()" style="background:#3b5998;color:white;margin-top:15px;">Login using Facebook</button><br>
+            <div class="note" style="color:#999">See which teachers and courses your friends know</div>
+          </div>
+          {% endif %}
  
           </div>
         </div>
@@ -645,7 +654,9 @@ function result_satisfaction(satisfy){
     $('#question_satisfy').css('display','none');
     $('#message_satisfy_no').css('display','');
     data={}
+   
     data['_id']='{{current_user.id}}';
+   
     data['satisfy']='no';
     data['query']='{{query}}';
 
@@ -769,7 +780,39 @@ $('.input-group #search').typeahead({
   
 });
 
+/*$('.venue-link').click(function(){
+        
+        click_data={}
+        click_data['id']="tutor['_id']";
+        jQuery.ajax({
+            url: '/count_clicks',
+            data: click_data,
+            type: 'POST',
+            success: function(data)
+            {
+              
+            }
 
+        });
+    });*/
+
+function increment_ranking(id)
+{
+  
+  click_data={}
+        click_data['id']=id;
+
+        jQuery.ajax({
+            url: '/count_clicks',
+            data: click_data,
+            type: 'POST',
+            success: function(data)
+            {
+              
+            }
+
+        });
+}
 
 
 function like_tutor(tutor_id,student_id,likes){

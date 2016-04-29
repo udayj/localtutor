@@ -2723,6 +2723,7 @@ def search():
 		cities=available_cities
 
 		print actual_tagged_subjects
+		
 		response=make_response(render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
@@ -2730,6 +2731,7 @@ def search():
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title,
 								meta_description=meta_description,fb_title=fb_title, fb_url=fb_url, fb_description=fb_description,
 								fb_app_id=fb_app_id,related_searches=related_subjects,actual_location=actual_location,cities=cities))
+
 		if set_cookie:
 			response.set_cookie('location',actual_location)
 		return response
@@ -2891,6 +2893,26 @@ def result_satisfaction():
 		js=json.dumps(response)
 		resp=Response(js,status=200,mimetype='application/json')
 		return resp
+	if data['_id'] == '':
+		try:
+			result={}
+			result['id']='anonymous'
+			result['name']='anonymous'
+			result['query']=data['query']
+			result['satisfy']=data['satisfy']
+			_id=db.satisfaction.save(result)
+			response={}
+			response={'result':'success'}
+			response={'satisfy_id':str(_id)}
+			js=json.dumps(response)
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp
+		except:
+			response={}
+			response={'result':'failed'}
+			js=json.dumps(response)
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp
 	user=db.users.find({'_id':ObjectId(data['_id'])})
 	try:
 		user=user.next()
