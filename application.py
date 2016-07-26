@@ -2407,7 +2407,7 @@ def search():
 			actual_location=cookie_location
 			
 		else:
-			actual_location='kolkata'
+			actual_location='online'
 			set_cookie=True
 
 		print 'actual_location='+actual_location
@@ -2677,7 +2677,7 @@ def search():
 				subjects_covered=', '.join([x for (x,y) in subjects_meta if len(x.strip())>0])
 				meta_description='Choose from '+str(total)+' teachers, online courses and centers for '+subjects_covered
 				fb_description='Choose from over 10000 teachers, online courses and centers for '+subjects_covered
-								
+
 			else:
 				meta_description='Choose from '+str(total)+' teachers, online courses and centers covering '+query
 				fb_description='Choose from 10000 teachers, online courses and centers covering '+query
