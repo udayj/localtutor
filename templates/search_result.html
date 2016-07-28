@@ -192,19 +192,19 @@
                 <h3>POPULAR SEARCHES</h3>
               <ul class="list-unstyled">
                 <li>
-                  <a class="top_categories" href="/search?subject=application security" style="color:#006c83">Application Security</a>
+                  <a class="popular_searches" href="/search?subject=application security" style="color:#006c83">Application Security</a>
                 </li>
                 <li>
-                  <a class="top_categories" href="/search?subject=lisp" style="color:#006c83">Lisp</a>
+                  <a class="popular_searches" href="/search?subject=lisp" style="color:#006c83">Lisp</a>
                 </li>
                 <li>
-                  <a class="top_categories" href="/search?subject=python" style="color:#006c83">Python</a>
+                  <a class="popular_searches" href="/search?subject=python" style="color:#006c83">Python</a>
                 </li>
                 <li>
-                  <a class="top_categories" href="/search?subject=c%2B%2B" style="color:#006c83">C++</a>
+                  <a class="popular_searches" href="/search?subject=c%2B%2B" style="color:#006c83">C++</a>
                 </li>
                 <li>
-                  <a class="top_categories" href="/search?subject=linear algebra" style="color:#006c83">Linear Algebra</a>
+                  <a class="popular_searches" href="/search?subject=linear algebra" style="color:#006c83">Linear Algebra</a>
                 </li>
               </ul>
                 {% endif %}
@@ -250,7 +250,7 @@
                             <ul role="menu" class="dropdown-menu">
                               {% for subject in item['subject'] %}
 
-                                <li><a href="/search?subject={{subject.title()}}&is_pre_filter=y" class="subjects_covered">{{subject.title()}}</a></li>
+                                <li><a href="/search?subject={{subject.title()|urlencode}}&is_pre_filter=y" class="subjects_covered">{{subject.title()}}</a></li>
                                 {% endfor %}
                             </ul>
                         </li>
@@ -565,7 +565,7 @@
               <ul class="list-unstyled">
                 {% for related_search in related_searches %}
                 <li>
-                  <a class="related_search" href="/search?subject={{related_search}}" style="color:#006c83">{{related_search.title()}}</a>
+                  <a class="related_searches" href="/search?subject={{related_search|urlencode}}" style="color:#006c83">{{related_search.title()}}</a>
                 </li>
                 {% endfor %}
               </ul>
@@ -1286,8 +1286,9 @@ mixpanel.track_links('.subjects_covered','Subjects Covered Link');
 mixpanel.track_links('.venue-link','Venue Link');
 mixpanel.track_links('.course-link','Course Link');
 mixpanel.track_links('.tutors','Tutors Link');
-mixpanel.track_links('.related_search','Related Search');
+mixpanel.track_links('.related_searches','Related Search');
 mixpanel.track_links('.top_categories','Top Categories');
+mixpanel.track_links('.popular_searches','Popular Searches');
 mixpanel.track('Search Results Pageview');
 
 </script>  

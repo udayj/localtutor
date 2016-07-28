@@ -78,11 +78,22 @@
                 <td>
                   Subjects Touched
                 </td>
-                <td>
-                  {% for subject in display_subjects %}
+              <td>
+                   {% for subjects_outer in display_subjects|batch(3) %}
+       <div class="row clearfix">
+        {% for subject in subjects_outer %}
+     
+        <div class="col-lg-4 col-md-4 col-sm-12">
+                    <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y">{{subject}}</a> 
+                    </div>
+  
+      {% endfor %}
+  </div>      
+        {% endfor %}
+                 <!-- {% for subject in display_subjects %}
                     <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y">{{subject}}</a> 
                     <br>
-                    {% endfor %}
+                    {% endfor %} -->
                 </td>
               </tr>
               
