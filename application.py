@@ -2686,9 +2686,41 @@ def search():
 		
 		if len(related_subject)>0:
 			related_subjects=get_related_subjects(related_subject,1)
+			subject_r=db.subjects.find({'name':query})
+			try:
+				subject_r=subject_r.next()
+				
+				more_related_subjects=get_related_subjects([query],1)
+				for r in more_related_subjects:
+					if r not in related_subjects:
+						related_subjects.append(r)
+			except:
+				pass
+			try:
+				related_subjects=random.sample(related_subjects,5)
+			except:
+				related_subjects=related_subjects[:5]
+
+
 		elif len(actual_tagged_subjects)>0:
 
 			related_subjects=get_related_subjects(actual_tagged_subjects,2)
+			subject_r=db.subjects.find({'name':query})
+			try:
+				subject_r=subject_r.next()
+				
+				more_related_subjects=get_related_subjects([query],1)
+				for r in more_related_subjects:
+					if r not in related_subjects:
+						related_subjects.append(r)
+			except:
+				pass
+			try:
+				related_subjects=random.sample(related_subjects,5)
+			except:
+				related_subjects=related_subjects[:5]
+
+
 		else:
 			related_subjects=get_related_subjects([x for (x,y) in subjects],3)
 		#related_subjects.remove(query)
@@ -2753,13 +2785,15 @@ def get_related_subjects(base,scenario):
 		try:
 			subject=subject.next()
 			category=subject['category']
-			category_subjects=db.subjects.find({'category':category})
-			for individual_subject in category_subjects:
-				if individual_subject['name'] not in related_subjects:
-					related_subjects.append(individual_subject['name'])
+			if len(category)>0:
+				category_subjects=db.subjects.find({'category':category})
+				for individual_subject in category_subjects:
+					if individual_subject['name'] not in related_subjects:
+						related_subjects.append(individual_subject['name'])
 
 			
 			if len(related_subjects)>4:
+				print related_subjects
 				return random.sample(related_subjects,5)
 			else:
 				return related_subjects

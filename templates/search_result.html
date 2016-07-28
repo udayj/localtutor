@@ -189,7 +189,24 @@
                    
                 
                 {% else %}
-                <h3>No Filters</h3>
+                <h3>POPULAR SEARCHES</h3>
+              <ul class="list-unstyled">
+                <li>
+                  <a class="top_categories" href="/search?subject=application security" style="color:#006c83">Application Security</a>
+                </li>
+                <li>
+                  <a class="top_categories" href="/search?subject=lisp" style="color:#006c83">Lisp</a>
+                </li>
+                <li>
+                  <a class="top_categories" href="/search?subject=python" style="color:#006c83">Python</a>
+                </li>
+                <li>
+                  <a class="top_categories" href="/search?subject=c%2B%2B" style="color:#006c83">C++</a>
+                </li>
+                <li>
+                  <a class="top_categories" href="/search?subject=linear algebra" style="color:#006c83">Linear Algebra</a>
+                </li>
+              </ul>
                 {% endif %}
                 </div>
             </div><!--/col-md-2-->
@@ -331,7 +348,11 @@
                       style="display:none;background:#006c83"
                       {% endif %}
                       style=""
-                      >I studied under this teacher</button>
+                      >{% if item['area']=='online' %}
+                          I know of this
+                          {% else %}
+                          I studied under this teacher
+                          {% endif %}</button>
                       
                       <span id="disassociate_{{item['_id']}}"
                        {% if item['_id'] in student_tutor_assoc %}
@@ -341,10 +362,14 @@
                       {% endif %}
                       style="background:#006c83"
                      >
-                      
+                      {% if item['area']=='online' %}
+                          You know of this
+                          {% else %}
+                         You studied under this tutor
+                          {% endif %}
 
                       
-                      You studied under this tutor 
+                       
 
                       <button type="button" class="btn-u btn-u-dark btn-u-sm" onclick="disassociate_tutor('{{item['_id']}}','{{current_user.fb_id}}')">No</button>
 
@@ -396,9 +421,9 @@
                       {% else %}
                          <ul class="list-inline down-ul">
                         <li>
-                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#fb-modal-login" style="background:#006c83" onclick="track_fb()">
+                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#fb-modal-login" style="background:#006c83" onclick="track_fb()" title="Marking this as known to you helps your friends ask you for feedback">
                           {% if item['area']=='online' %}
-                          I took this course
+                          I know of this
                           {% else %}
                           I studied under this teacher
                           {% endif %}
