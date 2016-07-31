@@ -144,7 +144,7 @@
 
              {% if subjects|length > 0 %}
             
-            <div id="subject_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:200px;overflow-y:scroll;margin-bottom:30px;">
+            <div id="subject_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
               <h3>Filter by Subject</h3>
               <ul class="list-unstyled">
               {% for subject in subjects %}
@@ -176,10 +176,28 @@
            
             </ul>
 
+
             </div>
             
             {% endif %}
-            
+            <h3>POPULAR SEARCHES</h3>
+              <ul class="list-unstyled">
+                <li>
+                  <a class="popular_searches" href="/search?subject=application security" style="color:#006c83">Application Security</a>
+                </li>
+                <li>
+                  <a class="popular_searches" href="/search?subject=lisp" style="color:#006c83">Lisp</a>
+                </li>
+                <li>
+                  <a class="popular_searches" href="/search?subject=python" style="color:#006c83">Python</a>
+                </li>
+                <li>
+                  <a class="popular_searches" href="/search?subject=c%2B%2B" style="color:#006c83">C++</a>
+                </li>
+                <li>
+                  <a class="popular_searches" href="/search?subject=linear algebra" style="color:#006c83">Linear Algebra</a>
+                </li>
+              </ul>
            
 
            
@@ -400,7 +418,7 @@
                     ><i class="fa fa-thumbs-down"></i> Un-like</button>
             <!--      </li>
                 </ul> -->
-                  <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">More</button>
+                  <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">More Details</button>
 
                     {% endif %}
                      
@@ -517,7 +535,7 @@
                                 </div>
                             </div>
                         </div>
-                            <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">More</button>
+                            <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">More Details</button>
                           </li>
 
                         <li>

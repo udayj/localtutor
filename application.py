@@ -2348,6 +2348,24 @@ def search():
 					student_tutor_like[teacher['_id']]=True
 		title='- Search results for '+query
 
+		if actual_tagged_subjects>0:
+			print '---------CHECKING----------'
+			related_subjects=get_related_subjects(actual_tagged_subjects,2)
+			subject_r=db.subjects.find({'name':query})
+			try:
+				subject_r=subject_r.next()
+				
+				more_related_subjects=get_related_subjects([query],1)
+				for r in more_related_subjects:
+					if r not in related_subjects:
+						related_subjects.append(r)
+			except:
+				pass
+			try:
+				related_subjects=random.sample(related_subjects,5)
+			except:
+				related_subjects=related_subjects[:5]
+
 		ist=timezone('Asia/Kolkata')
 		ist_now=datetime.now(ist)
 		date=ist_now.strftime('%d/%m/%Y')
@@ -2387,7 +2405,7 @@ def search():
 								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),fb_title=fb_title,fb_app_id=fb_app_id,
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,
-								title=title,cities=cities,actual_location=actual_location)
+								title=title,cities=cities,actual_location=actual_location,related_searches=related_subjects)
 
 	try:
 		query=request.args.get('subject')
