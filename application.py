@@ -45,7 +45,7 @@ login_manager.login_message = u"Please log in to access this page."
 
 login_serializer = URLSafeTimedSerializer(SECRET_KEY)
 
-available_cities=['online','ahmedabad','bangalore','hyderabad','kolkata','mumbai','pune','raipur']
+available_cities=['online']
 
 @app.route('/get_duplicates')
 def get_duplicates():
