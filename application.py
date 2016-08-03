@@ -623,6 +623,7 @@ def signup():
 			db.users.remove({'_id':_id})
 			return render_template('signup.html',signup_error='Problem sending email. Account not created. Try again later.',
 									username=username,email=data['email'],app_id=app_id)
+		
 		return render_template('checkmail.html',app_id=app_id)
 
 @app.route('/signup_tutor',methods=['GET','POST'])
@@ -888,10 +889,11 @@ def count_clicks():
 	db=client.local_tutor
 	teacher=db.teachers.find({'_id':ObjectId(data['id'])})
 	teacher=teacher.next()
+	print data['val']
 	if 'click_metric' not in teacher:
-		teacher['click_metric']=1.0
+		teacher['click_metric']=float(data['val'])
 	else:
-		teacher['click_metric']=teacher['click_metric']+1.0
+		teacher['click_metric']=teacher['click_metric']+float(data['val'])
 	db.teachers.save(teacher)
 	js=json.dumps({'result':'success','message':'updated data'})
 	resp=Response(js,status=200,mimetype='application/json')
@@ -906,6 +908,27 @@ def generate_fake_likes():
 		teacher['likes_fake']=random.randrange(0,70)
 		db.teachers.save(teacher)
 	js=json.dumps({'result':'success','message':'generated likes'})
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp	
+
+@app.route('/decay_click_metrics')
+def decay_click_metrics():
+	client=MongoClient()
+	db=client.local_tutor
+	teachers=db.teachers.find()
+	scaling_factor=request.args.get('scaling_factor')
+	if not scaling_factor:
+		scaling_factor=1.0
+	else:
+		try:
+			scaling_factor=float(scaling_factor)
+		except:
+			scaling_factor=1.0
+	for teacher in teachers:
+		if 'click_metric' in teacher:
+			teacher['click_metric']=teacher['click_metric']*scaling_factor
+			db.teachers.save(teacher)
+	js=json.dumps({'result':'success','message':'decayed click metric by '+str(scaling_factor)})
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp	
 
@@ -2277,6 +2300,19 @@ def search():
 			actual_data=teacher['_source']
 			actual_data['_id']=teacher['_id']
 			paginated_results.append(actual_data)
+
+		if page==1:
+			scaling_counter=1
+			for actual_data in paginated_results:
+				if scaling_counter<4:
+					actual_data['increment']=0.005
+				else:
+					actual_data['increment']=0.005+(scaling_counter-3)*0.001
+				scaling_counter=scaling_counter+1
+		else:
+			for actual_data in paginated_results:
+				actual_data['increment']=0.015
+
 			
 
 		areas=[]
@@ -2640,10 +2676,18 @@ def search():
 		results=response['hits']['hits']
 		
 		paginated_results=[]
+		scaling_counter=1
 		for teacher in results:
 			actual_data=teacher['_source']
 			actual_data['_id']=teacher['_id']
+			if scaling_counter<4:
+				actual_data['increment']=0.005
+			else:
+				actual_data['increment']=0.005+(scaling_counter-3)*0.001
+			scaling_counter=scaling_counter+1
+
 			paginated_results.append(actual_data)
+
 			
 
 			

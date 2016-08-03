@@ -106,14 +106,7 @@
                 </td>
               </tr>
               
-              <tr>
-                <td>
-                  Age Group
-                </td>
-                <td>
-                  {{tutor['age_group'].title()}}
-                </td>
-              </tr>
+             
               
               <tr>
                 <td>
@@ -125,10 +118,10 @@
               </tr>
               <tr>
                 <td>
-                  Studied in Group/individually
+                 Suitable for 
                 </td>
                 <td>
-                  {{tutor['classroom_type'].title()}}
+                  {{tutor['classroom_type'].title()}} Study
                 </td>
               </tr>
               <tr>
@@ -293,18 +286,7 @@ function friend_tutor(){
 
 fbq('track', "ViewContent");
 
-click_data={}
-click_data['id']="{{tutor['_id']}}";
-jQuery.ajax({
-    url: '/count_clicks',
-    data: click_data,
-    type: 'POST',
-    success: function(data)
-    {
-      
-    }
 
-});
 
 </script>  
 {% endblock %}
