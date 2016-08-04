@@ -53,7 +53,7 @@
       <div class="col-lg-8 col-md-8">
         <div class="panel panel-u margin-bottom-40">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-user"></i> Tutor Information</h3>
+                        <h3 class="panel-title"><i class="fa fa-user"></i> Detailed Information</h3>
                     </div>
                     <div class="panel-body">
      
@@ -61,7 +61,7 @@
             <thead>
               <tr>
                 <td>
-                  <h3>Course Information</h3>
+                  <h3>Resource Information</h3>
                 </td>
               </tr>
             </thead>
@@ -76,7 +76,7 @@
               </tr>
               <tr>
                 <td>
-                  Subjects Touched
+                  Relevant to
                 </td>
               <td>
                    {% for subjects_outer in display_subjects|batch(3) %}
@@ -110,7 +110,7 @@
               
               <tr>
                 <td>
-                  Venue
+                  Available at
                 </td>
                 <td>
                   {{tutor['venue']}}
@@ -124,20 +124,189 @@
                   {{tutor['classroom_type'].title()}} Study
                 </td>
               </tr>
+             
               <tr>
                 <td>
-                  Institution/Individual Teacher
+                  Social Recommendation
                 </td>
                 <td>
-                  {{tutor['teacher_type'].title()}}
-                </td>
-              </tr>
-              <tr style="display:none;" id="friends">
+                   <ul id="like_section_{{tutor['_id']}}" class="list-inline down-ul"
+                     {% if tutor['likes']+tutor['likes_fake'] > 0 %}
+                    style="display:;"
+                    {% else %}
+                    style="display:none;"
+                    {% endif %}
+                    >
+                      <li>
+                         {% if tutor['likes']+tutor['likes_fake'] == 0 %}
+                    <span id="likes_{{tutor['_id']}}">
+                     
+                      </span>
+                    {% endif %}
+
+                    {% if tutor['likes']+tutor['likes_fake'] > 2 %}
+                    <span id="likes_{{tutor['_id']}}">
+                      {% if tutor['_id'] in student_tutor_like %}
+                      You and {{tutor['likes']+tutor['likes_fake'] - 1}} people like this 
+                      {% else %}
+                      {{tutor['likes']+tutor['likes_fake']}} people like this 
+                      {% endif %}
+                      </span>
+                    {% endif %}
+                    {% if tutor['likes']+tutor['likes_fake'] == 2 %}
+                    <span id="likes_{{tutor['_id']}}">
+                      {% if tutor['_id'] in student_tutor_like %}
+                      You and {{tutor['likes']+tutor['likes_fake'] -1}} person like this 
+                      {% else %}
+                      {{tutor['likes']+tutor['likes_fake']}} people like this 
+                      {% endif %}
+                      </span>
+                    {% endif %}
+                    {% if tutor['likes']+tutor['likes_fake'] == 1 %}
+                    <span id="likes_{{tutor['_id']}}">
+                      {% if tutor['_id'] in student_tutor_like %}
+                      You like this
+                      {% else %}
+                      {{tutor['likes']+tutor['likes_fake']}} person likes this
+                      {% endif %}
+                      </span>
+                    {% endif %}
+
+                     {% if current_user.id %}
+                  <!-- <ul class="list-inline down-ul">
+                    <li> -->
+                      <br>
+                    <button id="like_{{tutor['_id']}}" type="button" class="btn-u btn-u-sm" onclick="like_tutor('{{tutor['_id']}}', '{{current_user.id}}',{{[tutor['likes'],tutor['likes_fake']]|sum}})"
+                    {% if tutor['_id'] not in student_tutor_like %}
+                    style="display:;background:#006c83"
+                    {% else %}
+                    style="display:none;background:#006c83"
+                    {% endif %}
+                    ><i class="fa fa-thumbs-up"></i> Like</button>
+
+                    <button id="dislike_{{tutor['_id']}}" type="button" class="btn-u btn-u-sm btn-u-light-green" onclick="dislike_tutor('{{tutor['_id']}}', '{{current_user.id}}',{{[tutor['likes'],tutor['likes_fake']]|sum}})"
+                    {% if tutor['_id'] in student_tutor_like %}
+                    style="display:;"
+                    {% else %}
+                    style="display:none;"
+                    {% endif %}
+                    ><i class="fa fa-thumbs-down"></i> Un-like</button>
+            <!--      </li>
+                </ul> -->
+                 
+
+                    {% endif %}
+
+                  </li>
+                </ul>
+              </td>
+                {% if current_user.id and current_user.fb_id %}
+                   
+                   <tr>
+                    <td>
+                      Known Resource ?
+                    </td>
+                    <td>
+                    <ul class="list-inline down-ul">
+                        <li>
+                         
+                   <button id="associate_{{tutor['_id']}}" type="button" class="btn-u btn-u-sm" onclick="associate_tutor('{{tutor['_id']}}','{{current_user.fb_id}}')"  
+                      {% if tutor['_id'] not in student_tutor_assoc %}
+                      style="display:;background:#006c83"
+                      {% else %}
+                      style="display:none;background:#006c83"
+                      {% endif %}
+                      style=""
+                      >{% if tutor['area']=='online' %}
+                          Yes, I know of this
+                          {% else %}
+                          I studied under this teacher
+                          {% endif %}</button>
+                      
+                      <span id="disassociate_{{tutor['_id']}}"
+                       {% if tutor['_id'] in student_tutor_assoc %}
+                      style="display:;"
+                      {% else %}
+                      style="display:none;"
+                      {% endif %}
+                      style="background:#006c83"
+                     >
+                      {% if tutor['area']=='online' %}
+                          You know of this
+                          {% else %}
+                         You studied under this tutor
+                          {% endif %}
+
+                      
+                       
+
+                      <button type="button" class="btn-u btn-u-dark btn-u-sm" onclick="disassociate_tutor('{{tutor['_id']}}','{{current_user.fb_id}}')">No I don't</button>
+
+
+
+                   
+                    </span>
+                    </li>
+                 </ul>
+               </td>
+             </tr>
+             
+                   
+                     {% else %}
+                      <tr>
+                    <td>
+                      Known Resource ?
+                    </td>
+                    <td>
+                         <ul class="list-inline down-ul">
+                        <li>
+                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#fb-modal-login" style="background:#006c83" onclick="track_fb()" title="Marking this as known to you helps your friends ask you for feedback">
+                          {% if tutor['area']=='online' %}
+                          Yes, I know of this
+                          {% else %}
+                          I studied under this teacher
+                          {% endif %}
+                        </button>
+                        
+                        
+                        <div class="modal fade" id="fb-modal-login" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                        <h4 class="modal-title" id="myModalLabel4">You need to login through Facebook for this</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                            
+                    <h4> Login through your existing Facebook account</h4>
+                    <p> Logging in through Facebook enables you to see what courses your friends are taking.</p>
+                    <button class="btn-u pull-left" onclick="fblogin()" data-dismiss="modal" aria-hidden="true" style="background:#3b5998;color:white;">Facebook Login</button><br>
+                    <hr>
+                    <h4>Want an account here? Its free</h4>
+                    <p> <a class="color-green" href="/signup">Click here</a> to create a new account here.</p>
+               
+                                            </div>
+                                          
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                      </td>
+                    </tr>
+                        {% endif %}
+              <tr style="" id="friends">
                 <td>
-                  Friends who have taken this course
+                  Friends who know of this resource
                 </td>
                 <td id="friend_names">
-                  
+                  {% if current_user.id and current_user.fb_id %}
+                  {% else %}
+                  Login through Facebook and invite friends to find out who knows of this resource
+                  {% endif %}
                 </td>
               </tr>
             </tbody>
@@ -201,7 +370,7 @@ var subjects = new Bloodhound({
    
   }
 });
-
+buffer["{{tutor['_id']}}"]=0;
 var suggestion="";
 var classify="y";
 
@@ -250,8 +419,10 @@ function friend_tutor(){
   var tutor_id=$('#tutor_id').text().trim();
   var friends=[];
   var friend_names={};
+  
    FB.api('/me/friends', function(response) {
     console.log(response);
+    alert(response);
     var ind=0;
     for(ind=0;ind<response['data'].length;ind++)
     {
@@ -277,7 +448,14 @@ function friend_tutor(){
       {
         result=result+friend_names[data['friend_tutor'][ind]]+"<br>"
       }
+      
+      if(typeof data['friend_tutor']=='undefined' || data['friend_tutor'].length<1)
+      {
+        $('#friend_names').html('None of your friends know of this resource yet');  
+      }
+      else{
       $('#friend_names').html(result);
+    }
       $('#friends').css('display','');
     }
   });
@@ -286,7 +464,141 @@ function friend_tutor(){
 
 fbq('track', "ViewContent");
 
+function associate_tutor(tutor_id,student_id){
 
+  mixpanel.track('I Studied Under');
+  data={};
+  data['tutor_id']=tutor_id;
+  data['student_id']=student_id;
+  jQuery.ajax({
+    url: '/associate_student_tutor',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      if(data['result']=='success')
+      {
+        $('#associate_'+tutor_id).css('display','none');
+        $('#disassociate_'+tutor_id).css('display','');
+      }
+    }
+
+});
+}
+
+function disassociate_tutor(tutor_id,student_id){
+
+  mixpanel.track('I did not Study Under');
+  data={};
+  data['tutor_id']=tutor_id;
+  data['student_id']=student_id;
+  jQuery.ajax({
+    url: '/disassociate_student_tutor',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      if(data['result']=='success')
+      {
+        $('#disassociate_'+tutor_id).css('display','none');
+        $('#associate_'+tutor_id).css('display','');
+      }
+    }
+
+});
+}
+
+
+function like_tutor(tutor_id,student_id,likes){
+
+  data={};
+  data['tutor_id']=tutor_id;
+  data['student_id']=student_id;
+
+  mixpanel.track('Tutor Page: Logged-in Like');
+
+  likes=parseInt(likes);
+  jQuery.ajax({
+    url: '/like_student_tutor',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      if(data['result']=='success')
+      {
+        $('#like_'+tutor_id).css('display','none');
+        $('#dislike_'+tutor_id).css('display','');
+        if(likes+buffer[""+tutor_id]==0)
+        {
+          $('#like_section_'+tutor_id).css('display','');
+          $('#likes_'+tutor_id).html('You like this teacher');
+        }
+        if(likes+buffer[""+tutor_id]==1)
+        {
+          $('#like_section_'+tutor_id).css('display','');
+          $('#likes_'+tutor_id).html('You and '+'1 person like this teacher');
+        }
+        if(likes+buffer[""+tutor_id]>1)
+        {
+          $('#like_section_'+tutor_id).css('display','');
+          $('#likes_'+tutor_id).html('You and '+(likes+buffer[""+tutor_id])+' people like this teacher');
+        }
+        buffer[""+tutor_id]=buffer[""+tutor_id]+1;
+
+      }
+    }
+
+});
+}
+
+function dislike_tutor(tutor_id,student_id,likes){
+
+  data={};
+  data['tutor_id']=tutor_id;
+  data['student_id']=student_id;
+  likes=parseInt(likes);
+
+  mixpanel.track('Tutor Page: Logged-in Dislike');
+
+  jQuery.ajax({
+    url: '/dislike_student_tutor',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      if(data['result']=='success')
+      {
+        $('#dislike_'+tutor_id).css('display','none');
+        $('#like_'+tutor_id).css('display','');
+      }
+      if(likes+buffer[""+tutor_id]<=1)
+        {
+          $('#like_section_'+tutor_id).css('display','none');
+          
+        }
+      if(likes+buffer[""+tutor_id]==2)
+        {
+          $('#like_section_'+tutor_id).css('display','');
+          $('#likes_'+tutor_id).html('1 person likes this teacher');
+        }
+      if(likes+buffer[""+tutor_id]>2)
+        {
+          $('#like_section_'+tutor_id).css('display','');
+          if(buffer[""+tutor_id]>0)
+          {
+          
+          $('#likes_'+tutor_id).html(likes+' people like this teacher');
+        }
+        else {
+         $('#likes_'+tutor_id).html((likes-1)+' people like this teacher'); 
+        }
+
+        }
+        buffer[""+tutor_id]=buffer[""+tutor_id]-1;
+    }
+
+});
+}
 
 </script>  
 {% endblock %}

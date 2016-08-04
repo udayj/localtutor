@@ -623,7 +623,7 @@ def signup():
 			db.users.remove({'_id':_id})
 			return render_template('signup.html',signup_error='Problem sending email. Account not created. Try again later.',
 									username=username,email=data['email'],app_id=app_id)
-		
+
 		return render_template('checkmail.html',app_id=app_id)
 
 @app.route('/signup_tutor',methods=['GET','POST'])
@@ -1532,15 +1532,35 @@ def tutor():
 					display_subjects.append(actual_subject['display_name'])
 			except StopIteration:
 				pass
+		if 'likes_fake' not in tutor:
+			tutor['likes_fake']=random.randrange(0,70)
+			db.teachers.save(tutor)
+
 		cities=available_cities
 		actual_location=request.cookies.get('location')
+
+		student_tutor_like={}
+		if hasattr(current_user,'id'):
+			student_teacher=db.student_tutor_like.find({'tutor_id':str(tutor['_id']),'student_id':current_user.id}).count()
+			if student_teacher>0:
+				student_tutor_like[tutor['_id']]=True
+
+		student_tutor_assoc={}
+		if hasattr(current_user,'id'):
+			student_teacher=db.student_tutor.find({'tutor_id':str(tutor['_id']),'student_id':current_user.fb_id}).count()
+			if student_teacher>0:
+				student_tutor_assoc[tutor['_id']]=True
+
+		tutor['likes']=db.student_tutor_like.find({'tutor_id':str(tutor['_id'])}).count()
+		
 
 		if tutor['area'] != 'online':
 			return render_template('tutor.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id,cities=cities,
 									actual_location=actual_location)
 		else:
 			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id,cities=cities,
-									actual_location=actual_location)
+									actual_location=actual_location,student_tutor_like=student_tutor_like,
+									student_tutor_assoc=student_tutor_assoc)
 	except StopIteration:
 		return render_template('error.html')
 
