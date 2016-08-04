@@ -422,7 +422,7 @@ function friend_tutor(){
   
    FB.api('/me/friends', function(response) {
     console.log(response);
-    alert(response);
+    
     var ind=0;
     for(ind=0;ind<response['data'].length;ind++)
     {
