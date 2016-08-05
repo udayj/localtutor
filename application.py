@@ -2860,7 +2860,7 @@ def get_related_subjects(base,scenario):
 	db=client.local_tutor
 	length=len(base)
 	if length>1 and length<4:
-		return base
+		return list(base)
 	related_subjects=[]
 	if length==1:
 		subject=db.subjects.find({'name':base[0]})
@@ -2883,7 +2883,7 @@ def get_related_subjects(base,scenario):
 			
 			return []
 	if len(base)==4:
-		return base
+		return list(base)
 	elif len(base)==0:
 		return []
 	else:
