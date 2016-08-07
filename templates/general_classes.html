@@ -61,7 +61,7 @@
 
 .tt-suggestion.tt-cursor {
   color: #fff;
-  background-color: #ff9966;
+  background-color: #2f95d2;
 
 }
 
@@ -106,17 +106,17 @@ select{
 </style>
 
       <!-- Jumbotron -->
-    <div class="search-block" style="background-color:#a9cddd">
+    <div class="search-block" style="background-color:#f7c34f">
         <div class="container" >
             <div class="col-md-6 col-md-offset-3" >
                 <center>
-                <div style="color:white;font-family:american_typewriter;"><b class="main_heading">Learn What You Love</b></div></center>
+                <div style="color:white;font-family:helvetica;"><span class="main_heading">Learn What You Love</span></div></center>
 <div class="form-group">
         <div class="input-group" >
         <div class="input-group-btn select" style="border-right:2px; border-color:#ccc;background:#ccc">
            
                 <select id="location" class="form-control" style="width:auto;" style="float:none;background:#ccc">
-        <option value="" class="options">Location ?</option>
+        
         {% for city in cities %}
         <option value="{{city}}" {% if city == actual_location %} selected {% endif %} class="options"
         >{{ city | capitalize }}</option>
@@ -130,7 +130,7 @@ select{
                   
     
       <span class="input-group-btn" style="float:none;">
-                        <button class="btn-u btn-u-lg" type="button" onclick="search()"></i> Search</button>
+                        <button class="btn-u btn-u-lg" type="button" onclick="search()" style="background-color:#2f95d2"></i> Search</button>
                     </span>
         </div>
      </div>
@@ -144,233 +144,79 @@ select{
     </div>
     <div class="container content-sm" style="padding-top:0px;padding-bottom:30px;">
    
-       <center><div class="headline"><h3>Start Learning</h3></div></center>
-        <div class="row category margin-bottom-40" style="align-content:center;">
-            <!-- Info Blocks -->
-            <div class="col-md-3 col-sm-3 col-xs-6" style="align-content:center;">
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40" style="align-content:center;">
-                  <div class="content-boxes-in-v3" style="align-content:center;">
-                        <center><div class="heading" ><a href="/search?subject=art" class="subject-link truncated" >Art</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=art" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/artcraft1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=programming" class="subject-link truncated" >Programming</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=programming" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/program.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-                 <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=cooking classes" class="subject-link truncated" >Cooking</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=cooking classes" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/cooking1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
+       <center><div class="headline"><h3>Popular Topics</h3></div></center>
+       
+       <center>
+          <div class="row">
+      <div class="col-lg-12 col-md-12">
+     
+      
+      
+     
+      
+      
+      
+       <div class="row clearfix">
+       
+             
+        <div class="col-lg-4 col-md-4 col-sm-12 col-offset-lg-1 col-offset-md-1">
+         
+      <h3><a class="categories" href="/search?subject=programming">Programming</a></h3>
+        
+        
+        
+          <a class="subjects" href="/search?subject=Python&is_pre_filter=y" style="color:#555;">Python</a> <br>
+        
 
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=dance" class="subject-link truncated" >Dance</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=dance" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/dance.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-               
-               
-                
-               
+           
+          <a class="subjects" href="/search?subject=C%2B%2B&is_pre_filter=y" style="color:#555;">C++</a>
+     
+        
+      
+    </div>
+
+     <div class="col-lg-4 col-md-4 col-sm-12">
+         
+      <h3><a class="categories" href="/search?subject=machine learning">Machine Learning</a></h3>
+        
+          <a class="subjects" href="/search?subject=classification&is_pre_filter=y" style="color:#555;">Classification</a>
+          <br>
+        
+          <a class="subjects" href="/search?subject=natural language processing&is_pre_filter=y" style="color:#555;">NLP</a>
+        
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-sm-12">
+         
+      <h3><a class="categories" href="/search?subject=linear algebra">Linear Algebra</a></h3>
+       
+          <a class="subjects" href="/search?subject=eigen values&is_pre_filter=y" style="color:#555;">Eigen Values</a>
+       <br>
+          <a class="subjects" href="/search?subject=eigen vectors&is_pre_filter=y" style="color:#555;">Eigen Vectors</a>
+      
+    </div>
+  
+      
+  </div>      
+
+<br>
+<br>
+   
+     
+
+
+
+       
+      
+          
             </div>
-            <!-- End Info Blocks -->
+          </div>
+        </center>
+       
 
-            <!-- Info Blocks -->
-            <div class="col-md-3 col-sm-3 col-xs-6 md-margin-bottom-40">
-               <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=theatre" class="subject-link truncated" >Theatre</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=theatre" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/theatreclap.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=design and photography" class="subject-link truncated" >Design and Photography</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=design and photography" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/designphotography.op2.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=fitness and yoga" class="subject-link truncated" >Fitness & Yoga</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=fitness and yoga" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/fitnessyoga1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=hair and makeup" class="subject-link truncated" >Hair & Makeup</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=hair and makeup" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/hairmakeup1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-                
-                
-                
-            </div>
+           
 
-             <div class="col-md-3 col-sm-3 col-xs-6 md-margin-bottom-40">
 
-              <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=handwriting and calligraphy" class="subject-link truncated" >Handwriting</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=handwriting and calligraphy" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/handwriting1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=languages" class="subject-link truncated" >Languages</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=languages" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/languages1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=music" class="subject-link truncated" >Music</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=music" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/musicinstruments1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=personal development" class="subject-link truncated" >Personal Development</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=personal development" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/personaldevspirituality1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-
-                
-               
-                
-            </div>
-
-            <div class="col-md-3 col-sm-3 col-xs-6 md-margin-bottom-40">
-
-              <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=toddlers" class="subject-link truncated" >Toddler Education</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=toddlers" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/toddlers1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=sports" class="subject-link truncated" >Sports</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=sports" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/sports1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/search?subject=consultants" class="subject-link truncated" >Career Counselling</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/search?subject=consultants" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/careercounselling1.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
-                  <div class="content-boxes-in-v3">
-                    <center>
-                        <div class="heading" ><a href="/subjects" class="subject-link truncated" >All Subjects</a></div>
-                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
-                        <a href="/subjects" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/icons/allsubjects.png" style="background-color:white;;"></img></a>
-                      </center>
-                    </div>
-                      
-                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
-                    
-                </div>
-
-                
-               
-                
-            </div>
           </div>
 
 

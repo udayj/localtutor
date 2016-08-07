@@ -8,7 +8,7 @@
 	text-align: left;
 	position: relative;
 	margin-bottom: 20px;
-	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/croppedsearchbanner.jpg)  0 repeat;		
+	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/search_banner.jpg)  0 repeat;		
 	background-size:70%;
 	background-position:top left;
 
@@ -63,7 +63,7 @@
 }
 
 .s-results .related-search a:hover {
-	color: #ff9966;
+	color: #2f95d2;
 }
 
 .s-results .related-search hr {
@@ -103,7 +103,7 @@
 }
 
 .s-results .inner-results h3 a:hover {
-	color: #ff9966;
+	color: #2f95d2;
 }
 
 .s-results .inner-results img {
@@ -123,7 +123,7 @@
 }
 
 .s-results .up-ul li a:hover {
-	color: #ff9966;
+	color: #2f95d2;
 }
 
 /*btn-group 'dropdown'*/
@@ -172,7 +172,7 @@
 }
 
 .s-results .down-ul li a {
-	color: #ff9966;
+	color: #2f95d2;
 }
 
 .s-results .star-vote {
@@ -232,7 +232,7 @@
 	text-align: left;
 	position: relative;
 	margin-bottom: 20px;
-	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/croppedsearchbanner.jpg)  0 repeat;		
+	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/banner_mobile.jpg)  0 repeat;		
 	background-size:80%;
 	background-position:top left;
 

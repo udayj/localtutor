@@ -28,7 +28,7 @@
   <div class="search-block" style="background-color:#a9cddd;">
         <div class="container" style="padding-top:30px;margin-bottom:20px;padding-bottom:20px;">
             <div class="col-md-6 ">
-               <h3 style="color:white;font-weight:bold;"><span style="background-color:#006c83;padding-left:1em;padding-right:1em;">Search results for {{query}}  </span></h3>
+               <h3 style="color:white;font-weight:bold;"><span style="background-color:#ef4e31;padding-left:1em;padding-right:1em;">Search results for {{query}}  </span></h3>
 
                
 
@@ -39,7 +39,7 @@
                    <div class="input-group-btn select" style="border-right:1px; border-color:#ccc;background:#ccc">
            
                 <select id="location" class="form-control" style="width:auto;" style="float:none;background:#ccc">
-        <option value="" >Location ?</option>
+       
         {% for city in cities %}
         <option value="{{city}}" {% if city == actual_location %} selected {% endif %}
         >{{ city | capitalize }}</option>
@@ -54,10 +54,10 @@
                     </span>
                 </div>
               </div>
-                
-                <h5 id="question_satisfy" class="note" style="display:inline;color:white;background-color:#006c83">Found the search results satisfactory? 
+                <!--
+                <h5 id="question_satisfy" class="note" style="display:inline;color:white;background-color:#2f95d2"><b>Found the search results satisfactory? </b>
                 </h5> <br>
-                <button id="yes_satisfy" class="btn btn-u btn-xs" type="button" onclick="result_satisfaction('yes')">Yes</button>
+                <button id="yes_satisfy" class="btn btn-u btn-xs" type="button" onclick="result_satisfaction('yes')" style="background-color:#ef4e31">Yes</button>
                   <button id="no_satisfy" class="btn btn-u btn-xs" type="button"  onclick="result_satisfaction('no')">No</button>
                   <div id="message_satisfy" style="display:none;color:#white;"><span style="background-color:#006c83;color:white;">Great, thanks for the feedback! </span></div>
                   <div id="message_satisfy_no" style="display:none;color:white;background-color:#006c83">Thanks for the feedback - we'll definitely improve the results and appreciate your help. <br>You can also comment on what exactly went wrong </div>
@@ -68,7 +68,7 @@
                   <input type="text" id="satisfy_id" style="display:none;">
                   <div id="satisfy_comment_status" style="display:none;color:white;background-color:#006c83">Comment submitted successfully, thank you</div>
 
-               
+               -->
                  
             </div>
         </div>
@@ -250,7 +250,7 @@
                         
                         <li>
                       {% if item['area'] is equalto 'online' %}
-                      Available online at <a href="{{item['geographical_location']}}" style="color:#ff9966" class="venue-link" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" target="_blank">{{item['venue']}}</a>
+                      Available online at <a href="{{item['geographical_location']}}" style="color:#ef4e31" class="venue-link" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" target="_blank">{{item['venue']}}</a>
                       {% else %}
 
                       {% if item['venue'] is equalto 'both' %}

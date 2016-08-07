@@ -84,7 +84,7 @@
         {% for subject in subjects_outer %}
      
         <div class="col-lg-4 col-md-4 col-sm-12">
-                    <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y">{{subject}}</a> 
+                    <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y" style="color:#ef4e31">{{subject}}</a> 
                     </div>
   
       {% endfor %}
@@ -102,7 +102,7 @@
                   Online URL
                 </td>
                 <td>
-                  <a href="{{tutor['geographical_location']}}">Link</a>
+                  <a href="{{tutor['geographical_location']}}" style="color:#ef4e31">Link</a>
                 </td>
               </tr>
               
@@ -178,9 +178,9 @@
                       <br>
                     <button id="like_{{tutor['_id']}}" type="button" class="btn-u btn-u-sm" onclick="like_tutor('{{tutor['_id']}}', '{{current_user.id}}',{{[tutor['likes'],tutor['likes_fake']]|sum}})"
                     {% if tutor['_id'] not in student_tutor_like %}
-                    style="display:;background:#006c83"
+                    style="display:;background:#2f95d2"
                     {% else %}
-                    style="display:none;background:#006c83"
+                    style="display:none;background:#2f95d2"
                     {% endif %}
                     ><i class="fa fa-thumbs-up"></i> Like</button>
 
@@ -212,9 +212,9 @@
                          
                    <button id="associate_{{tutor['_id']}}" type="button" class="btn-u btn-u-sm" onclick="associate_tutor('{{tutor['_id']}}','{{current_user.fb_id}}')"  
                       {% if tutor['_id'] not in student_tutor_assoc %}
-                      style="display:;background:#006c83"
+                      style="display:;background:#2f95d2"
                       {% else %}
-                      style="display:none;background:#006c83"
+                      style="display:none;background:#2f95d2"
                       {% endif %}
                       style=""
                       >{% if tutor['area']=='online' %}
@@ -229,7 +229,7 @@
                       {% else %}
                       style="display:none;"
                       {% endif %}
-                      style="background:#006c83"
+                      style="background:#2f95d2"
                      >
                       {% if tutor['area']=='online' %}
                           You know of this
@@ -260,7 +260,7 @@
                     <td>
                          <ul class="list-inline down-ul">
                         <li>
-                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#fb-modal-login" style="background:#006c83" onclick="track_fb()" title="Marking this as known to you helps your friends ask you for feedback">
+                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#fb-modal-login" style="background:#2f95d2" onclick="track_fb()" title="Marking this as known to you helps your friends ask you for feedback">
                           {% if tutor['area']=='online' %}
                           Yes, I know of this
                           {% else %}
