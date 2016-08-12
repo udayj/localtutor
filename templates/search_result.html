@@ -224,6 +224,9 @@
                 <li>
                   <a class="popular_searches" href="/search?subject=linear algebra" style="color:#006c83">Linear Algebra</a>
                 </li>
+                <li>
+                  <a class="popular_searches" href="/subjects" style="color:#ef4e31">EXPLORE SUBJECTS</a>
+                </li>
               </ul>
                 {% endif %}
                 </div>
@@ -856,6 +859,7 @@ function increment_ranking(id,increment)
             }
 
         });
+  fbq('track', "Search");
 }
 
 

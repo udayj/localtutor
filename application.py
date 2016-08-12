@@ -1062,16 +1062,21 @@ def subjects():
 	db=client.local_tutor
 	subjects=db.subjects.find()
 	output=[]
+	promoted_categories=['computer science','mathematics','programming','operating systems','machine learning',
+						'natural language processing','probability','linear algebra']
+
 	for subject in subjects:
-		if 'display_name' not in subject:
+		if 'display_name' not in subject and subject['category'] in promoted_categories:
 			output.append(subject['name'].title())
 		else:
-			output.append(subject['display_name'])
+			if subject['category'] in promoted_categories:
+				output.append(subject['display_name'])
 	output.sort()
 	category_wise={}
+	
 	subjects=db.subjects.find()
 	for subject in subjects:
-		if len(subject['category'])>1:
+		if len(subject['category'])>1 and subject['category'] in promoted_categories:
 			if subject['category'] not in category_wise:
 				category_wise[subject['category']]=[]
 			if 'display_name' not in subject:
@@ -2946,6 +2951,32 @@ def result_feedback():
 	db=client.local_tutor
 	feedback=db.satisfaction.find()
 	return render_template('result_feedback.html',feedback=feedback)
+
+
+@login_required
+@app.route('/users')
+def users():
+	client=MongoClient()
+	db=client.local_tutor
+	users=db.users.find()
+
+	actual_users=[]
+	count=0
+	fb_count=0
+	non_fb_count=0
+	try:
+		for user in users:
+			actual_users.append(user)
+			if 'fb_id' in user:
+				fb_count=fb_count+1
+			else:
+				non_fb_count=non_fb_count+1
+			count=count+1
+	except:
+		pass
+	actual_users.reverse()
+
+	return render_template('users.html',users=actual_users,count=count,fb_count=fb_count,non_fb_count=non_fb_count)
 
 @login_required
 @app.route('/user_queries')
