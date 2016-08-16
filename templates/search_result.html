@@ -301,6 +301,11 @@
                        {{item['geographical_location'].title()}}
                        {% endif %}
                      </li>
+                     {% if 'level' in item %}
+                     <li>
+                      <div id="display_additional_info_{{item['_id']}}" >Level - {{item['level']|join(', ')}}</div>
+                    </li>
+                    {% endif %}
                      <!--li>
                       <a href="/tutor?id={{item['_id']}}">More Details</a>
                      </li-->
@@ -554,7 +559,19 @@
                     </ul>
                     {% endif %}
 
-
+                    {% if current_user.id and current_user.id is equalto "566ee75368b71853f3b08cde" %}
+                    <ul class="list-inline up-ul col-md-8">
+                      <br>
+                      <li>
+                          <input id="additional_info_{{item['_id']}}" type="text" class="form-control col-md-2" placeholder="{{item['additional_info']}}" name="additional_info">
+                          <span class="input-group-btn" >
+                          <button id="additional_info_btn" type="button" class="btn-u btn-u-sm" onclick="save_level('{{item['_id']}}')" style="margin-top:0.5em;">Submit</button>
+                        </span>
+                          
+                          
+                      </li>
+                    </ul>
+                    {% endif %}
                 </div>
                 {% endfor %}
               </div>
@@ -741,6 +758,23 @@ function satisfaction_comment(){
     }
   });
 
+}
+
+function save_level(_id){
+
+  var data={}
+  data['level']=$('#additional_info_'+_id).val();
+  data['_id']=_id;
+  jQuery.ajax({
+    url: '/save_level',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+       $('#display_additional_info_'+_id).html("Level - "+data['response']);
+       
+    }
+  });  
 }
 
 $('#form_login').submit(function(){

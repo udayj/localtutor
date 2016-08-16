@@ -384,8 +384,8 @@ def content_entry(file_name,db_name):
 
 @app.route('/')
 def main_page():
-	title='- Find tutors and courses for everything you want to learn from over 800 subjects and 10000 teachers'
-	meta_description='Find teachers and courses for everything you want to learn from over 800 subjects and 10000 teachers'
+	title='- Find books, online courses, articles, guides and other resources for everything you want to learn'
+	meta_description='Find books, online courses and other resources for everything you want to learn'
 	cities=available_cities
 	actual_location=request.cookies.get('location')
 	return render_template('general_classes.html',app_id=app_id,active='main',title=title,meta_description=meta_description,
@@ -2755,19 +2755,19 @@ def search():
 		if is_pre_filter and is_pre_filter=='y':
 			areas_covered=','.join([x for (x,y) in areas if len(x.strip())>0])
 
-			meta_description='Choose from '+str(total)+' teachers, online courses and centers covering '+query
-			fb_description='Choose from over 10000 teachers, online courses and centers covering '+query
+			meta_description='Choose from '+str(total)+' books, online courses and resources covering '+query
+			fb_description='Choose from over 1000 books, online courses and resources covering '+query
 
 		else:
 			if is_machine_filtered==True:
 				areas_covered=','.join([x for x in actual_tagged_areas if len(x.strip())>0])
 				subjects_covered=', '.join([x for (x,y) in subjects_meta if len(x.strip())>0])
-				meta_description='Choose from '+str(total)+' teachers, online courses and centers for '+subjects_covered
-				fb_description='Choose from over 10000 teachers, online courses and centers for '+subjects_covered
+				meta_description='Choose from '+str(total)+' books, online courses and resources for '+subjects_covered
+				fb_description='Choose from over 1000 books, online courses and resources covering '+subjects_covered
 
 			else:
 				meta_description='Choose from '+str(total)+' teachers, online courses and centers covering '+query
-				fb_description='Choose from 10000 teachers, online courses and centers covering '+query
+				fb_description='Choose from 1000 books, online courses and resources covering '+query
 
 		related_subjects=[]
 		
@@ -2989,6 +2989,33 @@ def user_queries():
 		searches.append(search)
 	searches=reversed(searches)
 	return render_template('user_queries.html',searches=searches)	
+
+@login_required
+@app.route('/save_level',methods=['POST'])
+def save_level():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	tutor=db.teachers.find({'_id':ObjectId(data['_id'])})
+	levels=data['level'].split(',')
+	try:
+		tutor=tutor.next()
+		tutor['level']=levels
+		db.teachers.save(tutor)
+	except:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+			
+	response={}
+	response={'result':'failed','response':', '.join(levels)}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp	
 
 @app.route('/result_satisfaction_comment',methods=['POST'])
 def result_satisfaction_comment():
