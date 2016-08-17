@@ -303,7 +303,7 @@
                      </li>
                      {% if 'level' in item %}
                      <li>
-                      <div id="display_additional_info_{{item['_id']}}" >Level - {{item['level']|join(', ')}}</div>
+                      <div id="display_additional_info_{{item['_id']}}" >Difficulty Level - <span style="color:#2f95d2">{{item['level']|join(', ')}}</span></div>
                     </li>
                     {% endif %}
                      <!--li>
@@ -771,7 +771,7 @@ function save_level(_id){
     type: 'POST',
     success: function(data)
     {
-       $('#display_additional_info_'+_id).html("Level - "+data['response']);
+       $('#display_additional_info_'+_id).html("Difficulty Level - "+data['response']);
        
     }
   });  
