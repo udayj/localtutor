@@ -6,7 +6,7 @@
 <meta property="og:type"  content="article" />
 <meta property="og:title"  content="{{fb_title.upper()}}" />
 <meta property="og:description"  content="{{fb_description}}" />
-<meta property="og:image" content="http://www.tutorack.com/static/images/7.jpg" />
+<meta property="og:image" content="http://www.tutorack.com/static/images/cryptography_image.jpg" />
 <meta property="fb:app_id" content="{{fb_app_id}}" />
 <style>
 .pagination {
@@ -181,6 +181,7 @@
             
             {% endif %}
             <h3>POPULAR SEARCHES</h3>
+              
               <ul class="list-unstyled">
                 <li>
                   <a class="popular_searches" href="/search?subject=application security" style="color:#006c83">Application Security</a>
@@ -189,7 +190,7 @@
                   <a class="popular_searches" href="/search?subject=lisp" style="color:#006c83">Lisp</a>
                 </li>
                 <li>
-                  <a class="popular_searches" href="/search?subject=python" style="color:#006c83">Python</a>
+                  <a class="popular_searches" href="/search?subject=python" style="color:#006c83"><b>Python</b></a>
                 </li>
                 <li>
                   <a class="popular_searches" href="/search?subject=c%2B%2B" style="color:#006c83">C++</a>
@@ -232,8 +233,13 @@
                 </div>
             </div><!--/col-md-2-->
             <div class="col-md-7">
-               
-                <span class="results-number" style="margin-bottom:10px;" >{{total}} results</span>
+               <div>
+                <span class="results-number" style="margin-bottom:10px;display:inline;margin-right:1em;" >{{total}} results   </span> 
+                {% if length > 0 %}
+                <a href="https://www.facebook.com/dialog/share?app_id={{fb_app_id}}&display=page&href={{fb_url|urlencode}}&redirect_uri={{fb_url|urlencode}}" target="_blank" style="color:#ef4e31;text-transform:uppercase;">Share this page on Facebook </a>
+                {% endif %}
+              </div>
+
                 <div class="text-left hidden-xs hidden-sm" id="page_selection_top" style="display:inline;">
                     
                 </div>
@@ -584,6 +590,8 @@
                 <!-- Begin Inner Results -->
                 
                 <!-- Begin Inner Results -->
+
+            
 
                 <div class="margin-bottom-30"></div>
 

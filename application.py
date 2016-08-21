@@ -384,8 +384,8 @@ def content_entry(file_name,db_name):
 
 @app.route('/')
 def main_page():
-	title='- Find books, online courses, articles, guides and other resources for everything you want to learn'
-	meta_description='Find books, online courses and other resources for everything you want to learn'
+	title='- Find books, online courses, guides, tutorials and other resources for everything you want to learn'
+	meta_description='Find books, online courses and tutorials for everything you want to learn'
 	cities=available_cities
 	actual_location=request.cookies.get('location')
 	return render_template('general_classes.html',app_id=app_id,active='main',title=title,meta_description=meta_description,
@@ -2407,7 +2407,7 @@ def search():
 				student_teacher=db.student_tutor_like.find({'tutor_id':str(teacher['_id']),'student_id':current_user.id}).count()
 				if student_teacher>0:
 					student_tutor_like[teacher['_id']]=True
-		title='- Search results for '+query
+		title='- Books, online courses and tutorials for '+query
 
 		if actual_tagged_subjects>0:
 			print '---------CHECKING----------'
@@ -2461,10 +2461,11 @@ def search():
 
 		fb_title=title
 		fb_app_id=app_id
+		fb_url="http://www.tutorack.com/search?subject="+query
 		return render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total,
-								actual_tagged_subjects='|'.join(actual_tagged_subjects),fb_title=fb_title,fb_app_id=fb_app_id,
+								actual_tagged_subjects='|'.join(actual_tagged_subjects),fb_url=fb_url,fb_title=fb_title,fb_app_id=fb_app_id,
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,
 								title=title,cities=cities,actual_location=actual_location,related_searches=related_subjects)
 
@@ -2745,7 +2746,7 @@ def search():
 					student_tutor_like[teacher['_id']]=True
 
 		
-		title='- Search results for '+query
+		title='- Books, online courses, tutorials for '+query
 		fb_title=query
 		fb_url="http://www.tutorack.com/search?subject="+query
 		fb_app_id=app_id
@@ -2755,19 +2756,19 @@ def search():
 		if is_pre_filter and is_pre_filter=='y':
 			areas_covered=','.join([x for (x,y) in areas if len(x.strip())>0])
 
-			meta_description='Choose from '+str(total)+' books, online courses and resources covering '+query
-			fb_description='Choose from over 1000 books, online courses and resources covering '+query
+			meta_description='Choose from '+str(total)+' books, online courses and tutorials covering '+query
+			fb_description='Choose from over 1000 books, online courses and tutorials covering '+query
 
 		else:
 			if is_machine_filtered==True:
 				areas_covered=','.join([x for x in actual_tagged_areas if len(x.strip())>0])
 				subjects_covered=', '.join([x for (x,y) in subjects_meta if len(x.strip())>0])
-				meta_description='Choose from '+str(total)+' books, online courses and resources for '+subjects_covered
-				fb_description='Choose from over 1000 books, online courses and resources covering '+subjects_covered
+				meta_description='Choose from '+str(total)+' books, online courses and tutorials for '+subjects_covered
+				fb_description='Choose from over 1000 books, online courses and tutorials covering '+subjects_covered
 
 			else:
-				meta_description='Choose from '+str(total)+' teachers, online courses and centers covering '+query
-				fb_description='Choose from 1000 books, online courses and resources covering '+query
+				meta_description='Choose from '+str(total)+' books, online courses, tutorials covering '+query
+				fb_description='Choose from 1000 books, online courses and tutorials covering '+query
 
 		related_subjects=[]
 		
