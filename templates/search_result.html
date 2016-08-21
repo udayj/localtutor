@@ -6,7 +6,7 @@
 <meta property="og:type"  content="article" />
 <meta property="og:title"  content="{{fb_title.upper()}}" />
 <meta property="og:description"  content="{{fb_description}}" />
-<meta property="og:image" content="http://www.tutorack.com/static/images/cryptography_image.jpg" />
+<meta property="og:image" content="http://www.tutorack.com/static/images/cryptography_image.png" />
 <meta property="fb:app_id" content="{{fb_app_id}}" />
 <style>
 .pagination {
@@ -236,7 +236,7 @@
                <div>
                 <span class="results-number" style="margin-bottom:10px;display:inline;margin-right:1em;" >{{total}} results   </span> 
                 {% if length > 0 %}
-                <a href="https://www.facebook.com/dialog/share?app_id={{fb_app_id}}&display=page&href={{fb_url|urlencode}}&redirect_uri={{fb_url|urlencode}}" target="_blank" style="color:#ef4e31;text-transform:uppercase;">Share this page on Facebook </a>
+                <a href="https://www.facebook.com/dialog/share?app_id={{fb_app_id}}&display=page&href={{fb_url|urlencode}}&redirect_uri={{fb_url|urlencode}}" target="_blank" style="color:#ef4e31;text-transform:uppercase;" onclick="track_share()">Share this page on Facebook </a>
                 {% endif %}
               </div>
 
@@ -695,6 +695,10 @@ function show_tutor(id)
 }
 function track_activity(){
   mixpanel.track('Logged-out Like');
+}
+
+function track_share(){
+  mixpanel.track('Share Results on FB'); 
 }
 function result_satisfaction(satisfy){
 
