@@ -28,3 +28,14 @@ curl -XGET 'http://localhost:9200/local_tutor/_mapping/teachers'
 
 delete index
 curl -XDELETE 'http://localhost:9200/_all'
+
+mongo backup
+mongodump --out mongo_backup_<date>
+
+copy from remote host to local machine
+scp -r uday@104.131.180.232:/home/uday/mongo_backup_<date> ./
+
+mongo restore - from inside the backup directory
+mongorestore --drop local_tutor/
+
+

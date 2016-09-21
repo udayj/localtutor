@@ -114,6 +114,27 @@
 
           {% if filter_results %}
 
+          {% if levels|length > 0 %}
+           
+              <div id="levels_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
+                 <h3>Filter by Difficulty Level</h3>
+                
+                <ul class="list-unstyled" >
+                  
+              {% for l in levels %}
+
+              <li><label class="checkbox"><input class="levels_checkbox" type="checkbox" onclick="get_filtered_results_pre('levels')" name="{{l[0]}}"
+              {% if l[1] %}
+              checked
+              {% endif %}
+              ><i></i>{{l[0].title()}}</label></li>
+              {% endfor %}
+              
+           
+            </ul>
+
+            </div>
+            {% endif %}
             {% if venue|length > 0 %}
            
               <div id="venue_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
@@ -190,7 +211,7 @@
                   <a class="popular_searches" href="/search?subject=lisp" style="color:#006c83">Lisp</a>
                 </li>
                 <li>
-                  <a class="popular_searches" href="/search?subject=python" style="color:#006c83"><b>Python</b></a>
+                  <a class="popular_searches" href="/search?subject=python" style="color:#006c83">Python</a>
                 </li>
                 <li>
                   <a class="popular_searches" href="/search?subject=c%2B%2B" style="color:#006c83">C++</a>
@@ -640,7 +661,7 @@
                 </li>
               </ul>
             </div>
-            <br>
+            
             {% if not current_user.id %}
             <div class="col-md-2" style="margin-top:15px;">
             <button class="btn-u" onclick="fblogin()" style="background:#3b5998;color:white;margin-top:15px;">Login using Facebook</button><br>
@@ -1242,6 +1263,18 @@ selected_venue="";
   $('.venue_checkbox').each(function() {
     checkboxes_venue=checkboxes_venue+$(this).attr('name')+"|";
 }); 
+
+  selected_levels="";
+  $('#levels_outer input:checked').each(function() {
+    
+    selected_levels=selected_levels+$(this).attr('name')+"|";
+  
+});
+
+  checkboxes_levels="";
+  $('.levels_checkbox').each(function() {
+    checkboxes_levels=checkboxes_levels+$(this).attr('name')+"|";
+}); 
  
   data={}
   data['areas_selected']=selected_area;
@@ -1250,6 +1283,10 @@ selected_venue="";
   data['subject_checkboxes']=checkboxes_subject;
   data['venue_selected']=selected_venue;
   data['venue_checkboxes']=checkboxes_venue;
+  data['levels_selected']=selected_levels;
+  data['levels_checkboxes']=checkboxes_levels;
+
+  
 
 /*jQuery.ajax({
     url: window.location.href,
@@ -1326,6 +1363,14 @@ $('#filter_form').submit(function(){
                .attr("type", "hidden")
                .attr("name", "actual_tagged_areas").val(actual_tagged_areas);
 
+  var input9 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "levels_checkboxes").val(checkboxes_levels);
+
+  var input10 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "levels_selected").val(selected_levels);
+
   
   $('#filter_form').append(input1);
   $('#filter_form').append(input2);
@@ -1335,6 +1380,9 @@ $('#filter_form').submit(function(){
   $('#filter_form').append(input6);
   $('#filter_form').append(input7);
   $('#filter_form').append(input8);
+  $('#filter_form').append(input9);
+  $('#filter_form').append(input10);
+
 
 });
 
