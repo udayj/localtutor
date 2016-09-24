@@ -135,6 +135,27 @@
 
             </div>
             {% endif %}
+             {% if resource_types|length > 0 %}
+           
+              <div id="resource_types_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
+                 <h3>Filter by Type</h3>
+                
+                <ul class="list-unstyled" >
+                  
+              {% for r in resource_types %}
+
+              <li><label class="checkbox"><input class="resource_types_checkbox" type="checkbox" onclick="get_filtered_results_pre('resource_type')" name="{{r[0]}}"
+              {% if r[1] %}
+              checked
+              {% endif %}
+              ><i></i>{{r[0].title()}}</label></li>
+              {% endfor %}
+              
+           
+            </ul>
+
+            </div>
+            {% endif %}
             {% if venue|length > 0 %}
            
               <div id="venue_outer" class="col-md-12 col-sm-4 sky-form" style="border:0px;max-height:300px;overflow-y:scroll;margin-bottom:30px;">
@@ -328,9 +349,14 @@
                        {{item['geographical_location'].title()}}
                        {% endif %}
                      </li>
-                     {% if 'level' in item %}
+                     {% if 'level' in item  and item['level']|length> 0 %}
                      <li>
                       <div id="display_additional_info_{{item['_id']}}" >Difficulty Level - <span style="color:#2f95d2">{{item['level']|join(', ')}}</span></div>
+                    </li>
+                    {% endif %}
+                    {% if 'resource_type' in item and item['resource_type']|length>0 %}
+                     <li>
+                      <div id="display_additional_info1_{{item['_id']}}" >Type - <span style="color:#2f95d2">{{item['resource_type'].title()}}</span></div>
                     </li>
                     {% endif %}
                      <!--li>
@@ -597,6 +623,20 @@
                           
                           
                       </li>
+
+                       <li>
+                          <input id="additional_info_type_{{item['_id']}}" type="text" class="form-control col-md-2" placeholder="{{item['resource_type']}}" name="additional_info_type">
+                          <span class="input-group-btn" >
+                          <button id="additional_info_btn" type="button" class="btn-u btn-u-sm" onclick="save_resource_type('{{item['_id']}}')" style="margin-top:0.5em;">Submit</button>
+                        </span>
+                          
+                          
+                      </li>
+                    </ul>
+
+                     <ul class="list-inline up-ul col-md-8">
+                      <br>
+                     
                     </ul>
                     {% endif %}
                 </div>
@@ -805,6 +845,23 @@ function save_level(_id){
     success: function(data)
     {
        $('#display_additional_info_'+_id).html("Difficulty Level - "+data['response']);
+       
+    }
+  });  
+}
+
+function save_resource_type(_id){
+
+  var data={}
+  data['resource_type']=$('#additional_info_type_'+_id).val();
+  data['_id']=_id;
+  jQuery.ajax({
+    url: '/save_resource_type',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+       $('#display_additional_info1_'+_id).html("Type - "+data['response']);
        
     }
   });  
@@ -1275,6 +1332,18 @@ selected_venue="";
   $('.levels_checkbox').each(function() {
     checkboxes_levels=checkboxes_levels+$(this).attr('name')+"|";
 }); 
+
+  selected_resource_types="";
+  $('#resource_types_outer input:checked').each(function() {
+    
+    selected_resource_types=selected_resource_types+$(this).attr('name')+"|";
+  
+});
+
+  checkboxes_resource_types="";
+  $('.resource_types_checkbox').each(function() {
+    checkboxes_resource_types=checkboxes_resource_types+$(this).attr('name')+"|";
+}); 
  
   data={}
   data['areas_selected']=selected_area;
@@ -1285,6 +1354,8 @@ selected_venue="";
   data['venue_checkboxes']=checkboxes_venue;
   data['levels_selected']=selected_levels;
   data['levels_checkboxes']=checkboxes_levels;
+  data['resource_types_selected']=selected_resource_types;
+  data['resource_types_checkboxes']=checkboxes_resource_types;
 
   
 
@@ -1371,6 +1442,14 @@ $('#filter_form').submit(function(){
                .attr("type", "hidden")
                .attr("name", "levels_selected").val(selected_levels);
 
+  var input11 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "resource_types_checkboxes").val(checkboxes_resource_types);
+
+  var input12 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "resource_types_selected").val(selected_resource_types);
+
   
   $('#filter_form').append(input1);
   $('#filter_form').append(input2);
@@ -1382,6 +1461,8 @@ $('#filter_form').submit(function(){
   $('#filter_form').append(input8);
   $('#filter_form').append(input9);
   $('#filter_form').append(input10);
+  $('#filter_form').append(input11);
+  $('#filter_form').append(input12);
 
 
 });

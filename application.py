@@ -938,12 +938,18 @@ def create_online_resource():
 		data={}
 		
 		for name,value in dict(request.form).iteritems():
-			data[name]=value[0].strip().lower()
+			if name=='link' or name=='level':
+				data[name]=value[0].strip()
+			else:
+				data[name]=value[0].strip().lower()
+		app.logger.debug(data)
 		try:
 			name=data['name']
 			geographical_location=data['link']
 			subjects=data['subjects'].split(',')
 			parsed_url=urlparse(geographical_location)
+			level=data['level'].split(',')
+			resource_type=data['resource_type']
 			venue=parsed_url.netloc
 			if parsed_url.scheme=='':
 				parsed_url=urlparse('http://'+geographical_location)
@@ -961,11 +967,12 @@ def create_online_resource():
 				return render_template('create_online_resource.html',text='Submit New Link',
 									error='Could Not Create Resource. Please try again later')	
 			fields=['subject','name','contact_number','email','age_group','venue',
-			'classroom_type','geographical_location','area','usp','teacher_type','price','city']
-			values=[verified_subjects,name,'','','all',venue,'individual',geographical_location,'online','','institution','free','online']
+			'classroom_type','geographical_location','area','usp','teacher_type','price','city','level','resource_type']
+			values=[verified_subjects,name,'','','all',venue,'individual',geographical_location,'online','',
+				'institution','free','online',level,resource_type]
 			teacher={}
 			counter=0
-			while counter<13:
+			while counter<15:
 				teacher[fields[counter]]=values[counter]
 				counter=counter+1
 			client=MongoClient()
@@ -1802,7 +1809,8 @@ def tagger(text):
 	return(tagged_subjects,tagged_areas)
 
 def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,
-									actual_tagged_subjects,actual_tagged_areas,filter_levels,actual_location='online'):
+									actual_tagged_subjects,actual_tagged_areas,filter_levels,filter_resource_types,
+									actual_location='online'):
 
 	print 'prepare_machine_filtered query function'
 	payload={}
@@ -1965,6 +1973,15 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 
 		bool_query['bool']['must'].append(bool_query4)
 
+		bool_query5={}
+		bool_query5['bool']={}
+		bool_query5['bool']['should']=[]
+
+		for resource_type in filter_resource_types:
+			bool_query5['bool']['should'].append({'term': {'resource_type.not_analyzed':resource_type}})
+
+		bool_query['bool']['must'].append(bool_query5)
+
 		
 
 	if actual_location:
@@ -1991,7 +2008,8 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 	json_response=json.loads(r.text)
 	return json_response
 
-def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,actual_location,filter_levels):
+def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,actual_location,filter_levels,
+							filter_resource_types):
 	
 	print 'prepare_filter query function'
 	payload={}
@@ -2013,6 +2031,10 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 		bool_query3['bool']={}
 		bool_query3['bool']['should']=[]
 
+		bool_query4={}
+		bool_query4['bool']={}
+		bool_query4['bool']['should']=[]
+
 		bool_query={}
 		bool_query['bool']={}
 		bool_query['bool']['must']=[]
@@ -2030,9 +2052,13 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 		for level in filter_levels:
 			bool_query3['bool']['should'].append({'term': {'level':level}})
 
+		for resource_type in filter_resource_types:
+			bool_query4['bool']['should'].append({'term': {'resource_type.not_analyzed':resource_type}})
+
 
 		bool_query['bool']['must'].append(bool_query2)
 		bool_query['bool']['must'].append(bool_query3)
+		bool_query['bool']['must'].append(bool_query4)
 		bool_query_inner={}
 		bool_query_inner['bool']={}
 		bool_query_inner['bool']['must']=[]
@@ -2081,7 +2107,8 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 	return json_response
 
 
-def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,actual_location,filter_levels):
+def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,actual_location,filter_levels,
+					filter_resource_types):
 
 	print 'prepare query function'
 	payload={}
@@ -2214,6 +2241,15 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 			bool_query4['bool']['should'].append({'term': {'level':level}})
 
 		bool_query['bool']['must'].append(bool_query4)
+
+		bool_query5={}
+		bool_query5['bool']={}
+		bool_query5['bool']['should']=[]
+
+		for resource_type in filter_resource_types:
+			bool_query5['bool']['should'].append({'term': {'resource_type.not_analyzed':resource_type}})
+
+		bool_query['bool']['must'].append(bool_query5)
 		
 
 	if actual_location:
@@ -2277,6 +2313,8 @@ def search():
 
 		filter_levels_string=data['levels_selected'][0].split('|')
 
+		filter_resource_types_string=data['resource_types_selected'][0].split('|')
+
 		cities=available_cities
 		actual_location=request.cookies.get('location')
 		
@@ -2284,6 +2322,7 @@ def search():
 		subject_checkboxes=data['subject_checkboxes'][0].split('|')
 		venue_checkboxes=data['venue_checkboxes'][0].split('|')
 		levels_checkboxes=data['levels_checkboxes'][0].split('|')
+		resource_types_checkboxes=data['resource_types_checkboxes'][0].split('|')
 
 		actual_tagged_subjects=[s for s in data['actual_tagged_subjects'][0].split('|') if len(s)>0]
 		actual_tagged_areas=[s for s in data['actual_tagged_areas'][0].split('|') if len(s)>0]
@@ -2296,6 +2335,7 @@ def search():
 		filter_areas=[]
 		filter_venues=[]
 		filter_levels=[]
+		filter_resource_types=[]
 		is_filter=True
 		is_machine_filtered=False
 		
@@ -2323,10 +2363,15 @@ def search():
 			if len(level)>0:
 				filter_levels.append(level)
 
+		for resource_type in filter_resource_types_string:
+			if len(resource_type)>0:
+				filter_resource_types.append(resource_type)
+
 		print filter_areas
 		print filter_subjects
 		print filter_venues
 		print filter_levels
+		print filter_resource_types
 
 		is_pre_filter=request.args.get('is_pre_filter')
 
@@ -2334,20 +2379,20 @@ def search():
 			categories=get_category([query])
 			if len(categories)<1:
 				response=prepare_query_filtered(query,10,(page-1)*10,filter_areas,[query],filter_venues,is_filter,actual_location,
-												filter_levels)
+												filter_levels,filter_resource_types)
 			else:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,
 													filter_venues,is_filter,actual_tagged_subjects,actual_tagged_areas,
-													filter_levels,actual_location)
+													filter_levels,filter_resource_types,actual_location)
 				
 		else:
 			if is_machine_filtered:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,
 													filter_venues,is_filter,actual_tagged_subjects,actual_tagged_areas,
-													filter_levels,actual_location)
+													filter_levels,filter_resource_types,actual_location)
 			else:
 				response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,filter_venues,is_filter,actual_location,
-										filter_levels)
+										filter_levels,filter_resource_types)
 		
 		
 
@@ -2381,6 +2426,7 @@ def search():
 		subjects=[]
 		venues=[]
 		levels=[]
+		resource_types=[]
 		for area in areas_checkboxes:
 			if len(area)<1:
 				continue
@@ -2419,6 +2465,14 @@ def search():
 				levels.append((level,True))
 			else:
 				levels.append((level,False))
+
+		for resource_type in resource_types_checkboxes:
+			if len(resource_type)<1:
+				continue
+			if resource_type in filter_resource_types:
+				resource_types.append((resource_type,True))
+			else:
+				resource_types.append((resource_type,False))
 
 
 
@@ -2512,7 +2566,8 @@ def search():
 								areas=areas,subjects=subjects,venue=venues,classify='n',app_id=app_id,total=total,levels=levels,
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),fb_url=fb_url,fb_title=fb_title,fb_app_id=fb_app_id,
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,
-								title=title,cities=cities,actual_location=actual_location,related_searches=related_subjects)
+								title=title,cities=cities,actual_location=actual_location,related_searches=related_subjects,
+								resource_types=resource_types)
 
 	try:
 		query=request.args.get('subject')
@@ -2569,10 +2624,10 @@ def search():
 			categories=get_category([query])
 			if len(categories)<1:
 				if online=='online':
-					response=prepare_query_filtered(query,500,0,['online'],[query],[],True,None)
+					response=prepare_query_filtered(query,500,0,['online'],[query],[],True,None,None)
 					print 'working'
 				else:
-					response=prepare_query_filtered(query,500,0,None,None,None,False,actual_location,None)
+					response=prepare_query_filtered(query,500,0,None,None,None,False,actual_location,None,None)
 
 			else:
 				for tagged_category in categories:
@@ -2583,7 +2638,7 @@ def search():
 					filter_subjects.append(tagged_category)
 				related_subject=filter_subjects
 				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,filter_subjects,actual_tagged_areas,
-														None,actual_location)
+														None,None,actual_location)
 				print 'working category'
 				
 			is_pre_filter='y'
@@ -2627,12 +2682,12 @@ def search():
 				print actual_tagged_subjects
 				print actual_tagged_areas
 				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,actual_tagged_subjects,actual_tagged_areas,
-														None,actual_location)
+														None,None,actual_location)
 			else:
 				if online=='online':
-					response=prepare_query(query,500,0,['online'],[],[],True,None)
+					response=prepare_query(query,500,0,['online'],[],[],True,None,None)
 				else:		
-					response=prepare_query(query,500,0,None,None,None,False,actual_location,None)
+					response=prepare_query(query,500,0,None,None,None,False,actual_location,None,None)
 			is_pre_filter='n'
 
 		print 'check 2'
@@ -2646,6 +2701,8 @@ def search():
 		paginated_results=[]
 		levels=[]
 		actual_levels=[]
+		resource_types=[]
+		actual_resource_types=[]
 		sh_present=False
 		center_present=False
 		for teacher in results:
@@ -2667,7 +2724,14 @@ def search():
 				for level in actual_data['level']:
 					if level.strip().lower() not in actual_levels:
 						actual_levels.append(level.strip().lower())	
+
+			if 'resource_type' in actual_data:
+				if actual_data['resource_type'].strip().lower() not in actual_resource_types:
+					actual_resource_types.append(actual_data['resource_type'].strip().lower())	
+
 		print actual_levels							
+		print actual_resource_types
+
 		venue=[]
 		if sh_present==True:
 			venue.append(('Student\'s Home',False))
@@ -2676,6 +2740,9 @@ def search():
 
 		for level in actual_levels:
 			levels.append((level,False))
+
+		for resource_type in actual_resource_types:
+			resource_types.append((resource_type,False))
 
 		areas.sort()
 		if ('online',False) in areas:
@@ -2717,7 +2784,7 @@ def search():
 			areas=[]
 
 		filter_results=False
-		if len(areas)>1 or len(subjects)>1 or len(venue)>1:
+		if len(levels)>1 or len(subjects)>1 or len(resource_types)>1:
 			filter_results=True
 
 
@@ -2728,12 +2795,12 @@ def search():
 
 			if len(categories)<1:
 				if online=='online':
-					response=prepare_query_filtered(query,10,(page-1)*10,['online'],[query],[],True,None)
+					response=prepare_query_filtered(query,10,(page-1)*10,['online'],[query],[],True,None,None)
 				else:
-					response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False,actual_location,None)
+					response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False,actual_location,None,None)
 			else:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,
-														filter_subjects,actual_tagged_areas,None,actual_location)
+														filter_subjects,actual_tagged_areas,None,None,actual_location)
 				
 			is_pre_filter='y'
 			actual_tagged_subjects=filter_subjects
@@ -2742,12 +2809,12 @@ def search():
 
 			if is_machine_filtered==True:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,
-														actual_tagged_subjects,actual_tagged_areas,None,actual_location)
+														actual_tagged_subjects,actual_tagged_areas,None,None,actual_location)
 			else:
 				if online=='online':
-					response=prepare_query(query,10,(page-1)*10,['online'],[],[],True,None)
+					response=prepare_query(query,10,(page-1)*10,['online'],[],[],True,None,None)
 				else:
-					response=prepare_query(query,10,(page-1)*10,None,None,None,False,actual_location,None)
+					response=prepare_query(query,10,(page-1)*10,None,None,None,False,actual_location,None,None)
 			is_pre_filter='n'
 		
 
@@ -2901,7 +2968,7 @@ def search():
 		response=make_response(render_template('search_result.html',results=paginated_results,query=query,length=(len(paginated_results)+1)/2,
 								student_tutor_assoc=student_tutor_assoc,total_pages=total_pages,page=page,filter_results=filter_results,
 								areas=areas,subjects=subjects,classify='n',app_id=app_id,total=total,venue=venue,
-								actual_tagged_subjects='|'.join(actual_tagged_subjects),levels=levels,
+								actual_tagged_subjects='|'.join(actual_tagged_subjects),levels=levels,resource_types=resource_types,
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title,
 								meta_description=meta_description,fb_title=fb_title, fb_url=fb_url, fb_description=fb_description,
 								fb_app_id=fb_app_id,related_searches=related_subjects,actual_location=actual_location,cities=cities))
@@ -2912,6 +2979,22 @@ def search():
 
 	except Exception as e:
 		app.logger.error(str(e))
+
+@app.route('/set_resource_type',methods=['GET'])
+def set_resource_type():
+	client=MongoClient()
+	db=client.local_tutor
+	teachers=db.teachers.find()
+	for teacher in teachers:
+		if 'resource_type' in teacher:
+			teacher['resource_type']=random.choice(['book','video','online course','tutorial'])
+			db.teachers.save(teacher)
+	
+	response={}
+	response={'result':'success'}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
 
 
 def get_related_subjects(base,scenario):
@@ -3067,10 +3150,37 @@ def save_level():
 		resp=Response(js,status=200,mimetype='application/json')
 			
 	response={}
-	response={'result':'failed','response':', '.join(levels)}
+	response={'result':'success','response':', '.join(levels)}
 	js=json.dumps(response)
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp	
+
+@login_required
+@app.route('/save_resource_type',methods=['POST'])
+def save_resource_type():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip().lower()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	tutor=db.teachers.find({'_id':ObjectId(data['_id'])})
+	resource_type=data['resource_type']
+	try:
+		tutor=tutor.next()
+		tutor['resource_type']=resource_type
+		db.teachers.save(tutor)
+	except:
+		response={}
+		response={'result':'failed'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+			
+	response={}
+	response={'result':'success','response':resource_type}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
 
 @app.route('/result_satisfaction_comment',methods=['POST'])
 def result_satisfaction_comment():

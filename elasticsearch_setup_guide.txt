@@ -38,4 +38,18 @@ scp -r uday@104.131.180.232:/home/uday/mongo_backup_<date> ./
 mongo restore - from inside the backup directory
 mongorestore --drop local_tutor/
 
+create multifield mapping
 
+ {
+    "teachers": {
+      "properties": {
+        
+        "resource_type": {
+          "type": "multi_field",
+          "fields": {
+          "resource_type":{"type":"string"},
+          "not_analyzed": {"type":"string","index":"not_analyzed"}
+        }}
+      }
+    }
+  }
