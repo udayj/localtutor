@@ -975,6 +975,9 @@ def create_online_resource():
 			while counter<15:
 				teacher[fields[counter]]=values[counter]
 				counter=counter+1
+			teacher['likes_fake']=random.randrange(0,70)
+			teacher['likes']=0
+			teacher['composite_likes']=teacher['likes']+teacher['likes_fake']
 			client=MongoClient()
 			db=client.local_tutor
 			db.teachers.save(teacher)
@@ -1340,6 +1343,31 @@ def like_student_tutor():
 		resp=Response(js,status=200,mimetype='application/json')
 		return resp	
 
+	teacher=db.teachers.find({'_id':ObjectId(tutor_id)})
+	try:
+		teacher=teacher.next()
+		if 'likes' in teacher:
+			teacher['likes']=teacher['likes']+1
+			if 'likes_fake' in teacher:
+				teacher['composite_likes']=teacher['likes_fake']+teacher['likes']
+			else:
+				teacher['likes_fake']=random.randrange(0,70)
+				teacher['composite_likes']=teacher['likes_fake']+teacher['likes']
+		else:
+			teacher['likes']=1
+			if 'likes_fake' in teacher:
+				teacher['composite_likes']=teacher['likes_fake']+1
+			else:
+				teacher['likes_fake']=random.randrange(0,70)
+				teacher['composite_likes']=teacher['likes_fake']+1
+		db.teachers.save(teacher)
+	except:
+		app.logger.error('Problem updating no. of likes for tutor_id:'+tutor_id)
+		response={}
+		response={'result':'success'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp		
 	like={}
 	like['tutor_id']=tutor_id
 	like['student_id']=student_id
@@ -1376,6 +1404,33 @@ def dislike_student_tutor():
 		js=json.dumps(response)
 		resp=Response(js,status=200,mimetype='application/json')
 		return resp
+
+	teacher=db.teachers.find({'_id':ObjectId(tutor_id)})
+	try:
+		teacher=teacher.next()
+		if 'likes' in teacher:
+			teacher['likes']=teacher['likes']-1
+			if 'likes_fake' in teacher:
+				teacher['composite_likes']=teacher['likes_fake']+teacher['likes']
+			else:
+				teacher['likes_fake']=random.randrange(0,70)
+				teacher['composite_likes']=teacher['likes_fake']+teacher['likes']
+		else:
+			teacher['likes']=0
+			if 'likes_fake' in teacher:
+				teacher['composite_likes']=teacher['likes_fake']
+			else:
+				teacher['likes_fake']=random.randrange(0,70)
+				teacher['composite_likes']=teacher['likes_fake']
+		db.teachers.save(teacher)
+	except:
+		app.logger.error('Problem updating no. of likes for tutor_id:'+tutor_id)
+		response={}
+		response={'result':'success'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+
 	num=db.student_tutor_like.remove({'tutor_id':tutor_id,'student_id':student_id})
 	app.logger.debug(str(num)+' student teacher associations removed')
 	response={}
@@ -1384,6 +1439,41 @@ def dislike_student_tutor():
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp
 
+@app.route('/calculate_likes')
+def calculate_likes():
+	client=MongoClient()
+	db=client.local_tutor
+	teachers=db.teachers.find()
+	for teacher in teachers:
+		likes=db.student_tutor_like.find({'tutor_id':teacher['_id']}).count()
+		teacher['likes']=likes
+		db.teachers.save(teacher)
+	response={}
+	response={'result':'success'}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp	
+
+@app.route('/calculate_composite_likes')
+def calculate_composite_likes():
+	client=MongoClient()
+	db=client.local_tutor
+	teachers=db.teachers.find()
+	for teacher in teachers:
+		likes=teacher['likes']
+		if 'likes_fake' in teacher:
+			fake_likes=teacher['likes_fake']
+		else:
+			fake_likes=random.randrange(0,70)
+			teacher['likes_fake']=fake_likes
+		composite_likes=likes+fake_likes
+		teacher['composite_likes']=composite_likes
+		db.teachers.save(teacher)
+	response={}
+	response={'result':'success'}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp	
 
 @app.route('/associate_student_tutor',methods=['POST'])
 def associate_student_tutor():
@@ -1635,7 +1725,7 @@ def tutor_delete():
 def tutor_edit_save():
 	data={}
 	for name,value in dict(request.form).iteritems():
-		if name=='usp' or name=='announcement':
+		if name=='usp' or name=='announcement' or name=='geographical_location':
 			data[name]=value[0]
 		else:
 			data[name]=value[0].strip().lower()
@@ -1809,7 +1899,7 @@ def tagger(text):
 	return(tagged_subjects,tagged_areas)
 
 def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,
-									actual_tagged_subjects,actual_tagged_areas,filter_levels,filter_resource_types,
+									actual_tagged_subjects,actual_tagged_areas,filter_levels,filter_resource_types,sort_by_likes,
 									actual_location='online'):
 
 	print 'prepare_machine_filtered query function'
@@ -1999,7 +2089,11 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 	payload['query']['filtered']['filter'].append(bool_query)
 
 	
-	payload['sort']=[{'_score':{'order':'desc'}},{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
+	if sort_by_likes=='y':
+		payload['sort']=[{'composite_likes':{'order':'desc'}},{'_score':{'order':'desc'}},
+						{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
+	else:	
+		payload['sort']=[{'_score':{'order':'desc'}},{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 	print payload
 
 	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
@@ -2009,7 +2103,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 	return json_response
 
 def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,actual_location,filter_levels,
-							filter_resource_types):
+							filter_resource_types,sort_by_likes):
 	
 	print 'prepare_filter query function'
 	payload={}
@@ -2096,8 +2190,11 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 		payload['query']['filtered']['filter'].append(bool_query)
 
 	
-
-	payload['sort']=[{'_score':{'order':'desc'}},{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
+	if sort_by_likes=='y':
+		payload['sort']=[{'composite_likes':{'order':'desc'}},{'_score':{'order':'desc'}},
+					{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
+	else:
+		payload['sort']=[{'_score':{'order':'desc'}},{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 	print payload
 
 	print 'http://localhost:9200/local_tutor/teachers/_search?size='+str(size)+'&from='+str(start_from)
@@ -2108,7 +2205,7 @@ def prepare_query_filtered(query,size,start_from,filter_areas, filter_subjects,f
 
 
 def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_venues,is_filter,actual_location,filter_levels,
-					filter_resource_types):
+					filter_resource_types,sort_by_likes):
 
 	print 'prepare query function'
 	payload={}
@@ -2266,7 +2363,12 @@ def prepare_query(query,size,start_from,filter_areas, filter_subjects,filter_ven
 			
 	payload['query']['filtered']['filter'].append(bool_query)
 	
-	payload['sort']=[{'_score':{'order':'desc'}},{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
+	if sort_by_likes=='y':
+		payload['sort']=[{'composite_likes':{'order':'desc'}},{'_score':{'order':'desc'}},
+						{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
+	else:
+
+		payload['sort']=[{'_score':{'order':'desc'}},{'click_metric':{'order':'desc'}},{'venue_sort':{'order':'asc'}}]
 
 	print payload
 
@@ -2314,6 +2416,9 @@ def search():
 		filter_levels_string=data['levels_selected'][0].split('|')
 
 		filter_resource_types_string=data['resource_types_selected'][0].split('|')
+
+		sort_by_likes=data['sort_by_likes'][0]
+
 
 		cities=available_cities
 		actual_location=request.cookies.get('location')
@@ -2379,20 +2484,20 @@ def search():
 			categories=get_category([query])
 			if len(categories)<1:
 				response=prepare_query_filtered(query,10,(page-1)*10,filter_areas,[query],filter_venues,is_filter,actual_location,
-												filter_levels,filter_resource_types)
+												filter_levels,filter_resource_types,sort_by_likes)
 			else:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,
 													filter_venues,is_filter,actual_tagged_subjects,actual_tagged_areas,
-													filter_levels,filter_resource_types,actual_location)
+													filter_levels,filter_resource_types,sort_by_likes,actual_location)
 				
 		else:
 			if is_machine_filtered:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,filter_areas,filter_subjects,
 													filter_venues,is_filter,actual_tagged_subjects,actual_tagged_areas,
-													filter_levels,filter_resource_types,actual_location)
+													filter_levels,filter_resource_types,sort_by_likes,actual_location)
 			else:
 				response=prepare_query(query,10,(page-1)*10,filter_areas,filter_subjects,filter_venues,is_filter,actual_location,
-										filter_levels,filter_resource_types)
+										filter_levels,filter_resource_types,sort_by_likes)
 		
 		
 
@@ -2567,7 +2672,7 @@ def search():
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),fb_url=fb_url,fb_title=fb_title,fb_app_id=fb_app_id,
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,
 								title=title,cities=cities,actual_location=actual_location,related_searches=related_subjects,
-								resource_types=resource_types)
+								resource_types=resource_types,sort_by_likes=sort_by_likes)
 
 	try:
 		query=request.args.get('subject')
@@ -2575,7 +2680,7 @@ def search():
 		page=request.args.get('page')
 		online=request.args.get('medium')
 		location=request.args.get('location')
-
+		sort_by_likes='n'
 		print 'location='+str(location)
 		set_cookie=False
 		cookie_location=request.cookies.get('location')
@@ -2624,10 +2729,10 @@ def search():
 			categories=get_category([query])
 			if len(categories)<1:
 				if online=='online':
-					response=prepare_query_filtered(query,500,0,['online'],[query],[],True,None,None)
+					response=prepare_query_filtered(query,500,0,['online'],[query],[],True,None,None,sort_by_likes)
 					print 'working'
 				else:
-					response=prepare_query_filtered(query,500,0,None,None,None,False,actual_location,None,None)
+					response=prepare_query_filtered(query,500,0,None,None,None,False,actual_location,None,None,sort_by_likes)
 
 			else:
 				for tagged_category in categories:
@@ -2638,7 +2743,7 @@ def search():
 					filter_subjects.append(tagged_category)
 				related_subject=filter_subjects
 				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,filter_subjects,actual_tagged_areas,
-														None,None,actual_location)
+														None,None,sort_by_likes,actual_location)
 				print 'working category'
 				
 			is_pre_filter='y'
@@ -2682,12 +2787,12 @@ def search():
 				print actual_tagged_subjects
 				print actual_tagged_areas
 				response=prepare_query_machine_filtered(query,500,0,None,None,None,False,actual_tagged_subjects,actual_tagged_areas,
-														None,None,actual_location)
+														None,None,sort_by_likes,actual_location)
 			else:
 				if online=='online':
-					response=prepare_query(query,500,0,['online'],[],[],True,None,None)
+					response=prepare_query(query,500,0,['online'],[],[],True,None,None,sort_by_likes)
 				else:		
-					response=prepare_query(query,500,0,None,None,None,False,actual_location,None,None)
+					response=prepare_query(query,500,0,None,None,None,False,actual_location,None,None,sort_by_likes)
 			is_pre_filter='n'
 
 		print 'check 2'
@@ -2795,12 +2900,12 @@ def search():
 
 			if len(categories)<1:
 				if online=='online':
-					response=prepare_query_filtered(query,10,(page-1)*10,['online'],[query],[],True,None,None)
+					response=prepare_query_filtered(query,10,(page-1)*10,['online'],[query],[],True,None,None,sort_by_likes)
 				else:
-					response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False,actual_location,None,None)
+					response=prepare_query_filtered(query,10,(page-1)*10,None,None,None,False,actual_location,None,None,sort_by_likes)
 			else:
 				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,
-														filter_subjects,actual_tagged_areas,None,None,actual_location)
+														filter_subjects,actual_tagged_areas,None,None,sort_by_likes,actual_location)
 				
 			is_pre_filter='y'
 			actual_tagged_subjects=filter_subjects
@@ -2808,13 +2913,13 @@ def search():
 
 
 			if is_machine_filtered==True:
-				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,
-														actual_tagged_subjects,actual_tagged_areas,None,None,actual_location)
+				response=prepare_query_machine_filtered(query,10,(page-1)*10,None,None,None,False,actual_tagged_subjects,
+														actual_tagged_areas,None,None,sort_by_likes,actual_location)
 			else:
 				if online=='online':
-					response=prepare_query(query,10,(page-1)*10,['online'],[],[],True,None,None)
+					response=prepare_query(query,10,(page-1)*10,['online'],[],[],True,None,None,sort_by_likes)
 				else:
-					response=prepare_query(query,10,(page-1)*10,None,None,None,False,actual_location,None,None)
+					response=prepare_query(query,10,(page-1)*10,None,None,None,False,actual_location,None,None,sort_by_likes)
 			is_pre_filter='n'
 		
 
@@ -2971,7 +3076,8 @@ def search():
 								actual_tagged_subjects='|'.join(actual_tagged_subjects),levels=levels,resource_types=resource_types,
 								actual_tagged_areas='|'.join(actual_tagged_areas),student_tutor_like=student_tutor_like,title=title,
 								meta_description=meta_description,fb_title=fb_title, fb_url=fb_url, fb_description=fb_description,
-								fb_app_id=fb_app_id,related_searches=related_subjects,actual_location=actual_location,cities=cities))
+								fb_app_id=fb_app_id,related_searches=related_subjects,actual_location=actual_location,
+								sort_by_likes=sort_by_likes,cities=cities))
 
 		if set_cookie:
 			response.set_cookie('location',actual_location)
@@ -3154,6 +3260,18 @@ def save_level():
 	js=json.dumps(response)
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp	
+
+@app.route('/save_sort_preference',methods=['POST'])
+def save_sort_preference():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip().lower()
+	app.logger.debug(str(data))
+	response={}
+	response={'result':'failed'}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	
 
 @login_required
 @app.route('/save_resource_type',methods=['POST'])

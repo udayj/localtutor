@@ -275,10 +275,16 @@
                 </div>
             </div><!--/col-md-2-->
             <div class="col-md-7">
-               <div>
+               <div class="sky-form" style="border:0px;">
                 <span class="results-number" style="margin-bottom:10px;display:inline;margin-right:1em;" >{{total}} results   </span> 
                 {% if length > 0 %}
                 <a href="https://www.facebook.com/dialog/share?app_id={{fb_app_id}}&display=page&href={{fb_url|urlencode}}&redirect_uri={{fb_url|urlencode}}" target="_blank" style="color:#ef4e31;text-transform:uppercase;" onclick="track_share()">Share this page on Facebook </a>
+                <label class="checkbox" style="color:#999;"><input id="sort_preference" type="checkbox"
+                  {% if sort_by_likes=='y' %}
+                  checked
+                  {% endif %}
+                  ><i></i>SORT BY LIKES</label>
+                
                 {% endif %}
               </div>
 
@@ -867,6 +873,21 @@ function save_resource_type(_id){
   });  
 }
 
+var sort_by_likes='{{sort_by_likes}}';
+
+$('#sort_preference').click(function(){
+  
+  sort_by_likes='n';
+  if(this.checked)
+  {
+    sort_by_likes='y';
+  }
+
+  get_filtered_results_pre('sort_by_likes');
+  
+
+});
+
 $('#form_login').submit(function(){
 
       
@@ -1356,7 +1377,7 @@ selected_venue="";
   data['levels_checkboxes']=checkboxes_levels;
   data['resource_types_selected']=selected_resource_types;
   data['resource_types_checkboxes']=checkboxes_resource_types;
-
+  data['sort_by_likes']=sort_by_likes;
   
 
 /*jQuery.ajax({
@@ -1450,6 +1471,10 @@ $('#filter_form').submit(function(){
                .attr("type", "hidden")
                .attr("name", "resource_types_selected").val(selected_resource_types);
 
+  var input13 = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "sort_by_likes").val(sort_by_likes);
+
   
   $('#filter_form').append(input1);
   $('#filter_form').append(input2);
@@ -1463,7 +1488,7 @@ $('#filter_form').submit(function(){
   $('#filter_form').append(input10);
   $('#filter_form').append(input11);
   $('#filter_form').append(input12);
-
+  $('#filter_form').append(input13);
 
 });
 
