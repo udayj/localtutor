@@ -2582,7 +2582,7 @@ def search():
 
 
 		filter_results=False
-		if len(areas)>1 or len(subjects)>1 or len(venues)>1:
+		if len(levels)>1 or len(subjects)>1 or len(resource_types)>1:
 			filter_results=True
 
 
