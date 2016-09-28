@@ -309,6 +309,21 @@
                   {% endif %}
                 </td>
               </tr>
+              {% if current_user.id %}
+              <tr>
+                <td>
+                  Talk About This (your review)
+                </td>
+                <td id="review">
+                 <textarea id="review_{{tutor['_id']}}" class="form-control col-lg-12 col-md-12 textarea textarea-resizeable" rows="3"
+
+                 ></textarea>
+                 <div class="note">Enter user review - upto 140 characters</div>
+                 <button class="btn-u btn-u-sm" type="button" style="float:none;" onclick="save_review('{{tutor['_id']}}','{{current_user.id}}')">Save</button>
+
+                </td>
+              </tr>
+              {% endif %}
             </tbody>
           </table>
 
@@ -318,6 +333,31 @@
             </div>
           </div>
         </div>
+
+        {% if reviews|length > 0 %}
+        <div class="row">
+      <div class="col-lg-5 col-md-5">
+        <div class="panel panel-u margin-bottom-40">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-user"></i>What People Say</h3>
+                    </div>
+                    <div class="panel-body">
+     
+          <table class="table table-striped table-hover">
+            {% for review in reviews %}
+            <tr>
+              <td>
+                {{review['text']}}
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  
       </div>
 
     
@@ -486,6 +526,24 @@ function associate_tutor(tutor_id,student_id){
 });
 }
 
+function save_review(tutor_id,user_id)
+{
+  data={}
+  data['tutor_id']=tutor_id;
+  data['user_id']=user_id;
+  data['review']=$('#review_'+tutor_id).val().substr(0,140);
+  
+  jQuery.ajax({
+    url: '/save_review',
+    data: data,
+    type: 'POST',
+    success: function(data)
+    {
+      
+    }
+
+});
+}
 function disassociate_tutor(tutor_id,student_id){
 
   mixpanel.track('I did not Study Under');

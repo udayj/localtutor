@@ -135,6 +135,18 @@
                   <div class="note">Enter any additional information like your educational qualification, accomplishment etc</div>
                 </td>
               </tr>
+
+              <tr>
+                <td>
+                 Review
+                </td>
+                <td>
+                  <textarea id="review_{{tutor['_id']}}" class="form-control col-lg-12 col-md-12 textarea textarea-resizeable" rows="3"
+
+                  ></textarea>
+                  <div class="note">Enter user review - upto 140 characters</div>
+                </td>
+              </tr>
               
             </tbody>
           </table>
@@ -176,6 +188,7 @@ function save_tutor_data(id)
   classroom_type=$('#'+'classroom_type_'+new_id).val();
   teacher_type=$('#'+'teacher_type_'+new_id).val();
   usp=$('#additional_'+new_id).val();
+  review=$('#review_'+new_id).val().substr(0,140);
 
   var data={}
   data['_id']=new_id;
@@ -190,6 +203,7 @@ function save_tutor_data(id)
   data['classroom_type']=classroom_type;
   data['teacher_type']=teacher_type;
   data['usp']=usp;
+  data['review']=review;
 
   jQuery.ajax({
     url: '/tutor_edit_save',

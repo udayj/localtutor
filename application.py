@@ -1615,6 +1615,12 @@ def friend_tutor_name():
 
 @app.route('/tutor')
 def tutor():
+	def sorter(item):
+		if 'date' in item:
+			return item['date']
+		else:
+			return 'ZZZ'
+
 	tutor_id=request.args.get('id')
 	client=MongoClient()
 	db=client.local_tutor
@@ -1660,9 +1666,15 @@ def tutor():
 			return render_template('tutor.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id,cities=cities,
 									actual_location=actual_location)
 		else:
+			reviews=[]
+			actual_reviews=db.reviews.find({'tutor_id':tutor_id})
+			for review in actual_reviews:
+				reviews.append(review)
+			reviews=sorted(reviews,key=sorter)
+			reviews=sorted(reviews,reverse=True)
 			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id,cities=cities,
 									actual_location=actual_location,student_tutor_like=student_tutor_like,
-									student_tutor_assoc=student_tutor_assoc)
+									student_tutor_assoc=student_tutor_assoc,reviews=reviews)
 	except StopIteration:
 		return render_template('error.html')
 
@@ -1725,8 +1737,8 @@ def tutor_delete():
 def tutor_edit_save():
 	data={}
 	for name,value in dict(request.form).iteritems():
-		if name=='usp' or name=='announcement' or name=='geographical_location':
-			data[name]=value[0]
+		if name=='usp' or name=='announcement' or name=='geographical_location' or name=='review':
+			data[name]=value[0].strip()
 		else:
 			data[name]=value[0].strip().lower()
 	app.logger.debug(str(data))
@@ -1754,6 +1766,7 @@ def tutor_edit_save():
 			tutor['teacher_type']=data['teacher_type']
 			tutor['usp']=data['usp']
 
+
 			for subject in tutor['subject']:
 				actual_subject=db.subjects.find({'name':subject})
 				try:
@@ -1780,6 +1793,17 @@ def tutor_edit_save():
 		resp=Response(js,status=200,mimetype='application/json')
 		return resp		
 
+	ist=timezone('Asia/Kolkata')
+	ist_now=datetime.now(ist)
+	date=ist_now.strftime('%d/%m/%Y')
+
+	if len(data['review'])>1:
+		review={}
+		review['user_id']='admin'
+		review['tutor_id']=data['_id']
+		review['text']=data['review']
+		review['date']=date
+		db.reviews.save(review)
 	response={}
 	response={'result':'success'}
 	js=json.dumps(response)
@@ -3333,6 +3357,62 @@ def result_satisfaction_comment():
 		resp=Response(js,status=200,mimetype='application/json')
 		return resp			
 
+@login_required
+@app.route('/save_review',methods=['POST'])
+def save_review():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	user_id=data['user_id']
+	tutor_id=data['tutor_id']
+	review_text=data['review']
+	ist=timezone('Asia/Kolkata')
+	ist_now=datetime.now(ist)
+	date=ist_now.strftime('%d/%m/%Y')
+
+	if len(review_text)<=1:
+		response={}
+		response={'result':'success'}
+		js=json.dumps(response)
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp	
+	if user_id=='admin':
+		review={}
+		review['user_id']=user_id
+		review['tutor_id']=tutor_id
+		review['text']=review_text
+		review['date']=date
+		db.reviews.save(review)
+	else:
+		count=db.reviews.find({'user_id':user_id,'tutor_id':tutor_id}).count()
+		if count==1:
+			review=db.reviews.find({'user_id':user_id,'tutor_id':tutor_id})
+			try:
+				review=review.next()
+				review['text']=review_text
+				review['date']=date
+				db.reviews.save(review)
+			except:
+				response={}
+				response={'result':'failed'}
+				js=json.dumps(response)
+				resp=Response(js,status=200,mimetype='application/json')
+				return resp
+		else:
+			review={}
+			review['user_id']=user_id
+			review['tutor_id']=tutor_id
+			review['text']=review_text
+			review['date']=date
+			db.reviews.save(review)
+	response={}
+	response={'result':'success'}
+	js=json.dumps(response)
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp					
 
 
 @app.route('/result_satisfaction',methods=['POST'])
