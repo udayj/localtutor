@@ -318,7 +318,7 @@
                       {% endif %}
                       {% endif %}
                         </li>
-                        <li class="btn-group">
+                        <!--li class="btn-group">
                             <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" style="color:#555;">
                                 Subjects Covered<i class="fa fa-caret-down margin-left-5"></i>
                                 <span class="sr-only">Toggle Dropdown</span>
@@ -329,7 +329,7 @@
                                 <li><a href="/search?subject={{subject.title()|urlencode}}&is_pre_filter=y" class="subjects_covered">{{subject.title()}}</a></li>
                                 {% endfor %}
                             </ul>
-                        </li>
+                        </li-->
                         
                         <br>
                         {% if item['area'] is equalto 'online' %}
@@ -345,24 +345,15 @@
                         </li>
                        {% endif %}
                     
-                        <li>
-                       {% if item['area'] is equalto 'online' %}
-                       <a href="{{item['geographical_location']}}" class="course-link" style="text-decoration:underline;" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" target="_blank">Check out resource</a>
-                       {% else %}
-                       {% if item['geographical_location']|length >0 %}
-                       <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
-                       {% endif %}
-                       {{item['geographical_location'].title()}}
-                       {% endif %}
-                     </li>
+                        
                      {% if 'level' in item  and item['level']|length> 0 %}
                      <li>
-                      <div id="display_additional_info_{{item['_id']}}" >Difficulty Level - <span style="color:#2f95d2">{{item['level']|join(', ')}}</span></div>
+                      <div id="display_additional_info_{{item['_id']}}" >Difficulty Level - <span style="color:#999">{{item['level']|join(', ')}}</span></div>
                     </li>
                     {% endif %}
                     {% if 'resource_type' in item and item['resource_type']|length>0 %}
                      <li>
-                      <div id="display_additional_info1_{{item['_id']}}" >Type - <span style="color:#2f95d2">{{item['resource_type'].title()}}</span></div>
+                      <div id="display_additional_info1_{{item['_id']}}" >Type - <span style="color:#999">{{item['resource_type'].title()}}</span></div>
                     </li>
                     {% endif %}
                      <!--li>
@@ -486,7 +477,7 @@
                     ><i class="fa fa-thumbs-down"></i> Un-like</button>
             <!--      </li>
                 </ul> -->
-                  <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">More Details</button>
+                  <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">Details & Reviews</button>
 
                     {% endif %}
                      
@@ -603,7 +594,7 @@
                                 </div>
                             </div>
                         </div>
-                            <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">More Details</button>
+                            <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">Details & Reviews</button>
                           </li>
 
                         <li>
