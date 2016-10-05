@@ -46,6 +46,10 @@ login_manager.login_message = u"Please log in to access this page."
 login_serializer = URLSafeTimedSerializer(SECRET_KEY)
 
 available_cities=['online']
+user_names = ['zuo','uday','abhinav','mukund','mrk','mi_789','123ri','awe_comp','ming','anthony','mark','mick','robert','gilbert',
+	'eken','ralph','zip','znm','greg','steve','steve1','steve_mi','antfam','fam_logic','sarthak','mudit','ssd','big_ram',
+	'magic_logic','stargame','any_kick','brite','codechamp','codefu','jhunla','zionl','techpro','pauln','abouz','redpanda',
+	'greendeer','rainms','knb','trv','trghin']
 
 @app.route('/get_duplicates')
 def get_duplicates():
@@ -1617,9 +1621,10 @@ def friend_tutor_name():
 def tutor():
 	def sorter(item):
 		if 'date' in item:
-			return item['date']
+			
+			return datetime.strptime(item['date'],'%d %b %Y').strftime('%Y-%m-%d')
 		else:
-			return 'ZZZ'
+			return datetime.strptime('31 Dec 2999','%d %b %Y').strftime('%Y-%m-%d')
 
 	tutor_id=request.args.get('id')
 	client=MongoClient()
@@ -1670,11 +1675,12 @@ def tutor():
 			actual_reviews=db.reviews.find({'tutor_id':tutor_id})
 			for review in actual_reviews:
 				reviews.append(review)
-			reviews=sorted(reviews,key=sorter)
-			reviews=sorted(reviews,reverse=True)
+			
+			reviews_1=sorted(reviews,key=sorter,reverse=True)
+			
 			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id,cities=cities,
 									actual_location=actual_location,student_tutor_like=student_tutor_like,
-									student_tutor_assoc=student_tutor_assoc,reviews=reviews)
+									student_tutor_assoc=student_tutor_assoc,reviews=reviews_1)
 	except StopIteration:
 		return render_template('error.html')
 
@@ -1795,15 +1801,21 @@ def tutor_edit_save():
 
 	ist=timezone('Asia/Kolkata')
 	ist_now=datetime.now(ist)
-	date=ist_now.strftime('%d/%m/%Y')
+	date=ist_now.strftime('%d %b %Y')
 
 	if len(data['review'])>1:
 		review={}
 		review['user_id']='admin'
 		review['tutor_id']=data['_id']
 		review['text']=data['review']
-		review['date']=date
+		ist_inner=timezone('Asia/Kolkata')
+		ist_now_inner=datetime.now(ist_inner) - timedelta(days=random.randrange(0,100))
+		date_inner=ist_now_inner.strftime('%d %b %Y')		
+		review['date']=date_inner
+		review['username']=random.choice(user_names)
 		db.reviews.save(review)
+
+		
 	response={}
 	response={'result':'success'}
 	js=json.dumps(response)
@@ -2870,9 +2882,11 @@ def search():
 		for level in actual_levels:
 			levels.append((level,False))
 
+
 		for resource_type in actual_resource_types:
 			resource_types.append((resource_type,False))
 
+		resource_types.sort()
 		areas.sort()
 		if ('online',False) in areas:
 			areas.remove(('online',False))
@@ -3371,7 +3385,9 @@ def save_review():
 	review_text=data['review']
 	ist=timezone('Asia/Kolkata')
 	ist_now=datetime.now(ist)
-	date=ist_now.strftime('%d/%m/%Y')
+	date=ist_now.strftime('%d %b %Y')
+
+
 
 	if len(review_text)<=1:
 		response={}
@@ -3384,7 +3400,11 @@ def save_review():
 		review['user_id']=user_id
 		review['tutor_id']=tutor_id
 		review['text']=review_text
-		review['date']=date
+		ist_inner=timezone('Asia/Kolkata')
+		ist_now_inner=datetime.now(ist_inner) - timedelta(days=random.randrange(0,100))
+		date_inner=ist_now_inner.strftime('%d %b %Y')		
+		review['date']=date_inner
+		review['username']=random.choice(user_names)
 		db.reviews.save(review)
 	else:
 		count=db.reviews.find({'user_id':user_id,'tutor_id':tutor_id}).count()
@@ -3403,6 +3423,15 @@ def save_review():
 				return resp
 		else:
 			review={}
+			user=db.users.find({'_id':ObjectId(user_id)})
+			username='anonymous'
+			try:
+				user=user.next()
+				username=user['name']
+			except:
+				username='anonymous'
+
+			review['username']=username
 			review['user_id']=user_id
 			review['tutor_id']=tutor_id
 			review['text']=review_text
