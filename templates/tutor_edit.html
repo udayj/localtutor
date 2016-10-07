@@ -188,7 +188,7 @@ function save_tutor_data(id)
   classroom_type=$('#'+'classroom_type_'+new_id).val();
   teacher_type=$('#'+'teacher_type_'+new_id).val();
   usp=$('#additional_'+new_id).val();
-  review=$('#review_'+new_id).val().substr(0,140);
+  review=$('#review_'+new_id).val().substr(0,300);
 
   var data={}
   data['_id']=new_id;
