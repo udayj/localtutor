@@ -410,6 +410,14 @@
                     {% endif %}
 
                   </li>
+                  <b style="color:#999;">|&nbsp;</b>
+                  <li>
+                    {% if item['review_count'] == 1 %}
+                    {{item['review_count']}} review available
+                    {% else %}
+                    {{item['review_count']}} reviews available
+                    {% endif %}
+                  </li>
                 </ul>
                    
 

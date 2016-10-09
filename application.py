@@ -2547,6 +2547,7 @@ def search():
 		for teacher in results:
 			actual_data=teacher['_source']
 			actual_data['_id']=teacher['_id']
+			actual_data['review_count']=db.reviews.find({'tutor_id':actual_data['_id']}).count()
 			paginated_results.append(actual_data)
 
 		if page==1:
@@ -2849,6 +2850,8 @@ def search():
 		for teacher in results:
 			actual_data=teacher['_source']
 			actual_data['_id']=teacher['_id']
+			
+			
 			paginated_results.append(actual_data)
 			if actual_data['area'] not in areas_duplicate:
 				areas_duplicate.append(actual_data['area'])
@@ -2869,6 +2872,7 @@ def search():
 			if 'resource_type' in actual_data:
 				if actual_data['resource_type'].strip().lower() not in actual_resource_types:
 					actual_resource_types.append(actual_data['resource_type'].strip().lower())	
+			
 
 		print actual_levels							
 		print actual_resource_types
@@ -2970,6 +2974,7 @@ def search():
 		for teacher in results:
 			actual_data=teacher['_source']
 			actual_data['_id']=teacher['_id']
+			actual_data['review_count']=db.reviews.find({'tutor_id':actual_data['_id']}).count()
 			if scaling_counter<4:
 				actual_data['increment']=0.005
 			else:
