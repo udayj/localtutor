@@ -36,7 +36,7 @@
        
      
                 <div class="input-group">
-                   <div class="input-group-btn select" style="border-right:1px; border-color:#ccc;background:#ccc">
+                   <!--div class="input-group-btn select" style="border-right:1px; border-color:#ccc;background:#ccc">
            
                 <select id="location" class="form-control" style="width:auto;" style="float:none;background:#ccc">
        
@@ -46,9 +46,9 @@
         {% endfor %}
       </select>
            
-        </div>  
+        </div-->  
 
-                    <input id="search" type="text" class="form-control" placeholder="{{query}}" value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="{{query}}" style="float:none;">
+                    <input id="search" type="text" class="form-control" placeholder="{{query}}" value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="{{query}}" style="float:none;" size="40">
                     <span class="input-group-btn">
                         <button class="btn-u" type="button" style="float:none;" onclick="search()"><i class="fa fa-search"></i></button>
                     </span>
@@ -59,14 +59,14 @@
                 </h5> <br>
                 <button id="yes_satisfy" class="btn btn-u btn-xs" type="button" onclick="result_satisfaction('yes')" style="background-color:#ef4e31">Yes</button>
                   <button id="no_satisfy" class="btn btn-u btn-xs" type="button"  onclick="result_satisfaction('no')">No</button>
-                  <div id="message_satisfy" style="display:none;color:#white;"><span style="background-color:#006c83;color:white;">Great, thanks for the feedback! </span></div>
-                  <div id="message_satisfy_no" style="display:none;color:white;background-color:#006c83">Thanks for the feedback - we'll definitely improve the results and appreciate your help. <br>You can also comment on what exactly went wrong </div>
+                  <div id="message_satisfy" style="display:none;color:#white;"><span style="background-color:#2f95d2;color:white;">Great, thanks for the feedback! </span></div>
+                  <div id="message_satisfy_no" style="display:none;color:white;background-color:#2f95d2">Thanks for the feedback - we'll definitely improve the results and appreciate your help. <br>You can also comment on what exactly went wrong </div>
                   <input id="satisfy_comment" type="text" class="form-control col-md-2" placeholder="eg. irrelevant results /confusing /not useful" style="display:none;">
                   <span class="input-group-btn" >
                   <button id="satisfy_comment_button" type="button" class="btn btn-u btn-xs" onclick="satisfaction_comment()" style="display:none;margin-top:0.5em;">Submit</button>
                 </span>
                   <input type="text" id="satisfy_id" style="display:none;">
-                  <div id="satisfy_comment_status" style="display:none;color:white;background-color:#006c83">Comment submitted successfully, thank you</div>
+                  <div id="satisfy_comment_status" style="display:none;color:white;background-color:#2f95d2">Comment submitted successfully, thank you</div>
 
                -->
                  
@@ -279,16 +279,23 @@
                 <span class="results-number" style="margin-bottom:10px;display:inline;margin-right:1em;" >{{total}} results   </span> 
                 {% if length > 0 %}
                 <a href="https://www.facebook.com/dialog/share?app_id={{fb_app_id}}&display=page&href={{fb_url|urlencode}}&redirect_uri={{fb_url|urlencode}}" target="_blank" style="color:#ef4e31;text-transform:uppercase;" onclick="track_share()">Share this page on Facebook </a>
-                <label class="checkbox" style="color:#999;"><input id="sort_preference" type="checkbox"
+                <div class="inline-group">
+                <label class="radio" style="color:#999;"><input id="sort_preference" type="radio" name="sort_pref"
                   {% if sort_by_likes=='y' %}
                   checked
                   {% endif %}
-                  ><i></i>SORT BY LIKES</label>
-                
+                  ><i class="rounded-x"></i>SORT BY LIKES</label>
+                  <label class="radio" style="color:#999;">
+                  <input id="sort_preference1" type="radio" name="sort_pref"
+                  {% if sort_by_likes!='y' %}
+                  checked
+                  {% endif %}
+                  ><i class="rounded-x"></i>SORT BY MOST VIEWED</label>
+                </div>
                 {% endif %}
               </div>
 
-                <div class="text-left hidden-xs hidden-sm" id="page_selection_top" style="display:inline;">
+                <div class="pull-left hidden-xs hidden-sm" id="page_selection_top" style="display:inline;">
                     
                 </div>
                 <!-- Begin Inner Results -->
@@ -428,9 +435,9 @@
                           {% if current_user.fb_id %}
                    <button id="associate_{{item['_id']}}" type="button" class="btn-u btn-u-sm" onclick="associate_tutor('{{item['_id']}}','{{current_user.fb_id}}')"  
                       {% if item['_id'] not in student_tutor_assoc %}
-                      style="display:;background:#006c83"
+                      style="display:;background:#2f95d2"
                       {% else %}
-                      style="display:none;background:#006c83"
+                      style="display:none;background:#2f95d2"
                       {% endif %}
                       style=""
                       >{% if item['area']=='online' %}
@@ -445,7 +452,7 @@
                       {% else %}
                       style="display:none;"
                       {% endif %}
-                      style="background:#006c83"
+                      style="background:#2f95d2"
                      >
                       {% if item['area']=='online' %}
                           You know of this
@@ -470,9 +477,9 @@
 
                     <button id="like_{{item['_id']}}" type="button" class="btn-u btn-u-sm" onclick="like_tutor('{{item['_id']}}', '{{current_user.id}}',{{[item['likes'],item['likes_fake']]|sum}})"
                     {% if item['_id'] not in student_tutor_like %}
-                    style="display:;background:#006c83"
+                    style="display:;background:#2f95d2"
                     {% else %}
-                    style="display:none;background:#006c83"
+                    style="display:none;background:#2f95d2"
                     {% endif %}
                     ><i class="fa fa-thumbs-up"></i> Like</button>
 
@@ -485,7 +492,15 @@
                     ><i class="fa fa-thumbs-down"></i> Un-like</button>
             <!--      </li>
                 </ul> -->
-                  <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">Details & Reviews</button>
+                  <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}',{{item['increment']}})">Details & Reviews</button>
+                  <span class="hidden-sm hidden-xs">
+                 {% if 'resource_type' in item and item['resource_type']|length >0 %}
+                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="color:white;" target="_blank">Go to this {{item['resource_type']}}</a>
+                  {% else %}
+                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="color:white;" target="_blank">Go to this Resource</a>
+
+                    {% endif %}
+                  </span>
 
                     {% endif %}
                      
@@ -506,14 +521,14 @@
                       {% else %}
                          <ul class="list-inline down-ul">
                         <li>
-                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#fb-modal-login" style="background:#006c83" onclick="track_fb()" title="Marking this as known to you helps your friends ask you for feedback">
+                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#fb-modal-login" style="background:#2f95d2" onclick="track_fb()" title="Marking this as known to you helps your friends ask you for feedback">
                           {% if item['area']=='online' %}
                           I know of this
                           {% else %}
                           I studied under this teacher
                           {% endif %}
                         </button>
-                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#responsive" style="background:#006c83" ><i class="fa fa-thumbs-up" onclick="track_activity()"></i> Like</button>
+                        <button type="button" class="btn-u btn-u-sm" data-toggle="modal" data-target="#responsive" style="background:#2f95d2" ><i class="fa fa-thumbs-up" onclick="track_activity()"></i> Like</button>
                         <div class="modal fade" id="fb-modal-login" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -602,7 +617,16 @@
                                 </div>
                             </div>
                         </div>
-                            <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}')">Details & Reviews</button>
+                            <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}',{{item['increment']}})">Details & Reviews</button>
+                            <span class="hidden-sm hidden-xs">
+                            {% if 'resource_type' in item and item['resource_type']|length >0 %}
+                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="color:white;" target="_blank">Go to this {{item['resource_type']}}</a>
+                  {% else %}
+                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="color:white;" target="_blank">Go to this Resource</a>
+
+                    {% endif %}
+                  </span>
+
                           </li>
 
                         <li>
@@ -710,7 +734,7 @@
             {% if not current_user.id %}
             <div class="col-md-2" style="margin-top:15px;">
             <button class="btn-u" onclick="fblogin()" style="background:#3b5998;color:white;margin-top:15px;">Login using Facebook</button><br>
-            <div class="note" style="color:#999">See which teachers and courses your friends know</div>
+            <div class="note" style="color:#999">See which books and courses your friends know</div>
           </div>
           {% endif %}
  
@@ -753,9 +777,10 @@
 
 <script>
 
-function show_tutor(id)
+function show_tutor(id,increment)
 {
   mixpanel.track('More Clicked');
+  increment_ranking(id,increment);
   window.location="/tutor?id="+id;
 
 }
@@ -876,13 +901,38 @@ var sort_by_likes='{{sort_by_likes}}';
 
 $('#sort_preference').click(function(){
   
-  sort_by_likes='n';
+  if(sort_by_likes=='y')
+  {
+    return;
+  }
+
+  //sort_by_likes='n';
   if(this.checked)
   {
     sort_by_likes='y';
   }
 
   get_filtered_results_pre('sort_by_likes');
+
+  
+
+});
+
+$('#sort_preference1').click(function(){
+  
+
+  if (sort_by_likes!='y'){
+    return;
+  }
+  //sort_by_likes='n';
+  if(this.checked)
+  {
+    sort_by_likes='n';
+  }
+ 
+
+  get_filtered_results_pre('sort_by_likes');
+
   
 
 });
@@ -966,8 +1016,8 @@ $('.input-group #search').typeahead({
   suggestion=suggestion['value'];
   classify="n";
   mixpanel.track('Search Performed',{'Query':suggestion,'From':'Suggestion'});
-  var location='&location='+$('#location').find(':selected').val();
-  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion)+location; 
+  //var location='&location='+$('#location').find(':selected').val();
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion);
   
 });
 
@@ -1155,8 +1205,8 @@ function search()
         
           mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
           fbq('track', "Search");
-          var location='&location='+$('#location').find(':selected').val();
-          window.location='search?subject='+encodeURIComponent(name.value.trim())+location;
+          //var location='&location='+$('#location').find(':selected').val();
+          window.location='search?subject='+encodeURIComponent(name.value.trim());
         
     }
 
@@ -1511,6 +1561,7 @@ mixpanel.track_links('.tutors','Tutors Link');
 mixpanel.track_links('.related_searches','Related Search');
 mixpanel.track_links('.top_categories','Top Categories');
 mixpanel.track_links('.popular_searches','Popular Searches');
+mixpanel.track_links('.go_direct_button','Go Direct Button');
 mixpanel.track('Search Results Pageview');
 
 </script>  

@@ -17,7 +17,7 @@
        
      
                 <div class="input-group">
-                   <div class="input-group-btn select" style="border-right:1px; border-color:#ccc;background:#ccc">
+                   <!--div class="input-group-btn select" style="border-right:1px; border-color:#ccc;background:#ccc">
            
                 <select id="location" class="form-control" style="width:auto;" style="float:none;background:#ccc">
         <option value="" >Location ?</option>
@@ -27,9 +27,9 @@
         {% endfor %}
       </select>
            
-        </div>  
+        </div-->  
 
-                    <input id="search" type="text" class="form-control" placeholder="eg. physics, chemistry, dance" value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="" style="float:none;">
+                    <input id="search" type="text" class="form-control" placeholder="eg. java, c++, cryptography" value="{{query}}" onkeydown="if (event.keyCode==13) { search();}" value="" style="float:none;">
                     <span class="input-group-btn">
                         <button class="btn-u" type="button" style="float:none;" onclick="search()"><i class="fa fa-search"></i></button>
                     </span>
@@ -451,8 +451,8 @@ $('.input-group #search').typeahead({
   suggestion=suggestion['value'];
   classify="n";
   mixpanel.track('Search Performed',{'Query':suggestion,'From':'Suggestion'});
-  var location='&location='+$('#location').find(':selected').val();
-  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion)+location; 
+  //var location='&location='+$('#location').find(':selected').val();
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion);
   
 });
 
@@ -466,8 +466,8 @@ function search()
         {  
           
           mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
-          var location='&location='+$('#location').find(':selected').val();
-          window.location='search?subject='+encodeURIComponent(name.value.trim())+location;
+          //var location='&location='+$('#location').find(':selected').val();
+          window.location='search?subject='+encodeURIComponent(name.value.trim());
         }
         else
         {
