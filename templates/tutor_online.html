@@ -102,7 +102,8 @@
                   Online URL
                 </td>
                 <td>
-                  <a href="{{tutor['geographical_location']}}" style="color:#ef4e31;">LINK TO RESOURCE</a>
+                  <a href="{{tutor['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" style="color:white;" target="_blank">LINK TO RESOURCE</a>
+                  <!--a href="{{tutor['geographical_location']}}" style="color:#ef4e31;">LINK TO RESOURCE</a-->
                 </td>
               </tr>
               
@@ -350,8 +351,9 @@
               </div>  
             </div>
           </div>
-           {% if reviews|length > 0 %}
+           {% if reviews|length > 0 or tutor['usp']|length >0 %}
            <div class="col-lg-6 col-md-6 col-sm-12">
+            {% if reviews|length > 0 %}
         <div class="panel panel-u margin-bottom-40">
                     <div class="panel-heading">
                         <h3 class="panel-title"><i class="fa fa-user"></i>What People Say</h3>
@@ -376,6 +378,20 @@
           </table>
         </div>
       </div>
+      {% endif %}
+
+      {% if tutor['usp']|length >0 %}
+      <div class="panel panel-red margin-bottom-40">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-tasks"></i>What Will I Learn</h3>
+                    </div>
+                    <div class="panel-body">
+     
+                {{tutor['usp']}}
+        </div>
+      </div>
+      {% endif %}
+
     </div>
     {% endif %}
         </div>
