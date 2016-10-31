@@ -909,7 +909,8 @@ def generate_fake_likes():
 	db=client.local_tutor
 	teachers=db.teachers.find()
 	for teacher in teachers:
-		teacher['likes_fake']=random.randrange(0,70)
+		teacher['likes_fake']=random.randrange(0,400)
+		teacher['composite_likes']=teacher['likes_fake']+teacher['likes']
 		db.teachers.save(teacher)
 	js=json.dumps({'result':'success','message':'generated likes'})
 	resp=Response(js,status=200,mimetype='application/json')
