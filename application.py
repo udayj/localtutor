@@ -914,6 +914,7 @@ def generate_fake_likes():
 			teacher['composite_likes']=teacher['likes_fake']+teacher['likes']
 		else:
 			teacher['composite_likes']=teacher['likes_fake']
+			teacher['likes=']=0
 		db.teachers.save(teacher)
 	js=json.dumps({'result':'success','message':'generated likes'})
 	resp=Response(js,status=200,mimetype='application/json')
@@ -2108,7 +2109,7 @@ def prepare_query_machine_filtered(query,size,start_from,filter_areas, filter_su
 		bool_query5['bool']['should']=[]
 
 		for resource_type in filter_resource_types:
-			bool_query5['bool']['should'].append({'term': {'resource_type.not_analyzed':resource_type}})
+			bool_query5['bool']['should'].append({'term': {'resource_type':resource_type}})
 
 		bool_query['bool']['must'].append(bool_query5)
 
@@ -2427,7 +2428,8 @@ def search():
 		query=request.args.get('subject')
 		
 		page=request.args.get('page')
-		
+		print 'new problem'
+		app.logger.error('new problem')
 		try:
 			page=int(page)
 		except Exception,ValueError:

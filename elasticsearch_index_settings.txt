@@ -115,6 +115,14 @@
           "type" :   "string",
           "index" :  "not_analyzed"
         },
+        "resource_type" : {
+          "type" :   "string",
+          "index" :  "not_analyzed"
+        },
+        "level" : {
+          "type" :   "string"
+          
+        },
         "city" : {
           "type" :   "string",
           "index" :  "not_analyzed"
