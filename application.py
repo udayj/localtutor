@@ -920,6 +920,53 @@ def generate_fake_likes():
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp	
 
+@app.route('/increase_fake_likes',methods=['POST'])
+def increase_fake_likes():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	teacher=db.teachers.find({'_id':ObjectId(data['_id'])})
+	try:
+		teacher=teacher.next()
+		if 'likes_fake' in teacher:
+			teacher['likes_fake']=teacher['likes_fake']+10
+			db.teachers.save(teacher)
+	except:
+		js=json.dumps({'result':'failed','message':'couldnt increase likes'})
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	js=json.dumps({'result':'success','message':'increased likes'})
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
+
+@app.route('/decrease_fake_likes',methods=['POST'])
+def decrease_fake_likes():
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0].strip()
+	app.logger.debug(str(data))
+	client=MongoClient()
+	db=client.local_tutor
+	teacher=db.teachers.find({'_id':ObjectId(data['_id'])})
+	try:
+		teacher=teacher.next()
+		if 'likes_fake' in teacher:
+			teacher['likes_fake']=teacher['likes_fake']-10
+			if teacher['likes_fake']<0:
+				teacher['likes_fake']=0
+			db.teachers.save(teacher)
+	except:
+		js=json.dumps({'result':'failed','message':'couldnt decrease likes'})
+		resp=Response(js,status=200,mimetype='application/json')
+		return resp
+	js=json.dumps({'result':'success','message':'decreased likes'})
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
+
+
 @app.route('/decay_click_metrics')
 def decay_click_metrics():
 	client=MongoClient()
