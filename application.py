@@ -933,6 +933,11 @@ def increase_fake_likes():
 		teacher=teacher.next()
 		if 'likes_fake' in teacher:
 			teacher['likes_fake']=teacher['likes_fake']+10
+			if 'likes' in teacher:
+				teacher['composite_likes']=teacher['likes_fake']+teacher['likes']
+			else:
+				teacher['composite_likes']=teacher['likes_fake']
+				teacher['likes=']=0
 			db.teachers.save(teacher)
 	except:
 		js=json.dumps({'result':'failed','message':'couldnt increase likes'})
@@ -957,6 +962,12 @@ def decrease_fake_likes():
 			teacher['likes_fake']=teacher['likes_fake']-10
 			if teacher['likes_fake']<0:
 				teacher['likes_fake']=0
+			if 'likes' in teacher:
+				teacher['composite_likes']=teacher['likes_fake']+teacher['likes']
+			else:
+				teacher['composite_likes']=teacher['likes_fake']
+				teacher['likes=']=0
+				
 			db.teachers.save(teacher)
 	except:
 		js=json.dumps({'result':'failed','message':'couldnt decrease likes'})
