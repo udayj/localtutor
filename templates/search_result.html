@@ -418,13 +418,17 @@
 
                   </li>
                   <b style="color:#999;">|&nbsp;</b>
+                 
                   <li>
+                     <a href="/tutor?id={{item['_id']}}" style="color:#ef4e31">
                     {% if item['review_count'] == 1 %}
                     {{item['review_count']}} review available
                     {% else %}
                     {{item['review_count']}} reviews available
                     {% endif %}
+                  </a>
                   </li>
+                
                 </ul>
                    
 
@@ -492,12 +496,12 @@
                     ><i class="fa fa-thumbs-down"></i> Un-like</button>
             <!--      </li>
                 </ul> -->
-                  <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}',{{item['increment']}})">Details & Reviews</button>
+                  <!--button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}',{{item['increment']}})">Details & Reviews</button-->
                   <span class="hidden-sm hidden-xs">
                  {% if 'resource_type' in item and item['resource_type']|length >0 %}
-                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="color:white;" target="_blank">Go to this {{item['resource_type']}}</a>
+                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="color:white;background:#2f95d2" target="_blank">Go to this {{item['resource_type']}}</a>
                   {% else %}
-                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="color:white;" target="_blank">Go to this Resource</a>
+                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="color:white;background:#2f95d2" target="_blank">Go to this Resource</a>
 
                     {% endif %}
                   </span>
@@ -617,12 +621,12 @@
                                 </div>
                             </div>
                         </div>
-                            <button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}',{{item['increment']}})">Details & Reviews</button>
+                            <!--button type="button" class="btn-u btn-u-sm" onclick="show_tutor('{{item['_id']}}',{{item['increment']}})" style="background:#2f95d2" >Details & Reviews</button-->
                             <span class="hidden-sm hidden-xs">
                             {% if 'resource_type' in item and item['resource_type']|length >0 %}
-                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="color:white;" target="_blank">Go to this {{item['resource_type']}}</a>
+                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="background:#2f95d2;color:white;" target="_blank">Go to this {{item['resource_type']}}</a>
                   {% else %}
-                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="color:white;" target="_blank">Go to this Resource</a>
+                  <a href="{{item['geographical_location']}}" class="btn-u btn-u-sm go_direct_button" onclick="increment_ranking('{{item['_id']}}',{{item['increment']}})" style="background:#2f95d2;color:white;" target="_blank">Go to this Resource</a>
 
                     {% endif %}
                   </span>
