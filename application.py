@@ -967,7 +967,7 @@ def decrease_fake_likes():
 			else:
 				teacher['composite_likes']=teacher['likes_fake']
 				teacher['likes=']=0
-				
+
 			db.teachers.save(teacher)
 	except:
 		js=json.dumps({'result':'failed','message':'couldnt decrease likes'})
@@ -2781,7 +2781,7 @@ def search():
 		page=request.args.get('page')
 		online=request.args.get('medium')
 		location=request.args.get('location')
-		sort_by_likes='n'
+		sort_by_likes='y'
 		print 'location='+str(location)
 		set_cookie=False
 		cookie_location=request.cookies.get('location')
