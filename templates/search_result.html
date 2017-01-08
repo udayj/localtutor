@@ -420,7 +420,7 @@
                   <b style="color:#999;">|&nbsp;</b>
                  
                   <li>
-                     <a href="/tutor?id={{item['_id']}}" style="color:#ef4e31">
+                     <a href="/tutor?id={{item['_id']}}" style="color:#ef4e31" class="reviews_link">
                     {% if item['review_count'] == 1 %}
                     {{item['review_count']}} review available
                     {% else %}
@@ -916,9 +916,10 @@ $('#sort_preference').click(function(){
     sort_by_likes='y';
   }
 
+  mixpanel.track('Sort By Likes');
+
   get_filtered_results_pre('sort_by_likes');
 
-  
 
 });
 
@@ -934,7 +935,7 @@ $('#sort_preference1').click(function(){
     sort_by_likes='n';
   }
  
-
+  mixpanel.track('Sort By Most Viewed');
   get_filtered_results_pre('sort_by_likes');
 
   
@@ -1566,7 +1567,9 @@ mixpanel.track_links('.related_searches','Related Search');
 mixpanel.track_links('.top_categories','Top Categories');
 mixpanel.track_links('.popular_searches','Popular Searches');
 mixpanel.track_links('.go_direct_button','Go Direct Button');
+mixpanel.track_links('.reviews_link','Reviews Link');
 mixpanel.track('Search Results Pageview');
+
 
 </script>  
 {% endblock %}
