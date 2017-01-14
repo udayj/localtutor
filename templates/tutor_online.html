@@ -78,7 +78,7 @@
                 <td>
                   Relevant to
                 </td>
-              <td>
+              <!--td>
                    {% for subjects_outer in display_subjects|batch(3) %}
        <div class="row clearfix">
         {% for subject in subjects_outer %}
@@ -86,6 +86,23 @@
         <div class="col-lg-4 col-md-4 col-sm-12">
                     <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y" style="color:#ef4e31">{{subject}}</a> 
                     </div>
+  
+      {% endfor %}
+  </div>      
+        {% endfor %}
+                 <!-- {% for subject in display_subjects %}
+                    <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y">{{subject}}</a> 
+                    <br>
+                    {% endfor %} >
+                </td-->
+                <td style="margin-left:1em;">
+                   {% for subjects_outer in display_subjects|batch(3) %}
+       <div class="row clearfix;">
+        {% for subject in subjects_outer %}
+     
+        
+                    <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y" style="background-color:#e74c3c;color:white;padding-left:1em;padding-right:1em;margin-left:1em">{{subject}}</a> 
+                    
   
       {% endfor %}
   </div>      
