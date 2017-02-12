@@ -65,7 +65,7 @@ create multifield mapping
   }
 
   in case of file system corruption
-  - make a not of the kernel presently being used
+  - make a note of the kernel presently being used
   - poweroff from command line
   - change kernel to recovery mode kernel from do online dashboard
   - issue the relevant fsck command to check and repair errors in the fs

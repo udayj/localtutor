@@ -388,8 +388,8 @@ def content_entry(file_name,db_name):
 
 @app.route('/')
 def main_page():
-	title='- Find books, online courses, guides, tutorials and other resources for everything you want to learn'
-	meta_description='Find books, online courses and tutorials for everything you want to learn'
+	title='- Find books, online courses, guides, tutorials, recommendations, notes and more'
+	meta_description='Find books, online courses, guides, tutorials, recommendations, notes and more for everything you want to learn'
 	cities=available_cities
 	actual_location=request.cookies.get('location')
 	return render_template('general_classes.html',app_id=app_id,active='main',title=title,meta_description=meta_description,
@@ -1738,12 +1738,18 @@ def tutor():
 			actual_reviews=db.reviews.find({'tutor_id':tutor_id})
 			for review in actual_reviews:
 				reviews.append(review)
-			
+
+			meta_description=tutor['name'].title()+' is a '+tutor['resource_type']+'. '
+			if 'usp' in tutor and tutor['usp']!='':
+				meta_description=meta_description+tutor['usp']
+			else:
+				meta_description=meta_description+'It covers areas like ' + ','.join(display_subjects)
+
 			reviews_1=sorted(reviews,key=sorter,reverse=True)
 			
 			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id,cities=cities,
 									actual_location=actual_location,student_tutor_like=student_tutor_like,
-									student_tutor_assoc=student_tutor_assoc,reviews=reviews_1)
+									student_tutor_assoc=student_tutor_assoc,reviews=reviews_1,meta_description=meta_description)
 	except StopIteration:
 		return render_template('error.html')
 
@@ -3089,14 +3095,20 @@ def search():
 		if is_pre_filter and is_pre_filter=='y':
 			areas_covered=','.join([x for (x,y) in areas if len(x.strip())>0])
 
-			meta_description='Choose from '+str(total)+' books, online courses and tutorials covering '+query
+			meta_description=('Choose from {total} books, online courses, guides and tutorials covering {query}'
+							 '. Filter by subjects, difficulty level, type of resource. '
+							 'Read from over 100k reviews. Trusted by over 1 million people.')
+			meta_description=meta_description.format(total=str(total),query=query)
 			fb_description='Choose from over 1000 books, online courses and tutorials covering '+query
 
 		else:
 			if is_machine_filtered==True:
 				areas_covered=','.join([x for x in actual_tagged_areas if len(x.strip())>0])
 				subjects_covered=', '.join([x for (x,y) in subjects_meta if len(x.strip())>0])
-				meta_description='Choose from '+str(total)+' books, online courses and tutorials for '+subjects_covered
+				meta_description=('Choose from {total} books, online courses, guides and tutorials for {query}' 
+								 '. Filter by subjects, difficulty level, type of resource. '
+								 'Read from over 100k reviews. Trusted by over 1 million people.')
+				meta_description=meta_description.format(total=str(total),query=query)
 				fb_description='Choose from over 1000 books, online courses and tutorials covering '+subjects_covered
 
 			else:
