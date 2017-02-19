@@ -244,7 +244,7 @@
                    
                    <tr>
                     <td>
-                      Known Resource ?
+                    Known Resource?
                     </td>
                     <td>
                     <ul class="list-inline down-ul">
@@ -295,7 +295,7 @@
                      {% else %}
                       <tr>
                     <td>
-                      Known Resource ?
+                      Known Resource?
                     </td>
                     <td>
                          <ul class="list-inline down-ul">
@@ -381,9 +381,12 @@
                     </div>
                     <div class="panel-body">
      
-          <table class="table table-striped table-hover">
+          <table class="table table-striped table-hover reviews">
             {% for review in reviews %}
-            <tr>
+            <tr {% if 'extra' in review %}
+                class="extra" style="display:none;"
+                {% endif %}
+            >
               <td>
                 
 
@@ -397,6 +400,9 @@
             </tr>
             {% endfor %}
           </table>
+          {% if show_more == True %}
+          <button class="btn-u btn-u-sm" id="show_more" style="background:#2f95d2;color:white;" onclick="show_more_reviews()">Show More </button>
+          {% endif %}
         </div>
       </div>
       {% endif %}
@@ -719,6 +725,28 @@ function dislike_tutor(tutor_id,student_id,likes){
 
 });
 }
+
+function create_review_toggler()
+{
+  var counter=1;
+  function show_more_reviews()
+  {
+    if (counter%2==1)
+    {
+      $('table.reviews tr.extra').show();
+      $('#show_more').html('Show Less')     
+    }
+    else
+    {
+      $('table.reviews tr.extra').hide();
+      $('#show_more').html('Show More');
+    }
+    counter=counter+1;
+  }
+  return show_more_reviews;
+}
+
+var show_more_reviews=create_review_toggler();
 
 </script>  
 {% endblock %}

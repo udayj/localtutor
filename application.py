@@ -1736,19 +1736,30 @@ def tutor():
 		else:
 			reviews=[]
 			actual_reviews=db.reviews.find({'tutor_id':tutor_id})
+			counter=0
 			for review in actual_reviews:
+				
 				reviews.append(review)
 
-			meta_description=tutor['name'].title()+' is a '+tutor['resource_type']+'. '
+			meta_description=tutor['name'].title()+' is a learning resource.'
+			if 'resource_type' in tutor:
+				meta_description=tutor['name'].title()+' is a '+tutor['resource_type']+'. '
 			if 'usp' in tutor and tutor['usp']!='':
 				meta_description=meta_description+tutor['usp']
 			else:
 				meta_description=meta_description+'It covers areas like ' + ','.join(display_subjects)
 
 			reviews_1=sorted(reviews,key=sorter,reverse=True)
-			
+			for review in reviews_1:
+				counter=counter+1
+				if (counter>4):
+					review['extra']=True
+			show_more=False
+			if counter>4:
+				show_more=True
+
 			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id,cities=cities,
-									actual_location=actual_location,student_tutor_like=student_tutor_like,
+									actual_location=actual_location,student_tutor_like=student_tutor_like,show_more=show_more,
 									student_tutor_assoc=student_tutor_assoc,reviews=reviews_1,meta_description=meta_description)
 	except StopIteration:
 		return render_template('error.html')
