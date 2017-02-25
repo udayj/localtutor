@@ -1058,7 +1058,7 @@ function increment_ranking(id,increment)
             }
 
         });
-  fbq('track', "Search");
+  fbq('track', "SearchActivity");
 }
 
 
@@ -1209,7 +1209,7 @@ function search()
           return;
         
           mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
-          fbq('track', "Search");
+          fbq('track', "SearchActivity");
           //var location='&location='+$('#location').find(':selected').val();
           window.location='search?subject='+encodeURIComponent(name.value.trim());
         
@@ -1304,7 +1304,7 @@ $('#page_selection').bootpag({
  }
    $('#filter_form').attr('action',url);
    mixpanel.track('Next Page',{'Page':num});
-   fbq('track', "Search");
+   fbq('track', "SearchActivity");
    get_filtered_results();
    //window.location='/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page="+num;
 });
@@ -1329,7 +1329,7 @@ $('#page_selection_top').bootpag({
  }
    $('#filter_form').attr('action',url);
    mixpanel.track('Next Page',{'Page':num});
-   fbq('track', "Search");
+   fbq('track', "SearchActivity");
    get_filtered_results();
    //window.location='/search?subject='+$('#pagination_query').html().trim()+'&classify='+$('#classify').html().trim()+"&page="+num;
 });
@@ -1471,7 +1471,7 @@ function get_filtered_results_pre(type)
  }
   $('#filter_form').attr('action',url);
   mixpanel.track('Filter',{'Type':type});
-  fbq('track', "Search");
+  fbq('track', "SearchActivity");
   get_filtered_results();
 }
 
