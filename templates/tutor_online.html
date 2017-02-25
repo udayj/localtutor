@@ -101,7 +101,7 @@
         {% for subject in subjects_outer %}
      
         
-                    <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y" style="background-color:#e74c3c;color:white;padding-left:1em;padding-right:1em;margin-left:1em">{{subject}}</a> 
+                    <a href="/search?subject={{subject|urlencode}}&is_pre_filter=y" style="background-color:#e74c3c;color:white;padding-left:1em;padding-right:1em;margin-left:1em" class="subjects">{{subject}}</a> 
                     
   
       {% endfor %}
@@ -735,19 +735,24 @@ function create_review_toggler()
     {
       $('table.reviews tr.extra').show();
       $('#show_more').html('Show Less')     
+      mixpanel.track('Show More')
     }
     else
     {
       $('table.reviews tr.extra').hide();
       $('#show_more').html('Show More');
+      mixpanel.track('Show Less')
     }
     counter=counter+1;
+
   }
   return show_more_reviews;
 }
 
 var show_more_reviews=create_review_toggler();
 
+mixpanel.track_links('.go_direct_button','Link to Resource')
+mixpanel.track_links('.subjects','Subject Links')
 </script>  
 {% endblock %}
 
