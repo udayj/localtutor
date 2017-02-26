@@ -1740,7 +1740,7 @@ def tutor():
 			for review in actual_reviews:
 				
 				reviews.append(review)
-
+			title='- Reviews for ' + tutor['name'].title()
 			meta_description=tutor['name'].title()+' is a learning resource.'
 			if 'resource_type' in tutor:
 				meta_description=tutor['name'].title()+' is a '+tutor['resource_type']+'. '
@@ -1760,7 +1760,8 @@ def tutor():
 
 			return render_template('tutor_online.html',tutor=tutor,display_subjects=display_subjects,app_id=app_id,cities=cities,
 									actual_location=actual_location,student_tutor_like=student_tutor_like,show_more=show_more,
-									student_tutor_assoc=student_tutor_assoc,reviews=reviews_1,meta_description=meta_description)
+									student_tutor_assoc=student_tutor_assoc,reviews=reviews_1,meta_description=meta_description,
+									title=title)
 	except StopIteration:
 		return render_template('error.html')
 
