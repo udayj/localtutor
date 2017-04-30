@@ -454,6 +454,7 @@ $('.input-group #search').typeahead({
 }).on('typeahead:select', function (obj, suggestion) {
   suggestion=suggestion['value'];
   classify="n";
+  fbq('track', "SearchPerformed");
   mixpanel.track('Search Performed',{'Query':suggestion,'From':'Suggestion'});
   //var location='&location='+$('#location').find(':selected').val();
   window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion)+"&classify=n";
@@ -467,6 +468,7 @@ function search()
         var name=document.getElementById("search");
         if(name==null || name.value.trim()=="")
           return;
+          fbq('track', "SearchPerformed");
           mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
           
           //var location='&location='+$('#location').find(':selected').val();

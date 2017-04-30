@@ -394,6 +394,14 @@ def main_page():
 	actual_location=request.cookies.get('location')
 	return render_template('general_classes.html',app_id=app_id,active='main',title=title,meta_description=meta_description,
 							cities=cities,actual_location=actual_location)
+@app.route('/general')
+def general():
+	title='- Find books, online courses, guides, tutorials, recommendations, notes and more'
+	meta_description='Find books, online courses, guides, tutorials, recommendations, notes and more for everything you want to learn'
+	cities=available_cities
+	actual_location=request.cookies.get('location')
+	return render_template('main_page.html',app_id=app_id,active='main',title=title,meta_description=meta_description,
+							cities=cities,actual_location=actual_location)
 
 @app.route('/classes_in_kolkata')
 def classes_in_kolkata():

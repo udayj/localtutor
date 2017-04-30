@@ -1,6 +1,6 @@
 {% extends "base2.html" %}
 {% block css %}
-<link rel="stylesheet" href="/static/stylesheets/pages/page_search.css">
+<link rel="stylesheet" href="/static/stylesheets/pages/page_search_main.css">
 
 
 {% endblock %}
@@ -8,6 +8,20 @@
 {% block content %}
 
 <style>
+
+.videoWrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  padding-top: 25px;
+  height: 0;
+}
+.videoWrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
 
 .twitter-typeahead { width: 100%; } 
 .tt-hint { width: 100%; } 
@@ -47,41 +61,317 @@
 
 .tt-suggestion.tt-cursor {
   color: #fff;
-  background-color: #72c02c;
+  background-color: #2f95d2;
 
 }
 
 .tt-suggestion p {
   margin: 0;
 }
+
+@media (max-width: 480px) {
+  
+.input-group-addon, .input-group-btn, .input-group .form-control {
+    display: block;
+    margin-bottom: 10px;
+    clear: both;
+    }
+.input-group {
+    display: block;
+    }
+.input-group, .form-control {
+  width:100%;
+
+}
+.form-group .input-group .input-group-btn {
+  width:100%;
+
+}
+.input-group-btn, .btn-u {
+  width:100%;
+
+}
+
+select{
+  width:100% !important;
+}
+.options {
+  width:100%;
+
+}
+
+}
+
+
 </style>
 
       <!-- Jumbotron -->
-    <div class="search-block parallaxBg">
-        <div class="container">
-            <div class="col-md-6 col-md-offset-3">
-                <h1>Find <span class="color-green">Connect</span> Learn</h1>
-                <h3 style="color:white;">Find the best tutors for anything you want to learn</h3>
-                <div class="input-group sky-form">
-                  <
-                    <input id="search" type="text" class="form-control" placeholder="Search eg. physics, chemistry, dancing" onkeydown="if (event.keyCode==13) { search();}">
-                    <span class="input-group-btn">
-                        <button class="btn-u btn-u-lg" type="button" style="margin-top:-0.4em;" onclick="search()"><i class="fa fa-search"></i></button>
+    <div class="search-block" style="background-color:#7dc8ef">
+        <div class="container" >
+            <div class="col-md-8 col-md-offset-2" >
+              <center>
+            
+              <div class="tag-line" style="font-weight:bold;font-size:3em;color:white;text-shadow:5px;text-shadow-color:63bfed;"> FIND RESOURCES FOR ANYTHING YOU WANT TO LEARN </div>
+            </center>
+                
+<div class="form-group">
+        <div class="input-group col-md-8 col-md-offset-2" >
+        <!--div class="input-group-btn select" style="border-right:2px; border-color:#ccc;background:#ccc">
+           
+                <select id="location" class="form-control" style="width:auto;" style="float:none;background:#ccc">
+        
+        {% for city in cities %}
+        <option value="{{city}}" {% if city == actual_location %} selected {% endif %} class="options"
+        >{{ city | capitalize }}</option>
+        {% endfor %}
+
+      </select>
+           
+        </div-->  
+       
+         <input id="search" type="text" class="form-control" style="float:none;border-left:2px;border-color:#ccc" placeholder="Search eg. java, c++, statistics" onkeydown="if (event.keyCode==13) { search();}">
+                  
+    
+      <span class="input-group-btn" style="float:none;">
+                        <button class="btn-u" type="button" onclick="search()" style="background-color:#ef4e31"></i> Search</button>
                     </span>
-                </div>
+        </div>
+     </div>
+
+                
+               
 
                 
             </div>
         </div>
     </div>
+    <div class="container content-sm" style="padding-top:0px;padding-bottom:30px;">
+   
+       <center><div class="headline"><h3>Popular Topics</h3></div></center>
+       <div class="row category margin-bottom-40" style="align-content:center;">
+            <!-- Info Blocks -->
+            <div class="col-md-3 col-sm-3 col-xs-12" style="align-content:center;">
+                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40" style="align-content:center;">
+                  <div class="content-boxes-in-v3" style="align-content:center;">
+                        <center><div class="heading" ><a href="/search?subject=programming" class="subject-link truncated" >Programming</a></div>
+                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
+                        <a href="/search?subject=programming" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/programming_image.jpg" style="background-color:white;;"></img></a>
+                      </center>
+                    </div>
+                      
+                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
+                    
+                </div>
+                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
+                  <div class="content-boxes-in-v3">
+                    <center>
+                        <div class="heading" ><a href="/search?subject=computer graphics" class="subject-link truncated" >Computer Graphics</a></div>
+                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
+                        <a href="/search?subject=computer graphics" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/computer_graphics_image.jpg" style="background-color:white;;"></img></a>
+                      </center>
+                    </div>
+                      
+                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
+                    
+                </div>
+               
+               
+               
+                
+               
+            </div>
+            <!-- End Info Blocks -->
+
+            <!-- Info Blocks -->
+            <div class="col-md-3 col-sm-3 col-xs-12 md-margin-bottom-40">
+               <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
+                  <div class="content-boxes-in-v3">
+                    <center>
+                        <div class="heading" ><a href="/search?subject=machine learning" class="subject-link truncated" >Machine Learning</a></div>
+                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
+                        <a href="/search?subject=machine learning" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/machine_learning_image.jpg" style="background-color:white;;"></img></a>
+                      </center>
+                    </div>
+                      
+                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
+                    
+                </div>
+                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
+                  <div class="content-boxes-in-v3">
+                    <center>
+                        <div class="heading" ><a href="/search?subject=linear algebra" class="subject-link truncated" >Linear Algebra</a></div>
+                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
+                        <a href="/search?subject=linear algebra" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/linear_algebra_image.jpg" style="background-color:white;;"></img></a>
+                      </center>
+                    </div>
+                      
+                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
+                    
+                </div>
+             
+                
+                
+                
+            </div>
+
+             <div class="col-md-3 col-sm-3 col-xs-12 md-margin-bottom-40">
+
+              <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
+                  <div class="content-boxes-in-v3">
+                    <center>
+                        <div class="heading" ><a href="/search?subject=neural networks" class="subject-link truncated" >Neural Networks</a></div>
+                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
+                        <a href="/search?subject=neural networks" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/neural_networks_image.jpg" style="background-color:white;;"></img></a>
+                      </center>
+                    </div>
+                      
+                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
+                    
+                </div>
+
+                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
+                  <div class="content-boxes-in-v3">
+                    <center>
+                        <div class="heading" ><a href="/search?subject=computer networking" class="subject-link truncated" >Networking</a></div>
+                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
+                        <a href="/search?subject=computer networking" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/computer_networking_image.png" style="background-color:white;;"></img></a>
+                      </center>
+                    </div>
+                      
+                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
+                    
+                </div>
+            
+
+                
+               
+                
+            </div>
+
+                <div class="col-md-3 col-sm-3 col-xs-12 md-margin-bottom-40">
+
+              <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
+                  <div class="content-boxes-in-v3">
+                    <center>
+                        <div class="heading" ><a href="/search?subject=cryptography" class="subject-link truncated" >Cryptography</a></div>
+                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
+                        <a href="/search?subject=cryptography" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/cryptography_image.png" style="background-color:white;;"></img></a>
+                      </center>
+                    </div>
+                      
+                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
+                    
+                </div>
+
+                <div class="content-boxes-v3 margin-bottom-40 md-margin-bottom-40">
+                  <div class="content-boxes-in-v3">
+                    <center>
+                        <div class="heading" ><a href="/search?subject=calculus" class="subject-link truncated" >Calculus</a></div>
+                        <!--p>From salsa and kathak to zumba and kuchipudi, find teachers and courses for over 20 different types of dances</p-->
+                        <a href="/search?subject=calculus" class="subject-link" ><img class="icon-custom icon-sm icon-bg-red img-responsive" src="/static/images/calculus_image.png" style="background-color:white;;"></img></a>
+                      </center>
+                    </div>
+                      
+                    <!--i class="icon-custom icon-sm rounded-x icon-bg-aqua fa fa-music"></i-->
+                    
+                </div>
+            
+
+                
+               
+                
+            </div>
+
+          
+          </div>
+
+
+
+            <!-- End Info Blocks -->
+    
+
+           
+
+
+          </div>
+
+
+
+            <!-- End Info Blocks -->
+
+    
+
+    <div class="bg-color-light">
+        <div class="container content-sm">
+            <div class="headline-center margin-bottom-60">
+                <h2>WHAT PEOPLE SAY</h2>
+                <p>Find online courses, videos, books, articles and much more for anything. Filter by difficulty level.<br>
+                  Sort by Likes. Read Reviews. Find the most relevant resources - start now - no registration required.
+                </p>
+            </div>
+
+            <!-- Testimonials Wrap -->
+            <div class="testimonials-v6 testimonials-wrap">
+                <div class="row margin-bottom-50">
+                    <div class="col-md-6 md-margin-bottom-50">
+                        <div class="testimonials-info rounded-bottom">
+                            
+                            <div class="testimonials-desc">
+                                <p>The resources I found for compter networking were top notch.</p>
+                                <strong>Paul Doherty</strong>
+                                <span>CS Student</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="testimonials-info rounded-bottom">
+                            
+                            <div class="testimonials-desc">
+                                <p>Its not just books, you can find videos, or online courses. Thats what makes this app different.</p>
+                                <strong>Mudit</strong>
+                                <span>NLP Practitioner</span>
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/end row-->
+
+                <div class="row margin-bottom-20">
+                    <div class="col-md-6 md-margin-bottom-50">
+                        <div class="testimonials-info rounded-bottom">
+                            
+                            <div class="testimonials-desc">
+                                <p>The best part is you can find books suited to any level from beginner to advanced.</p>
+                                <strong>Sarthak</strong>
+                                <span>Mathematics Student</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="testimonials-info rounded-bottom">
+                            
+                            <div class="testimonials-desc">
+                                <p>I really liked the Facebook feature where you can see which resources your friends know about.</p>
+                                <strong>Joe</strong>
+                                <span>Autodidact</span>
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/end row-->
+            </div>
+            <!-- End Testimonials Wrap -->
+        </div><!--/end container-->
+    </div>
     <div class="container content-sm">
-    <div class="row margin-bottom-30">
+    <div class="row margin-bottom-10">
+      <div class="headline-center margin-bottom-20">
+        <h2>HOW IT WORKS</h2>
+      </div>
           <div class="col-md-4">
             <div class="service">
                     <i class="fa fa-search service-icon"></i>
               <div class="desc">
                 <h4>Find</h4>
-                        <p>Find tutors, institutes and courses in your city for anything you want to learn like dancing, swimming or even unqiue areas like taekwondo and magic</p>
+                        <p>Find online courses, recommended books, articles, how tos, suggestions on getting started and much more for any subject of your choice.</p>
               </div>
             </div>
           </div>
@@ -89,8 +379,8 @@
             <div class="service">
                     <i class="fa fa-cogs service-icon"></i>
               <div class="desc">
-                <h4>Connect</h4>
-                        <p>Connect with tutors quickly and directly. Network with friends who personally know the tutor to decide if they are a good fit</p>
+                <h4>Decide</h4>
+                        <p>Filter by difficulty level, resource type (books, courses, videos, etc.) Sort by Likes. Read reviews</p>
               </div>
             </div>
           </div>
@@ -105,6 +395,14 @@
           </div>
       </div>
     </div>
+
+    <!--div class="container content-sm">
+      <div class="videoWrapper">
+        
+          <iframe src="https://www.youtube.com/embed/pGMBDs_YWSg" frameborder="0" allowfullscreen></iframe>
+        
+      </div>
+        </div-->
 
 <script>     
 function options(subject)
@@ -147,6 +445,7 @@ var subjects = new Bloodhound({
 
 var suggestion="";
 var classify="y";
+
 $('.input-group #search').typeahead({
   hint: true,
   highlight: true,
@@ -158,8 +457,10 @@ $('.input-group #search').typeahead({
 }).on('typeahead:select', function (obj, suggestion) {
   suggestion=suggestion['value'];
   classify="n";
+  fbq('track', "SearchPerformed");
   mixpanel.track('Search Performed',{'Query':suggestion,'From':'Suggestion'});
-  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion)+"&classify=n"; 
+  //var location='&location='+$('#location').find(':selected').val();
+  window.location='search?is_pre_filter=y&subject='+encodeURIComponent(suggestion)+"&classify=n";
   
 })
 ;
@@ -170,14 +471,18 @@ function search()
         var name=document.getElementById("search");
         if(name==null || name.value.trim()=="")
           return;
-          
+          fbq('track', "SearchPerformed");
           mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
+          
+          //var location='&location='+$('#location').find(':selected').val();
           window.location='search?subject='+encodeURIComponent(name.value.trim());
         
 
     }
 
- 
+ mixpanel.track('Main Pageview');
+ mixpanel.track_links('.subject-link','FP Subject Link');
+
 </script>
       <!-- Example row of columns -->
      

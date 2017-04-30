@@ -2472,8 +2472,9 @@
 
 .testimonials-v6 .testimonials-info {
   padding: 20px;
-  background: #f7c34f;
+  background: #21a9ed;
   border-bottom: solid 3px #eee;
+  color:white;
     -webkit-transition: all 0.4s ease-in-out;
     -moz-transition: all 0.4s ease-in-out;
     -o-transition: all 0.4s ease-in-out;
@@ -2481,7 +2482,7 @@
 }
 
 .testimonials-v6 .testimonials-info:hover {
-    border-color: #2f95d2;
+    border-color: #63bfed;
 }
 
 .testimonials-v6 .testimonials-info img {
@@ -2497,12 +2498,14 @@
 
 .testimonials-v6 .testimonials-desc p {
   margin-bottom: 15px;
+  color:white;
 }
 
 .testimonials-v6 .testimonials-desc strong,
 .testimonials-v6 .testimonials-desc span {
-  color: #555;
+  color: white;
   display: block;
+
 }
 
 @media (max-width: 768px) {
