@@ -109,9 +109,10 @@ select{
     <div class="search-block" style="background-color:#7dc8ef">
         <div class="container" >
             <div class="col-md-8 col-md-offset-2" >
-              <center>
+              <center style="padding-bottom:2em;">
             
               <div class="tag-line" style="font-weight:bold;font-size:3em;color:white;text-shadow:5px;text-shadow-color:63bfed;"> FIND RESOURCES FOR ANYTHING YOU WANT TO LEARN </div>
+              <div class="tag-line" style="font-weight:bold;font-size:1em;color:white;text-shadow:5px;text-shadow-color:63bfed;"> BOOKS, ONLINE COURSES, ARTICLES, VIDEOS, TUTORIALS, GUIDES, NOTES</div>
             </center>
                 
 <div class="form-group">
@@ -471,7 +472,7 @@ function search()
         var name=document.getElementById("search");
         if(name==null || name.value.trim()=="")
           return;
-          
+
           mixpanel.track('Search Performed',{'Query':name.value.trim(),'From':'Search Button'});
           
           //var location='&location='+$('#location').find(':selected').val();
