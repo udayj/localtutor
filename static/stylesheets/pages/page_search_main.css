@@ -36,7 +36,7 @@
 	text-align: center;
 	position: relative;
 	margin-bottom: 20px;
-	/*background: url(../../images/banner.jpg) 0 no-repeat;		*/
+	background: url(../../images/6833.jpg) 0 no-repeat;		
 	background-size:100%;
 	background-position:top left;
 	
@@ -145,14 +145,15 @@
 
 .search-block {
 	padding: 0px 0;
-	padding-top:3em;
-	padding-bottom:2em;
+	padding-top:1em;
+	padding-bottom:1em;
 	text-align: left;
 	position: relative;
 	margin-bottom: 20px;
-	background-color:#f7c34f;
-	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/banner_mobile.jpg)  0 repeat;		
-	background-size:80%;
+	background:#7dc8ef;
+	/*background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/6833.jpg)  0 repeat;*/
+	
+	background-size:100%;
 	background-position:top left;
 
 	
@@ -187,13 +188,15 @@
 
 .search-block {
 	padding: 0px 0;
-	padding-top:4em;
+	padding-top:1em;
 	padding-bottom:2em;
 	text-align: left;
 	position: relative;
 	margin-bottom: 20px;
-	background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/banner_mobile.jpg)  0 repeat;		
-	background-size:70%;
+	background:#7dc8ef;
+	/*background: url(../../images/6833.jpg)  0 repeat;*/
+	/*background: linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)), url(../../images/6833.jpg)  0 repeat;*/
+	background-size:100%;
 	background-position:top left;
 
 	
